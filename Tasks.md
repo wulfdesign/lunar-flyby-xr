@@ -8,6 +8,8 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **GitHub Publication**: Repository live at `https://github.com/wulfdesign/lunar-flyby-xr` with GitHub Pages enabled. (Chalice 🏆 2026-03-31)
+- [x] 🏆 **Project Screenshots**: Integrated in-sim screenshots into repository and README. (Verified 2026-03-31)
 - [x] 🏆 **Standalone Compatibility**: Fix `index.html` to work with single double click (no server required). (Chalice 🏆 2026-03-31)
 - [x] 🏆 **Modernize Startup Script**: Update `start_lunar_flyby.bat` to use `npx serve` on port 3550. (Chalice 🏆 2026-03-31)
 *(Archive items moved to COMPLETED.md)*
@@ -18,7 +20,7 @@
 - [ ] 🧪 **Consolidated HUD**: Merging Environment and Telemetry panels into one list.
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Fix Lunar SOI Warp Stop**: Simulation "stops" or resets warp repeatedly upon entering Lunar Orbit.
+- [ ] 🔥🔥🔥 **Fix Lunar SOI Warp Stop**: Simulation "stops" or resets warp repeatedly upon entering Lunar Orbit. (Top Release Priority)
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **Bug Investigation: Time Warp Latch**: Refine the SOI trigger to prevent multiple warp drops.

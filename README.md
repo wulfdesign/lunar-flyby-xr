@@ -2,6 +2,14 @@
 
 **A browser-based, educational gravity and orbital dynamics simulator built with Three.js and WebXR.**
 
+![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_LEO-Orbit-TMI-BurnStart_2026-03-31.png)
+*Initial Burn toward the Moon from Low Earth Orbit.*
+
+![At the Moon](LunarFlybyXR_Screenshot_AtMoon_2026-03-31.png)
+*Arriving at the Moon after a 3-day cislunar coast.*
+
+> **🚀 Current Status (v1.9.1):** The simulation successfully achieves Trans-Lunar Injection and coast. Currently, the physics engine "stops" or resets warp upon entering the Lunar Sphere of Influence (SOI). This is the top priority for the V2.0 roadmap to allow for full flybys and Earth returns.
+
 ## **🚀 The Vision**
 
 *Artemis: The Free Return* was conceived to make orbital mechanics accessible, intuitive, and awe-inspiring without intimidating the user with complex mathematics.

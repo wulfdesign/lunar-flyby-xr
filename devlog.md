@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 12:30] - Official GitHub Launch & Media Integration
+### 📝 Summary
+Successfully published the project to GitHub and enabled hosting. Integrated in-sim screenshots into the repository for better project visibility.
+
+### 🛠️ Work Done
+- **GitHub Launch**: Pushed repository to `wulfdesign/lunar-flyby-xr` and verified GitHub Pages deployment.
+- **Media Integration**: Updated `.gitignore` to allow project screenshots and added them to the `README.md`.
+- **Roadmap Clarity**: Added a clear "Current Status" notice to the README regarding the Lunar SOI warp stop to manage user expectations.
+- **Task Management**: Marked GitHub Publication and Screenshot Integration as completed (🏆).
+
+---
+
 ## [2026-03-31 12:05] - GitHub Publication & QA Verification
 ### 📝 Summary
 Finalized project state for public release on GitHub. Verified standalone execution and updated project tracking.

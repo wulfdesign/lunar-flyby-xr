@@ -1,7 +1,6 @@
 # Internal Archive & Rescue Files
 lunar-flyby-xr_RescuedChatLog+code_NeedsCollating.txt
 artemis_flight_log*.json
-Screenshot*.png
 
 # Logs
 npm-debug.log*
