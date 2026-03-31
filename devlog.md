@@ -1,22 +1,20 @@
 # 🚀 Lunar Flyby XR - Devlog
 
-## [2026-03-30 23:15] - Version 12: Milestones & Phase Recalibration
+## [2026-03-30 23:30] - Version 13: SOI Latch & HUD Consolidation
 ### 📝 Summary
-Refined trajectory math and added environment tracking for long-duration transit.
+Bug fixes for the time warp system and streamlined HUD for better visibility.
 
 ### 🛠️ Work Done
-- **Phase Recalibration**: Adjusted the TMI lead angle to exactly 47.5 degrees (0.83 rads), optimized for a perfect 87-hour lunar intercept.
-- **Space Environment Panel**: Added a new HUD panel to track the current orbital region (MEO, GEO, Deep Space, Lunar SOI) and record "Max Altitude" achieved.
-- **Moon Heading Indicator**: Implemented a degrees-to-target calculation that helps the user pan the camera to find the Moon in the starfield.
-- **Advanced Time Warp**: Added 60x, 600x, and 3600x (1 hour/sec) warp modes for traversing the cislunar gap.
-- **Automatic Encounter Cutoff**: The simulation now automatically drops to 1x speed upon entering the "Lunar Encounter" phase (10,000 km from Moon).
-- **Source Roadmap**: Embedded the V2.0 roadmap in the code comments for future development reference.
+- **SOI State Latch**: Fixed the "warp reset" loop. The simulation now uses a state latch (`hasEnteredLunarSOI`) to ensure the automatic drop to 1x speed only happens once upon entering the Moon's gravity well.
+- **HUD Consolidation**: Merged the Environment and Telemetry panels into a single, unified list on the left side of the screen. This clears the right side for an unobstructed view of the lunar encounter.
+- **Raycast Targeting Fix**: Specifically excluded the cockpit geometry from the raycaster to prevent the "Targeting: Cockpit" bug and ensure planets are selectable.
+- **Physics Verification**: Confirmed fuel mass flow rates and Specific Impulse ($I_{sp}$) calculations for physical accuracy.
 
 ---
 
-## [2026-03-30 23:00] - Version 11: G-Force & Educational Tooltips
+## [2026-03-30 23:15] - Version 12: Milestones & Phase Recalibration
 ### 📝 Summary
-Added physiological simulation and extensive educational documentation to the HUD.
+Refined trajectory math and added environment tracking for long-duration transit.
 
 ### 🛠️ Work Done
 ...
