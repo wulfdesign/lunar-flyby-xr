@@ -1,0 +1,46 @@
+# **Artemis: The Free Return (WebXR Orbital Sandbox)**
+
+**A browser-based, educational gravity and orbital dynamics simulator built with Three.js and WebXR.**
+
+## **🚀 The Vision**
+
+*Artemis: The Free Return* was conceived to make orbital mechanics accessible, intuitive, and awe-inspiring without intimidating the user with complex mathematics.
+
+Originally inspired by a proposal for the now-canceled *dearMoon* project and timed to celebrate NASA's historic Artemis missions, this project places everyday people in the commander's seat of a spacecraft in Low Earth Orbit (LEO). It proves that you don't need a multi-billion dollar budget to reach the stars—you just need curiosity and a browser.
+
+## **🛠️ Features**
+
+This isn't a pre-rendered animation; it's a living physics sandbox.
+
+* **Real Newtonian Physics:** Powered by a custom Velocity Verlet integration engine using real-world units (kilometers, kilograms, seconds) and true N-body gravity (Earth and Moon).  
+* **Orbital Energy Targeting:** The flight computer calculates Trans-Lunar Injection (TLI) burns using the Vis-viva equation and orbital energy, not just preset timers.  
+* **Dynamic Telemetry HUD:** Real-time G-Force, relative velocity, altitude, and fuel mass-flow calculations.  
+* **Time Warp System:** Accelerate time up to 3,600x to cross the 3-day cislunar gap.  
+* **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser.  
+* **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis.
+
+## **💻 How to Run**
+
+This project is currently completely self-contained in a single file for maximum accessibility.
+
+1. Clone or download this repository.  
+2. Double-click index.html to open it in any modern web browser.  
+3. (Optional) Put on a WebXR-compatible headset (like the Meta Quest) and click "ENTER VR FLYBY".
+
+## **🗺️ V2.0 Roadmap**
+
+* \[ \] **Bug Investigation:** Time warp seems to halt/reset repeatedly when deep inside the Lunar Sphere of Influence. Need to refine the SOI trigger latch.  
+* \[ \] **Mid-Course Correction (MCC):** Add an "Off Course Detected" warning and a "Recalculate Destination" button to execute a burn midway to the Moon if alignment drifts.  
+* \[ \] **Trajectory Trails:** Render the actual path flown (white line) vs projected path (blue dotted line).  
+* \[ \] **Overview Map:** A 3/4 top-down orthographic minimap overlay showing Earth, Moon, and ship position.  
+* \[ \] **Post-Flight Report:** After flyby/crash, generate a UI report showing Max Gs, flight time, and fuel remaining.  
+* \[ \] **Lagrangian Points (L1-L4):** Add invisible targets/markers to the raycaster for L1 (between Earth/Moon), L2 (behind Moon), etc.  
+* \[ \] **Lunar Orbit Insertion (LOI):** Add capability to do a retrograde burn at perilune to establish Lunar Orbit instead of a Free Return.  
+* \[ \] **Asset Upgrades:** Replace procedural geometry with high-res NASA .glb models for the Orion capsule and SLS.
+
+## **👨‍🚀 About the Creator**
+
+**Larry James** (WulfDesignStudios) is an indie VR developer, futurist, and game jammer. Previous works include *High Desert Eclipse* (capturing the 2017 eclipse in 360 VR) and the *UpLiftVR 'Maiden Flight'* balloon ride that headlined the SIFF VR Zone. From early 2D gravity sandboxes like *10 Seconds of Thrust* and *Space Rocks* to full WebXR simulations, Larry's goal has always been to push the boundaries of telepresence and space education.
+
+* [FilmFreeway: Larry James](https://filmfreeway.com/LarryJames)  
+* [LinkedIn: WulfDesignStudios](https://www.google.com/search?q=https://linkedin.com/in/WulfDesignStudios)
