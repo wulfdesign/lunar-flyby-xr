@@ -8,11 +8,11 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Standalone Compatibility**: Fix `index.html` to work with single double click (no server required). (Chalice 🏆 2026-03-31)
 - [x] 🏆 **Modernize Startup Script**: Update `start_lunar_flyby.bat` to use `npx serve` on port 3550. (Chalice 🏆 2026-03-31)
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
-- [ ] 🧪 **Standalone Compatibility**: Fix `index.html` to work with single double click (no server required). (Ready for QA 🧪 2026-03-31)
 - [ ] 🧪 **SOI Entrance Latch (Initial Version)**: Attempted fix for warp-reset when entering Moon's gravity. (Needs testing, User reports it still "stops" the sim).
 - [ ] 🧪 **Mission Itinerary Checklist**: Checklist UI that tracks TLI, Coast, and Flyby phases.
 - [ ] 🧪 **Consolidated HUD**: Merging Environment and Telemetry panels into one list.
