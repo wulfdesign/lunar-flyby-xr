@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 16:45] - Licensing & Live Deployment Finalization
+### 📝 Summary
+Finalized the public-facing repository with an MIT license and a prominent live experience link.
+
+### 🛠️ Work Done
+- **Licensing**: Created `LICENSE.md` with the MIT license, officially crediting Wulf Design Studios / UpLiftVR Studios.
+- **Accessibility**: Added a "Launch Live Experience" link to the top of `README.md` for immediate browser access via GitHub Pages.
+- **Task Management**: Marked licensing and deployment as verified (🏆).
+- **GitHub Sync**: Finalized repository state and pushed updates to remote origin.
+
+---
+
 ## [2026-03-31 16:20] - Repository Cleanup & Debug Archive
 ### 📝 Summary
 Organized the repository by moving non-production assets and flight logs into a dedicated `/debug` directory.

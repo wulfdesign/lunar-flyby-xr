@@ -8,6 +8,8 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Project Licensing**: Added MIT License (LICENSE.md) credited to Wulf Design Studios / UpLiftVR Studios. (Verified 2026-03-31)
+- [x] 🏆 **Live Deployment**: Enabled GitHub Pages and added the [Launch Live Experience](https://wulfdesign.github.io/lunar-flyby-xr/) link to README. (Verified 2026-03-31)
 - [x] 🏆 **Project Cleanup**: Organized debug screenshots and flight logs into `/debug` directory. (Verified 2026-03-31)
 - [x] 🏆 **GitHub Publication**: Repository live at `https://github.com/wulfdesign/lunar-flyby-xr` with GitHub Pages enabled. (Chalice 🏆 2026-03-31)
 - [x] 🏆 **Project Screenshots**: Integrated in-sim screenshots into repository and README. (Verified 2026-03-31)

@@ -2,6 +2,9 @@
 
 **A browser-based, educational gravity and orbital dynamics simulator built with Three.js and WebXR.**
 
+### **🚀 [Launch Live Experience](https://wulfdesign.github.io/lunar-flyby-xr/)**
+*(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
+
 ![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_LEO-Orbit-TMI-BurnStart_2026-03-31.png)
 *Initial Burn toward the Moon from Low Earth Orbit.*
 
