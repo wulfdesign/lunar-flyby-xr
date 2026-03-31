@@ -57,9 +57,23 @@ This project is currently completely self-contained in a single file for maximum
 
 ## **🏆 Completed Ready to Archive**
 
-## **👨– About the Creator**
+## **👨‍🚀 About the Creator**
 
-**Larry James** (WulfDesignStudios) is an indie VR developer, futurist, and game jammer. Previous works include *High Desert Eclipse* (capturing the 2017 eclipse in 360 VR) and the *UpLiftVR 'Maiden Flight'* balloon ride that headlined the SIFF VR Zone. From early 2D gravity sandboxes like *10 Seconds of Thrust* and *Space Rocks* to full WebXR simulations, Larry's goal has always been to push the boundaries of telepresence and space education.
+**Larry James (WulfDesignStudios / UpLiftVR Studios)** is an indie VR developer, filmmaker, and space enthusiast with a passion for using immersive technology to make complex science accessible and awe-inspiring.
 
-* [FilmFreeway: Larry James](https://filmfreeway.com/LarryJames)  
-* [LinkedIn: WulfDesignStudios](https://www.google.com/search?q=https://linkedin.com/in/WulfDesignStudios)
+### **🌑 Featured Project: High Desert Eclipse**
+One of Larry's most impactful works is **"High Desert Eclipse,"** a 360-degree VR documentary capturing the majestic 2017 total solar eclipse from a remote hilltop in the Oregon high desert. 
+
+*   **For Educators & Schools:** This experience is a powerful tool for Earth and Space science. It captures the eerie transition from day to twilight, the 360-degree "sunrise" on the horizon, and the breathtaking solar corona.
+*   **Watch for Free:** The 4K 360-degree timelapse is available on YouTube. **Tip:** For the best quality, especially in a VR headset, set the playback speed to **0.25x**. This allows the 4K stream to buffer smoothly and lets you soak in the subtle environmental changes.
+    *   [📺 Watch: High Desert Eclipse (YouTube)](https://www.youtube.com/watch?v=G_G8omlM_LC)
+*   **Immersive Edition:** A full-length version is available for the **Meta Quest** (via App Lab) and on [upliftvr.itch.io](https://upliftvr.itch.io/). It's a perfect addition to classroom VR kits to bring a "once-in-a-lifetime" celestial event to students anywhere.
+
+### **🚀 The Vision Behind Artemis: The Free Return**
+This project represents a "lifetime vision finally fulfilled." Inspired by a proposal for the (now canceled) *dearMoon* project, it leverages the latest in WebXR and AI-assisted development to create a prototype that is "quicker and more accessible than ever before in history." 
+
+Larry's goal is to inspire the next generation of space explorers and to remind those who have seen a total eclipse of the magic—and for those who haven't, to provide the impetus to get into the path of the next one.
+
+*   [🎥 Evening Magazine Feature (UpLiftVR)](https://www.youtube.com/watch?v=Xh0l8hA9y0c)
+*   [🎬 FilmFreeway: Larry James](https://filmfreeway.com/LarryJames)
+*   [🔗 LinkedIn: WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
