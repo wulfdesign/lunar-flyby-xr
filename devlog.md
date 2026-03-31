@@ -1,21 +1,22 @@
 # 🚀 Lunar Flyby XR - Devlog
 
-## [2026-03-30 23:00] - Version 11: G-Force & Educational Tooltips
+## [2026-03-30 23:15] - Version 12: Milestones & Phase Recalibration
 ### 📝 Summary
-Added physiological simulation and extensive educational documentation to the HUD.
+Refined trajectory math and added environment tracking for long-duration transit.
 
 ### 🛠️ Work Done
-- **G-Force Meter**: Implemented real-time G-force calculations (Acceleration / 9.81 m/s²). Displays 0.00G in freefall and dynamic loads during engine burns.
-- **Educational Tooltips**: Added descriptive tooltips to nearly every telemetry item and itinerary step to explain the "Why" behind orbital mechanics.
-- **Interactive Prograde Marker**: The 3D Prograde vector ring is now a raycast target. Looking at it displays information about the ship's travel heading.
-- **UI UX Polish**: Repositioned the FOV/Zoom indicator to the bottom-center and added hover effects to the primary telemetry panels.
-- **Reset View Optimization**: Refined the camera centering logic to ensure a perfect forward-facing perspective upon mission restart.
+- **Phase Recalibration**: Adjusted the TMI lead angle to exactly 47.5 degrees (0.83 rads), optimized for a perfect 87-hour lunar intercept.
+- **Space Environment Panel**: Added a new HUD panel to track the current orbital region (MEO, GEO, Deep Space, Lunar SOI) and record "Max Altitude" achieved.
+- **Moon Heading Indicator**: Implemented a degrees-to-target calculation that helps the user pan the camera to find the Moon in the starfield.
+- **Advanced Time Warp**: Added 60x, 600x, and 3600x (1 hour/sec) warp modes for traversing the cislunar gap.
+- **Automatic Encounter Cutoff**: The simulation now automatically drops to 1x speed upon entering the "Lunar Encounter" phase (10,000 km from Moon).
+- **Source Roadmap**: Embedded the V2.0 roadmap in the code comments for future development reference.
 
 ---
 
-## [2026-03-30 22:45] - Version 10: Warp UI Fix & Polish
+## [2026-03-30 23:00] - Version 11: G-Force & Educational Tooltips
 ### 📝 Summary
-Bug fixes for the time warp interface and UI stability.
+Added physiological simulation and extensive educational documentation to the HUD.
 
 ### 🛠️ Work Done
 ...
