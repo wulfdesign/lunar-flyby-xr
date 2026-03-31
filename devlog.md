@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 16:20] - Repository Cleanup & Debug Archive
+### 📝 Summary
+Organized the repository by moving non-production assets and flight logs into a dedicated `/debug` directory.
+
+### 🛠️ Work Done
+- **Directory Structure**: Created `/debug` folder to house archive/debugging assets.
+- **Media Cleanup**: Moved redundant debugging screenshots into the debug folder while keeping them as a "work archive."
+- **Log Management**: Relocated `artemis_flight_log*.json` files into the debug folder for better root directory clarity.
+- **Persistence**: Updated `Tasks.md` and prepared for final commit.
+
+---
+
 ## [2026-03-31 12:30] - Official GitHub Launch & Media Integration
 ### 📝 Summary
 Successfully published the project to GitHub and enabled hosting. Integrated in-sim screenshots into the repository for better project visibility.
