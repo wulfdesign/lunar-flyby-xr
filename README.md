@@ -19,6 +19,15 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 * **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser.  
 * **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis.
 
+## **🛠️ Tech Stack**
+- **Engine:** Three.js (r128)
+- **Physics:** Custom Velocity Verlet Integration
+- **Frontend:** Vanilla HTML5/CSS3 (No Tailwind/Bootstrap)
+- **Immersion:** WebXR API (VR Support)
+
+## **📜 History**
+This project began as an AI-assisted rapid prototype session on March 30-31, 2026. After a successful iteration process, the source code was rescued from a browser canvas glitch and reconstructed into this repository to serve as a foundation for further development of educational space simulations.
+
 ## **💻 How to Run**
 
 This project is currently completely self-contained in a single file for maximum accessibility.
@@ -38,7 +47,9 @@ This project is currently completely self-contained in a single file for maximum
 * \[ \] **Lunar Orbit Insertion (LOI):** Add capability to do a retrograde burn at perilune to establish Lunar Orbit instead of a Free Return.  
 * \[ \] **Asset Upgrades:** Replace procedural geometry with high-res NASA .glb models for the Orion capsule and SLS.
 
-## **👨‍🚀 About the Creator**
+## **🏆 Completed Ready to Archive**
+
+## **👨– About the Creator**
 
 **Larry James** (WulfDesignStudios) is an indie VR developer, futurist, and game jammer. Previous works include *High Desert Eclipse* (capturing the 2017 eclipse in 360 VR) and the *UpLiftVR 'Maiden Flight'* balloon ride that headlined the SIFF VR Zone. From early 2D gravity sandboxes like *10 Seconds of Thrust* and *Space Rocks* to full WebXR simulations, Larry's goal has always been to push the boundaries of telepresence and space education.
 

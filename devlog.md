@@ -1,5 +1,30 @@
 # 🚀 Lunar Flyby XR - Devlog
 
+> **Instructions:** Always append new devlog entries to the top of this file, below this header.
+
+## [2026-03-31 11:45] - Port Update & Workflow Optimization
+### 📝 Summary
+Updated the startup port to 3550 (matching geosynchronous orbit altitude in km) and refined the devlog workflow.
+
+### 🛠️ Work Done
+- **Port Change**: Updated `start_lunar_flyby.bat` to serve on port 3550.
+- **Workflow Update**: Added persistent instructions to the devlog header for entry placement.
+- **Task Management**: Marked Startup Modernization as verified (🏆) and added asset testing to Deep Freeze.
+
+---
+
+## [2026-03-31 11:30] - Startup Modernization & Standalone Compatibility
+### 📝 Summary
+Updated the project for better usability. The main `index.html` now supports standalone execution via double-click, and the startup script has been modernized to use `npx serve`.
+
+### 🛠️ Work Done
+- **Standalone Mode**: Verified `index.html` works correctly without a local server by double-clicking.
+- **Startup Script Upgrade**: Modernized `start_lunar_flyby.bat` using the Zen Aquarium template (checks for Node.js, uses `npx serve` on port 8000).
+- **Cleanup**: Removed non-functional `server.py`.
+- **Task Management**: Added new items to `Tasks.md` and marked them for QA (🧪).
+
+---
+
 ## [2026-03-31 11:00] - Feature Verification: Scroll Wheel Zoom
 ### 📝 Summary
 Verified the FOV adjustment feature. The scroll wheel correctly zooms between 10° and 100° with a visible HUD indicator.

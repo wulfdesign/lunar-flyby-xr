@@ -1,26 +1,22 @@
 @echo off
 setlocal
-echo 🚀 Launching Artemis: Lunar Flyby XR...
-echo.
+cd /d "%~dp0"
 
-:: Check if Python is installed
-python --version >nul 2>&1
+echo 🧊 Starting Lunar Flyby XR on Port 3550...
+
+:: Check if npx is available
+where npx >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ⚠️  Python not found! Please install Python to run the local server.
-    echo.
-    echo Attempting to open index.html directly...
-    start index.html
+    echo [ERROR] Node.js/npm/npx not found. Please install from https://nodejs.org/
     pause
     exit /b
 )
 
-:: Start the server in a new window and minimized
-echo Starting local web server on port 8000...
-start /min "Lunar Flyby Server" python server.py
+:: Open the browser first (serve might block the window)
+start http://localhost:3550/index.html
 
-echo.
-echo ✅ Server started! Your browser should open automatically.
-echo If it doesn't, navigate to: http://localhost:8000
-echo.
-echo (Close the other terminal window to stop the server)
-pause
+:: Start the server
+echo [INFO] Serving on http://localhost:3550
+echo [INFO] Press Ctrl+C in this window to stop the server.
+
+npx serve -l 3550
