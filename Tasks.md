@@ -8,6 +8,8 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Artemis II & dearMoon Research**: Created `ArtemisII.md` and `dearMoon.md` with mission history and context. (Verified 2026-03-31)
+- [x] 🏆 **Project History Documentation**: Created `projectHistory.md` documenting the journey from Alaska to Artemis (WIP). (Verified 2026-03-31)
 - [x] 🏆 **Attribution Guidelines**: Added "Attribution & Giving Credit" section to README with tagging requests. (Verified 2026-03-31)
 - [x] 🏆 **Project Licensing**: Added MIT License (LICENSE.md) credited to Wulf Design Studios / UpLiftVR Studios. (Verified 2026-03-31)
 - [x] 🏆 **Live Deployment**: Enabled GitHub Pages and added the [Launch Live Experience](https://wulfdesign.github.io/lunar-flyby-xr/) link to README. (Verified 2026-03-31)
