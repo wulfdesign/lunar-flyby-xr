@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 17:00] - Attribution Guidelines & Final Repository Sync
+### 📝 Summary
+Added clear guidelines for attribution and credit to ensure the creator's vision and work are recognized in downstream uses.
+
+### 🛠️ Work Done
+- **Documentation**: Added a "⭐ Attribution & Giving Credit" section to `README.md`.
+- **Request**: Explicitly asked for credits to Larry James (Wulf Design Studios / UpLiftVR Studios) and tagging on LinkedIn and YouTube.
+- **Task Management**: Marked Attribution Guidelines as verified (🏆).
+- **GitHub Sync**: Finalized all changes and pushed the fully documented repository to the main branch.
+
+---
+
 ## [2026-03-31 16:45] - Licensing & Live Deployment Finalization
 ### 📝 Summary
 Finalized the public-facing repository with an MIT license and a prominent live experience link.

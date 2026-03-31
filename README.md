@@ -47,6 +47,16 @@ This project is currently completely self-contained in a single file for maximum
 2. Double-click index.html to open it in any modern web browser.  
 3. (Optional) Put on a WebXR-compatible headset (like the Meta Quest) and click "ENTER VR FLYBY".
 
+## **⭐ Attribution & Giving Credit**
+
+If you use this project for your own research, education, or as a base for your own work, we'd love to see it! 
+
+*   **Credit:** Please credit **Larry James (Wulf Design Studios / UpLiftVR Studios)** in any public-facing descriptions or presentations.
+*   **Tag Us:** Tag us on social media so we can share your progress with the community!
+    *   **LinkedIn:** [WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
+    *   **YouTube:** [UpLiftVR Studios](https://www.youtube.com/@UpLiftVR)
+*   **Clone & Fork:** If you fork or clone this repository, please keep the attribution and license files intact.
+
 ## **🗺️ V2.0 Roadmap**
 
 * \[ \] **Bug Investigation:** Time warp seems to halt/reset repeatedly when deep inside the Lunar Sphere of Influence. Need to refine the SOI trigger latch.  
