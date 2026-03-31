@@ -1,20 +1,23 @@
 # 🚀 Lunar Flyby XR - Devlog
 
-## [2026-03-30 21:30] - Version 6: Precision Launch & Autopilot Cues
+## [2026-03-30 22:00] - Version 7: Targeting & Itinerary HUD
 ### 📝 Summary
-Refined the starting conditions for better "gameplay" flow and added visual cues for the burn window.
+Added advanced navigation tools, flight logging, and interactive targeting features.
 
 ### 🛠️ Work Done
-- **Precision Start**: The simulation now calculates the exact phase angle to start the ship 120 seconds before the TMI burn window opens.
-- **Autopilot "Caution" Flash**: The "ENABLE AUTO TMI" button now flashes yellow when the window is less than 5 minutes away to prompt user action.
-- **Full Moon Lighting**: Adjusted the Sun's position to create a dramatic "Full Moon" view directly ahead of the ship at the start of the mission.
-- **Autopilot State Polish**: Autopilot now defaults to OFF to encourage user interaction with the new flashing prompt.
+- **Raycast-powered Targeting**: Looking at Earth, Moon, or Sun now triggers a dynamic info popup showing distance and contextual mission hints.
+- **Scroll Zooming**: Added ability to adjust FOV (10° to 100°) using the mouse scroll wheel, with a HUD indicator for zoom level.
+- **Mission Itinerary HUD**: A new checklist panel tracks major mission milestones (TLI Burn, Coast, Flyby) with real-time ETA calculations.
+- **3D Prograde Marker**: Added a green ring marker in the 3D scene that represents the ship's forward velocity vector.
+- **Orbital Energy Targeting**: Switched the TMI cutoff logic to use **Specific Orbital Energy**. This is more accurate than simple velocity as it accounts for altitude changes during long burns.
+- **Flight Data Logging**: Implemented a "SAVE FLIGHT LOG" feature that exports mission telemetry (Altitude, Velocity, Events) to a JSON file for analysis.
+- **Physics Polish**: Implemented realistic mass flow rates based on thrust and $I_{sp}$ (exhaust velocity).
 
 ---
 
-## [2026-03-30 21:00] - Version 5: HUD Polish & Reset View
+## [2026-03-30 21:30] - Version 6: Precision Launch & Autopilot Cues
 ### 📝 Summary
-Refined UI and added quality-of-life improvements for camera controls.
+Refined the starting conditions for better "gameplay" flow and added visual cues for the burn window.
 
 ### 🛠️ Work Done
 ...
