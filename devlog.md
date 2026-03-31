@@ -1,5 +1,23 @@
 # 🚀 Lunar Flyby XR - Devlog
 
+## [2026-03-30 18:00] - Version 1: Initial Prototype
+### 📝 Summary
+First functional prototype of the Artemis Lunar Flyby simulation.
+
+### 🛠️ Work Done
+- Set up core Three.js scene with Earth, Moon, and Starfield.
+- Implemented basic UI for telemetry (Altitude, Distance, Velocity, Mass, Fuel).
+- Added manual and auto-burn controls for Trans-Lunar Injection (TMI).
+- Scaled unit system (1 unit = 1000km) to avoid WebGL z-fighting.
+- Basic VR support via WebXR.
+- Simple Euler integration for physics.
+
+### ⚠️ Known Issues
+- ReferenceError: WEBGL is not defined (CDN link issue).
+- Initial orbit is unstable, leading to immediate atmospheric crash.
+
+---
+
 ## [2026-03-31] - Project Recovery & Initialization
 
 ### 📝 Summary

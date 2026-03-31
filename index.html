@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Artemis: Lunar Flyby VR</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; }
+       
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+            padding: 20px; box-sizing: border-box; z-index: 10;
+        }
+
+
+        .panel {
+            background: rgba(0, 20, 40, 0.7); border: 1px solid #00ffff;
+            padding: 15px; border-radius: 8px; backdrop-filter: blur(4px);
+            pointer-events: auto; max-width: 350px;
+        }
+
+
+        h1 { margin: 0 0 10px 0; font-size: 1.2rem; color: #00ffff; text-transform: uppercase; letter-spacing: 2px;}
+        p { margin: 5px 0; font-size: 0.9rem; }
+        .warning { color: #ff4444; font-weight: bold; }
+        .good { color: #44ff44; font-weight: bold; }
+        .value { float: right; }
+
+
+        .controls { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
+        button {
+            background: rgba(0, 255, 255, 0.2); color: #00ffff; border: 1px solid #00ffff;
+            padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;
+            flex-grow: 1; transition: all 0.2s;
+        }
+        button:hover { background: #00ffff; color: #000; }
+        button:active { transform: scale(0.95); }
+        button.danger { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.2); }
+        button.danger:hover { background: #ff4444; color: #000; }
+
+
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; width: 20px; height: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.5); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none;
+        }
+        #crosshair::after { content: ''; position: absolute; top: 9px; left: -5px; width: 26px; height: 2px; background: rgba(0,255,255,0.5); }
+        #crosshair::before { content: ''; position: absolute; top: -5px; left: 9px; width: 2px; height: 26px; background: rgba(0,255,255,0.5); }
+    </style>
+    <!-- Import Three.js and WebXR polyfills -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/WebGL.js"></script>
+</head>
+<body>
+    <div id="ui-layer">
+        <div class="panel">
+            <h1>Flight Telemetry</h1>
+            <p>Mission: <span class="value">Artemis Flyby</span></p>
+            <p>Phase: <span id="phase-text" class="value good">Low Earth Orbit</span></p>
+            <hr style="border-color: #00ffff; opacity: 0.3;">
+            <p>Alt (Earth): <span id="alt-earth" class="value">0 km</span></p>
+            <p>Dist (Moon): <span id="dist-moon" class="value">0 km</span></p>
+            <p>Velocity: <span id="velocity" class="value">0 km/s</span></p>
+            <p>Mass: <span id="mass" class="value">26,000 kg</span></p>
+            <p>Fuel: <span id="fuel" class="value">100%</span></p>
+        </div>
+
+
+        <div id="crosshair"></div>
+
+
+        <div class="panel" style="align-self: flex-end;">
+            <h1>Navigation & Propulsion</h1>
+            <p>Time to TMI Burn: <span id="countdown" class="value warning">T- 00:30</span></p>
+            <p>Time Warp: <span id="warp-text" class="value">1x (Realtime)</span></p>
+            <p>Engine Status: <span id="engine-status" class="value">STANDBY</span></p>
+           
+            <div class="controls">
+                <button id="btn-thrust" class="danger" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()">MANUAL BURN</button>
+                <button id="btn-auto">AUTO TMI BURN</button>
+            </div>
+            <div class="controls">
+                <button id="btn-warp-1">1x</button>
+                <button id="btn-warp-100">100x</button>
+                <button id="btn-warp-1000">1000x</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Check for WebGL support
+        if ( ! WEBGL.isWebGLAvailable() ) {
+            document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+        }
+
+
+        // --- CORE ENGINE SETUP ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+       
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true; // Enable WebXR
+        document.body.appendChild(renderer.domElement);
+
+
+        // Add VR Button (Custom implementation to avoid extra external script dependency issues in Canvas)
+        const btnVR = document.createElement('button');
+        btnVR.style.position = 'absolute';
+        btnVR.style.bottom = '20px';
+        btnVR.style.left = 'calc(50% - 50px)';
+        btnVR.style.width = '100px';
+        btnVR.style.zIndex = '999';
+        btnVR.textContent = 'ENTER VR';
+        document.body.appendChild(btnVR);
+       
+        btnVR.addEventListener('click', async () => {
+            if (navigator.xr) {
+                try {
+                    const session = await navigator.xr.requestSession('immersive-vr');
+                    renderer.xr.setSession(session);
+                    btnVR.style.display = 'none';
+                } catch (e) {
+                    alert("VR Session not supported or failed to start.");
+                }
+            } else {
+                alert("WebXR not supported in this browser.");
+            }
+        });
+
+
+        // --- SCALED PHYSICS CONSTANTS ---
+        // Using a scaled down unit system to prevent WebGL floating point z-fighting
+        // 1 unit = 1,000 km
+        const G = 1;
+        const MASS_EARTH = 10000;
+        const MASS_MOON = MASS_EARTH / 81; // ~123
+        const RAD_EARTH = 6.371;
+        const RAD_MOON = 1.737;
+        const DIST_MOON = 384.4; // Average distance
+
+
+        // --- SHIP STATE ---
+        // Start in LEO: 400km altitude -> r = 6.771
+        let shipPos = new THREE.Vector3(6.771, 0, 0);
+        // Orbital velocity for circular LEO v = sqrt(G*M/r) = sqrt(10000/6.771) = 38.42
+        let shipVel = new THREE.Vector3(0, 0, 38.42);
+       
+        let fuel = 10000; // kg
+        const shipEmptyMass = 16000; // kg
+        let isBurning = false;
+        let thrustPower = 15; // acceleration units
+        let timeWarp = 1;
+       
+        // Timer logic
+        let tmiCountdown = 30; // seconds until optimal burn
+        let autoBurnActive = false;
+        let autoBurnTargetDv = 15.8; // Delta-V required to raise apoapsis to Moon
+        let autoBurnAccumulated = 0;
+
+
+        // --- SCENE OBJECTS ---
+        const textureLoader = new THREE.TextureLoader();
+
+
+        // Earth
+        const earthGeo = new THREE.SphereGeometry(RAD_EARTH, 64, 64);
+        const earthMat = new THREE.MeshStandardMaterial({
+            map: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
+            roughness: 0.6,
+            metalness: 0.1
+        });
+        const earth = new THREE.Mesh(earthGeo, earthMat);
+        scene.add(earth);
+
+
+        // Moon
+        const moonGeo = new THREE.SphereGeometry(RAD_MOON, 64, 64);
+        const moonMat = new THREE.MeshStandardMaterial({
+            map: textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/moon_1024.jpg'),
+            roughness: 0.8,
+            metalness: 0.0
+        });
+        const moon = new THREE.Mesh(moonGeo, moonMat);
+        // Position moon ahead so it comes up from behind Earth relative to the ship
+        let moonAngle = Math.PI / 2.2;
+        scene.add(moon);
+
+
+        // Starfield
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 5000;
+        const starVerts = new Float32Array(starCount * 3);
+        for(let i=0; i < starCount * 3; i+=3) {
+            // Generate stars far away
+            let r = 800 + Math.random() * 500;
+            let theta = Math.random() * 2 * Math.PI;
+            let phi = Math.acos((Math.random() * 2) - 1);
+            starVerts[i] = r * Math.sin(phi) * Math.cos(theta);
+            starVerts[i+1] = r * Math.sin(phi) * Math.sin(theta);
+            starVerts[i+2] = r * Math.cos(phi);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starVerts, 3));
+        const starMat = new THREE.PointsMaterial({color: 0xffffff, size: 1.5, sizeAttenuation: false});
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+
+
+        // Lighting
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        // Sun coming from the side to illuminate half of Earth and Moon
+        sunLight.position.set(-100, 20, 100).normalize();
+        scene.add(sunLight);
+        scene.add(new THREE.AmbientLight(0x111122));
+
+
+        // Cockpit (Simple framing for VR context)
+        const cockpitGroup = new THREE.Group();
+        const frameGeo = new THREE.BoxGeometry(4, 3, 4);
+        const frameMat = new THREE.MeshStandardMaterial({color: 0x222222, side: THREE.BackSide});
+        const cockpit = new THREE.Mesh(frameGeo, frameMat);
+        // Open the front window
+        cockpitGroup.add(cockpit);
+       
+        // Ship Group holds camera and cockpit
+        const shipGroup = new THREE.Group();
+        shipGroup.add(cockpitGroup);
+        shipGroup.add(camera);
+        scene.add(shipGroup);
+
+
+        // --- UI BINDINGS ---
+        const uiAlt = document.getElementById('alt-earth');
+        const uiDist = document.getElementById('dist-moon');
+        const uiVel = document.getElementById('velocity');
+        const uiMass = document.getElementById('mass');
+        const uiFuel = document.getElementById('fuel');
+        const uiCountdown = document.getElementById('countdown');
+        const uiWarp = document.getElementById('warp-text');
+        const uiEngine = document.getElementById('engine-status');
+        const uiPhase = document.getElementById('phase-text');
+
+
+        // Controls
+        function startManualBurn() { if(fuel > 0) isBurning = true; }
+        function stopManualBurn() { isBurning = false; }
+       
+        document.getElementById('btn-auto').addEventListener('click', () => {
+            if(tmiCountdown <= 0 && fuel > 0 && !autoBurnActive) {
+                autoBurnActive = true;
+                isBurning = true;
+                uiEngine.textContent = "AUTO TMI BURN";
+                uiEngine.style.color = "#ff4444";
+            }
+        });
+
+
+        document.getElementById('btn-warp-1').addEventListener('click', () => setWarp(1));
+        document.getElementById('btn-warp-100').addEventListener('click', () => setWarp(100));
+        document.getElementById('btn-warp-1000').addEventListener('click', () => setWarp(1000));
+
+
+        function setWarp(w) {
+            timeWarp = w;
+            uiWarp.textContent = w + "x";
+            if(w > 1) {
+                uiWarp.classList.add('warning');
+            } else {
+                uiWarp.classList.remove('warning');
+            }
+        }
+
+
+        // --- SIMULATION LOOP ---
+        const clock = new THREE.Clock();
+
+
+        function calculateGravity(pos, massObj, posObj) {
+            let dir = new THREE.Vector3().subVectors(posObj, pos);
+            let distSq = dir.lengthSq();
+            let forceMag = (G * massObj) / distSq;
+            return dir.normalize().multiplyScalar(forceMag);
+        }
+
+
+        function updatePhysics(dt) {
+            // Update Moon position (circular orbit around earth for simplicity)
+            // Moon orbital velocity angular = v / r
+            const moonAngularVel = Math.sqrt(G * MASS_EARTH / DIST_MOON) / DIST_MOON;
+            moonAngle += moonAngularVel * dt;
+            moon.position.set(
+                Math.cos(moonAngle) * DIST_MOON,
+                0,
+                Math.sin(moonAngle) * DIST_MOON
+            );
+
+
+            // Calculate gravity on ship
+            let gravEarth = calculateGravity(shipPos, MASS_EARTH, earth.position);
+            let gravMoon = calculateGravity(shipPos, MASS_MOON, moon.position);
+           
+            let totalAccel = new THREE.Vector3().addVectors(gravEarth, gravMoon);
+
+
+            // Handle Engine Burn (Thrust is always Prograde - facing forward)
+            if (isBurning && fuel > 0) {
+                let prograde = shipVel.clone().normalize();
+                let thrustAccel = prograde.multiplyScalar(thrustPower);
+                totalAccel.add(thrustAccel);
+               
+                // Consume fuel
+                let fuelRate = 50 * dt;
+                fuel -= fuelRate;
+                if(fuel <= 0) { fuel = 0; isBurning = false; autoBurnActive = false; }
+               
+                uiEngine.textContent = "FIRING";
+                uiEngine.style.color = "#ff4444";
+
+
+                // Auto burn logic
+                if(autoBurnActive) {
+                    autoBurnAccumulated += thrustPower * dt;
+                    if(autoBurnAccumulated >= autoBurnTargetDv) {
+                        isBurning = false;
+                        autoBurnActive = false;
+                        uiPhase.textContent = "Trans-Lunar Coast";
+                        uiPhase.style.color = "#00ffff";
+                    }
+                }
+            } else {
+                uiEngine.textContent = "STANDBY";
+                uiEngine.style.color = "#00ffff";
+            }
+
+
+            // Euler Integration
+            shipVel.add(totalAccel.multiplyScalar(dt));
+            shipPos.add(shipVel.clone().multiplyScalar(dt));
+
+
+            // Update Ship Transform
+            shipGroup.position.copy(shipPos);
+            // Automatically look towards velocity vector (Prograde)
+            let lookTarget = shipPos.clone().add(shipVel);
+            shipGroup.lookAt(lookTarget);
+
+
+            // Rotate Earth
+            earth.rotation.y += 0.005 * dt;
+        }
+
+
+        function updateUI(dt_real) {
+            // Update timers
+            if(tmiCountdown > 0) {
+                tmiCountdown -= dt_real;
+                if(tmiCountdown <= 0) {
+                    tmiCountdown = 0;
+                    uiCountdown.textContent = "BURN WINDOW OPEN";
+                    uiCountdown.classList.replace('warning', 'good');
+                    document.getElementById('btn-auto').style.background = "#00ffff";
+                    document.getElementById('btn-auto').style.color = "#000";
+                } else {
+                    let secs = Math.ceil(tmiCountdown);
+                    uiCountdown.textContent = `T- 00:${secs < 10 ? '0'+secs : secs}`;
+                }
+            }
+
+
+            // Math to real-world units (1 unit = 1000km)
+            let altE = (shipPos.length() - RAD_EARTH) * 1000;
+            let distM = (shipPos.distanceTo(moon.position) - RAD_MOON) * 1000;
+            let velKms = shipVel.length(); // In our scale, unit/sec maps roughly to km/s for aesthetic purposes
+           
+            uiAlt.textContent = altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
+            uiDist.textContent = distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
+            uiVel.textContent = velKms.toFixed(2) + " km/s";
+           
+            let currentMass = shipEmptyMass + fuel;
+            uiMass.textContent = currentMass.toLocaleString() + " kg";
+            uiFuel.textContent = ((fuel / 10000) * 100).toFixed(1) + "%";
+
+
+            // Safety checks
+            if(altE < 0) {
+                uiPhase.textContent = "HULL BREACH: ATMOSPHERIC CRASH";
+                uiPhase.className = "value warning";
+            } else if (distM < 0) {
+                uiPhase.textContent = "LITHOBRAKING: MOON CRASH";
+                uiPhase.className = "value warning";
+            } else if (altE > 100000 && !autoBurnActive && tmiCountdown === 0) {
+                uiPhase.textContent = "Trans-Lunar Coast";
+            }
+        }
+
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+
+        // Main Render Loop (VR Compatible)
+        renderer.setAnimationLoop(() => {
+            const dt_real = clock.getDelta();
+           
+            // Limit dt to prevent huge physics jumps on lag
+            let dt_sim = Math.min(dt_real, 0.1) * timeWarp;
+           
+            // Step physics in smaller chunks if warp is high for stability
+            let steps = timeWarp > 1 ? 10 : 1;
+            let dt_step = dt_sim / steps;
+           
+            for(let i=0; i<steps; i++) {
+                updatePhysics(dt_step);
+            }
+
+
+            updateUI(dt_real);
+            renderer.render(scene, camera);
+        });
+
+
+    </script>
+</body>
+</html>
