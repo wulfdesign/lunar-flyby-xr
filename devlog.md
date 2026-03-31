@@ -1,5 +1,15 @@
 # 🚀 Lunar Flyby XR - Devlog
 
+## [2026-03-31 11:00] - Feature Verification: Scroll Wheel Zoom
+### 📝 Summary
+Verified the FOV adjustment feature. The scroll wheel correctly zooms between 10° and 100° with a visible HUD indicator.
+
+### 🛠️ Work Done
+- Tested and confirmed Scroll Wheel Zoom functionality.
+- Updated `tasks.md` to reflect verified status. 🏆
+
+---
+
 ## [2026-03-31 10:45] - 🏆 Project Reconstruction Complete
 ### 📝 Summary
 Successfully parsed, collated, and committed the entire project history from the rescued text logs. The repository now accurately reflects the iterative development process from V1 through V1.9.1.
