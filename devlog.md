@@ -1,20 +1,19 @@
 # 🚀 Lunar Flyby XR - Devlog
 
-## [2026-03-30 22:30] - Version 9: Autopilot Latch & Burn Diagnostics
+## [2026-03-30 22:45] - Version 10: Warp UI Fix & Polish
 ### 📝 Summary
-Improved autopilot reliability and added detailed burn performance metrics.
+Bug fixes for the time warp interface and UI stability.
 
 ### 🛠️ Work Done
-- **Autopilot Latch**: Implemented a state latch that keeps the engines firing until the target orbital energy is reached, even if the optimal window timing drifts during the burn.
-- **Burn Diagnostics HUD**: Added real-time tracking of "Target Burn" (frozen at ignition) vs "Actual Burn" time.
-- **Visual Feedback**: Added color-coded flashing for the burn duration counter (Red < 80% complete, Yellow > 80%, Green flashing on MECO).
-- **Physics Polish**: Refined the transition between LEO and Trans-Lunar Coast states.
+- **TypeError Fix**: Resolved an issue where the `warp-text` element could cause a crash if updated before the DOM was fully ready or after a reset. Added safety checks for the element existence.
+- **Warp Color Coding**: The time warp text now changes to "Caution" (yellow) color when accelerated, providing better visual feedback for the simulation state.
+- **HUD Consistency**: Ensured all status labels follow the same nominal/caution/danger class structure.
 
 ---
 
-## [2026-03-30 22:15] - Version 8: Stability & Bug Fix (TypeError)
+## [2026-03-30 22:30] - Version 9: Autopilot Latch & Burn Diagnostics
 ### 📝 Summary
-Fixed a critical initialization bug and improved simulation stability during startup.
+Improved autopilot reliability and added detailed burn performance metrics.
 
 ### 🛠️ Work Done
 ...
