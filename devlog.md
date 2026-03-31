@@ -1,18 +1,20 @@
 # 🚀 Lunar Flyby XR - Devlog
 
-## [2026-03-30 22:15] - Version 8: Stability & Bug Fix (TypeError)
+## [2026-03-30 22:30] - Version 9: Autopilot Latch & Burn Diagnostics
 ### 📝 Summary
-Fixed a critical initialization bug and improved simulation stability during startup.
+Improved autopilot reliability and added detailed burn performance metrics.
 
 ### 🛠️ Work Done
-- **TypeError Fix**: Resolved a crash where the `telemetry` object was null on the first frame if `simSecondsToProcess` was zero. Added a safety check to ensure at least one physics step is processed (`Math.max(1, ...)`).
-- **Physics Latch**: Improved the `isTliCoast` detection logic to prevent accidental engine re-ignition during state transitions.
+- **Autopilot Latch**: Implemented a state latch that keeps the engines firing until the target orbital energy is reached, even if the optimal window timing drifts during the burn.
+- **Burn Diagnostics HUD**: Added real-time tracking of "Target Burn" (frozen at ignition) vs "Actual Burn" time.
+- **Visual Feedback**: Added color-coded flashing for the burn duration counter (Red < 80% complete, Yellow > 80%, Green flashing on MECO).
+- **Physics Polish**: Refined the transition between LEO and Trans-Lunar Coast states.
 
 ---
 
-## [2026-03-30 22:00] - Version 7: Targeting & Itinerary HUD
+## [2026-03-30 22:15] - Version 8: Stability & Bug Fix (TypeError)
 ### 📝 Summary
-Added advanced navigation tools, flight logging, and interactive targeting features.
+Fixed a critical initialization bug and improved simulation stability during startup.
 
 ### 🛠️ Work Done
 ...
