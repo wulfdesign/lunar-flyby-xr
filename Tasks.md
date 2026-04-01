@@ -8,15 +8,13 @@
 ---
 
 ## 🏆 Completed
-- [x] 🏆 **Cinematic Capture System**: Implemented "Shot 01" automation engine with dynamic warp and smooth camera pans. (Verified 2026-03-31)
 - [x] 🏆 **Private Workspace Infrastructure**: Established `privTasks.md`, `privDevLog.md`, and `privCompleted.md` for confidential planning. (Verified 2026-03-31)
-- [x] 🏆 **Project Credits & Resources**: Created `docs/credits.md` and updated `README.md` with full attribution (NASA, Three.js, Wikipedia, etc.). (Chalice 🏆 2026-03-31)
+- [x] 🏆 **Artemis II & dearMoon Research**: Created `ArtemisII.md` and `dearMoon.md` with mission history and context. (Verified 2026-03-31)
 - [x] 🏆 **Cinematic Video Scripting**: Created `docs/videoShotScript.md` with "Shot 01: The Cislunar Crossing" sequence parameters. (Verified 2026-03-31)
 - [x] 🏆 **LinkedIn & Facebook Soft Launch**: Published official launch posts and cross-posted to NASA/Space groups. (Verified 2026-03-31)
 - [x] 🏆 **Social Media Strategy**: Created `docs/socialMedia.md` with goals and content guidelines. (Verified 2026-03-31)
 - [x] 🏆 **Historical Artifact Archiving**: Preserved the 2018 dearMoon proposal email in `/archive` and updated project history. (Verified 2026-03-31)
 - [x] 🏆 **Repository Organization**: Moved documentation files into `/docs` and kept archives in `/archive` for a clean root structure. (Verified 2026-03-31)
-- [x] 🏆 **Artemis II & dearMoon Research**: Created `ArtemisII.md` and `dearMoon.md` with mission history and context. (Verified 2026-03-31)
 - [x] 🏆 **Project Licensing**: Added MIT License (LICENSE.md) credited to Wulf Design Studios / UpLiftVR Studios. (Verified 2026-03-31)
 - [x] 🏆 **Live Deployment**: Enabled GitHub Pages and added the [Launch Live Experience](https://wulfdesign.github.io/lunar-flyby-xr/) link to README. (Verified 2026-03-31)
 - [x] 🏆 **Project Cleanup**: Organized debug screenshots and flight logs into `/debug` directory. (Verified 2026-03-31)
@@ -27,6 +25,8 @@
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
+- [ ] 🧪 **Cinematic Capture System**: Implemented "Shot 01" automation engine with dynamic warp and smooth camera pans. (Ready for QA 🧪 2026-03-31)
+- [ ] 🧪 **Project Credits & Resources**: Created `docs/credits.md` and updated `README.md` with full attribution (NASA, Three.js, Wikipedia, etc.). (Chalice 🏆 2026-03-31)
 - [ ] 🧪 **SOI Entrance Latch (Initial Version)**: Attempted fix for warp-reset when entering Moon's gravity. (Needs testing, User reports it still "stops" the sim).
 - [ ] 🧪 **Mission Itinerary Checklist**: Checklist UI that tracks TLI, Coast, and Flyby phases.
 - [ ] 🧪 **Consolidated HUD**: Merging Environment and Telemetry panels into one list.
