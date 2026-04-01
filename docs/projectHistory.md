@@ -17,8 +17,12 @@ Fast forward to the **2017 Total Solar Eclipse**, Larry James filmed a 360-degre
 ## 🎈 UpLiftVR 'Maiden Flight' (2018)
 Larry's studio, **UpLiftVR**, developed the **'Maiden Flight' Balloon Ride**, an experimental VR experience that headlined the **Seattle International Film Festival (SIFF) VR Zone** in 2018.
 
-## 🌙 The dearMoon Proposal
-When the **dearMoon project** was first announced, Larry submitted a proposal to join the mission as a world-class creative. Though the project was ultimately cancelled in 2024, the vision for a lunar flyby remained.
+## 🌙 The dearMoon Proposal (Sept 17, 2018)
+When the **dearMoon project** was first announced, Larry sent a proactive proposal to the team on **September 17, 2018**—even before the official public call for creative crew members. 
+
+*   **The Pitch:** He proposed a 360-degree immersive film and VR project to capture the mission's "pivotal moment in history," leveraging his experience from *High Desert Eclipse* and *Maiden Flight*.
+*   **Archived Context:** The original email (now obfuscated) is preserved in the project's `/archive` folder, documenting a "lifetime of preparation" from solo sailing and cave exploration to open-source 3D printing and VR.
+*   **The Vision:** Though the mission was cancelled in 2024, that same drive to "expand people's minds and show what kind of world we can build" is the heartbeat of this simulation.
 
 ## 🚀 Artemis: The Free Return (2026)
 With the launch of **Artemis II** on April 1, 2026, the technology finally reached a point—through Three.js, WebXR, and agentic AI—where this vision could be realized as a public-facing, interactive prototype. 
