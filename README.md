@@ -30,11 +30,13 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 * **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser.  
 * **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis.
 
-## **🛠️ Tech Stack**
-- **Engine:** Three.js (r128)
-- **Physics:** Custom Velocity Verlet Integration
-- **Frontend:** Vanilla HTML5/CSS3 (No Tailwind/Bootstrap)
-- **Immersion:** WebXR API (VR Support)
+## **🛠️ Tech Stack & Credits**
+
+*   **Engine:** Three.js (r128)
+*   **Physics:** Custom Velocity Verlet Integration
+*   **Frontend:** Vanilla HTML5/CSS3 (No Tailwind/Bootstrap)
+*   **Immersion:** WebXR API (VR Support)
+*   **Full Attribution:** See the detailed [🎖️ Credits & Resources](docs/credits.md) for a list of all scientific data sources, texture origins, and technical influences.
 
 ## **📜 History**
 This project began as an AI-assisted rapid prototype session on March 30-31, 2026. After a successful iteration process, the source code was rescued from a browser canvas glitch and reconstructed into this repository to serve as a foundation for further development of educational space simulations.

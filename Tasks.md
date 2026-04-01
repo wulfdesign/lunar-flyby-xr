@@ -8,6 +8,7 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Project Credits & Resources**: Created `docs/credits.md` and updated `README.md` with full attribution (NASA, Three.js, Wikipedia, etc.). (Chalice 🏆 2026-03-31)
 - [x] 🏆 **Cinematic Video Scripting**: Created `docs/videoShotScript.md` with "Shot 01: The Cislunar Crossing" sequence parameters. (Verified 2026-03-31)
 - [x] 🏆 **LinkedIn & Facebook Soft Launch**: Published official launch posts and cross-posted to NASA/Space groups. (Verified 2026-03-31)
 - [x] 🏆 **Social Media Strategy**: Created `docs/socialMedia.md` with goals and content guidelines. (Verified 2026-03-31)
@@ -34,7 +35,7 @@
 - [ ] 🔥🔥 **Social: Short-Form Content**: Prepare <1 min portrait mode videos (Shorts/Reels).
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
-- [ ] 🔥🔥🔥 **Bug Investigation: Time Warp Latch**: Refine the SOI trigger to prevent multiple warp drops.
+- [ ] 🔥🔥🔥 **Bug Investigation: Time Warp Latch**: Refine the SOI trigger between Earth/Moon.
 
 ## 🔥🔥 Medium Priority
 - [ ] 🔥🔥 **V2.0 Roadmap Integration**: Move roadmap items from `index.html` comments into `tasks.md`.
