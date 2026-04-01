@@ -8,6 +8,8 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **LinkedIn & Facebook Soft Launch**: Published official launch posts and cross-posted to NASA/Space groups. (Verified 2026-03-31)
+- [x] 🏆 **Social Media Strategy**: Created `docs/socialMedia.md` with goals and content guidelines. (Verified 2026-03-31)
 - [x] 🏆 **Historical Artifact Archiving**: Preserved the 2018 dearMoon proposal email in `/archive` and updated project history. (Verified 2026-03-31)
 - [x] 🏆 **Repository Organization**: Moved documentation files into `/docs` and kept archives in `/archive` for a clean root structure. (Verified 2026-03-31)
 - [x] 🏆 **Artemis II & dearMoon Research**: Created `ArtemisII.md` and `dearMoon.md` with mission history and context. (Verified 2026-03-31)
@@ -27,6 +29,8 @@
 
 ## 🛠️ Current Work
 - [ ] 🔥🔥🔥 **Fix Lunar SOI Warp Stop**: Simulation "stops" or resets warp repeatedly upon entering Lunar Orbit. (Top Release Priority)
+- [ ] 🔥🔥🔥 **Social: Cinematic Video Capture**: Record TLI burn, coast, and flyby for YouTube.
+- [ ] 🔥🔥 **Social: Short-Form Content**: Prepare <1 min portrait mode videos (Shorts/Reels).
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **Bug Investigation: Time Warp Latch**: Refine the SOI trigger to prevent multiple warp drops.

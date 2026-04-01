@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 18:05] - Social Media Soft Launch & Strategy
+### 📝 Summary
+Executed the first public social media wave to coincide with the Artemis II launch excitement and established a long-term content strategy.
+
+### 🛠️ Work Done
+- **Social Launch**: Published official launch posts on LinkedIn and Facebook. Cross-posted the simulation to multiple NASA and Space Science groups.
+- **Strategy Documentation**: Created `docs/socialMedia.md` to track social platforms, content guidelines, and upcoming video tasks.
+- **Task Management**: Marked the initial soft launch as completed (🏆) and added cinematic video capture to Current Work.
+- **GitHub Sync**: Pushed the new strategy document and updated task lists to the repository.
+
+---
+
 ## [2026-03-31 17:45] - Historical Archiving & Project Organization
 ### 📝 Summary
 Successfully integrated a 2018 historical artifact into the project archive and reorganized the documentation into a cleaner directory structure.
