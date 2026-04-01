@@ -2,6 +2,20 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 19:45] - Social Media Launch Records & Future Mission Planning
+### 📝 Summary
+Recorded the official social media launch links and established a private planning track for future "Artemis-adjacent" missions.
+
+### 🛠️ Work Done
+- **Launch Records**: Logged the official post links for project history:
+    - **Facebook**: [https://www.facebook.com/1828841046/posts/10226076838107342/](https://www.facebook.com/1828841046/posts/10226076838107342/)
+    - **LinkedIn**: [https://www.linkedin.com/posts/wulfdesignstudios_artemisii-nasa-webxr-ugcPost-7444904892533719040-Xu3h](https://www.linkedin.com/posts/wulfdesignstudios_artemisii-nasa-webxr-ugcPost-7444904892533719040-Xu3h)
+- **Infrastructure**: Added a `/private` folder to `.gitignore` to allow for local-only version control of unreleased plans and mission architectures.
+- **Future Mission Planning**: Documented the "Mission: CubeSat Moon Flyby" concept in response to community discussion (Sean Siem) regarding consumer electronics in deep space.
+- **Task Management**: Added the CubeSat crowdfunding initiative to the project roadmap.
+
+---
+
 ## [2026-03-31 19:00] - Final Documentation & Resource Credits
 ### 📝 Summary
 Completed the comprehensive project attribution and resource documentation. Finalized the repository for public release with full scientific and technical credits.

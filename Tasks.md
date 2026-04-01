@@ -39,6 +39,7 @@
 
 ## 🔥🔥 Medium Priority
 - [ ] 🔥🔥 **V2.0 Roadmap Integration**: Move roadmap items from `index.html` comments into `tasks.md`.
+- [ ] 🔥🔥 **Mission: CubeSat Crowdfund**: Develop technical proof-of-concept for lunar flyby using consumer electronics (COTS).
 - [ ] 🔥🔥 **Prograde Marker Refinement**: Ensure 3D marker and crosshair don't confuse the user about ship heading.
 
 ## 🧊 Icebox (Cold)
