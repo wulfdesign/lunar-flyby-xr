@@ -33,8 +33,8 @@
 
 ## 🛠️ Current Work
 - [ ] 🔥🔥🔥 **Fix Lunar SOI Warp Stop**: Simulation "stops" or resets warp repeatedly upon entering Lunar Orbit. (Top Release Priority)
-- [ ] 🔥🔥🔥 **Social: Cinematic Video Execution**: Record TLI burn, coast, and flyby using the new automation system.
-- [ ] 🔥🔥 **Social: Short-Form Content**: Prepare <1 min portrait mode videos (Shorts/Reels).
+- [ ] 🔥🔥🔥 **Troubleshoot Phase 5 Refinements**: Fix physics instability at 7.2kx, gear-shifting logic, and logging bugs encountered in the latest session.
+- [ ] 🔥🔥🔥 **Social: Cinematic Video Execution**: Record TLI burn, coast, and flyby using the stable automation system (Commit 2779de5).
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **Bug Investigation: Time Warp Latch**: Refine the SOI trigger between Earth/Moon.

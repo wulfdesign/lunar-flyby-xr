@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 23:55] - Advanced Refinement Attempt & Session Conclusion
+### 📝 Summary
+Attempted to implement Phase 5 refinements (7.2kx warp, gear-shifting transitions, and enhanced milestone ETAs). Encountered physics instability (ship flying off into deep space) and logging issues.
+
+### 🛠️ Work Done
+- **Rollback**: Reverted `index.html` to the last stable local commit (`2779de5`) to preserve a working baseline.
+- **Stable Features**: The current local version includes the refined 15s cinematic pan, auto-tracking (Moon), and basic milestone alerts.
+- **Next Steps**: Troubleshooting the gear-shifting logic and physics step timing at ultra-high warp (7.2kx) when fresh.
+- **Context Preservation**: Updated `NewChatInst.md` and `Tasks.md` for a potential new session start.
+
+---
+
 ## [2026-03-31 21:45] - Cinematic Capture System Implementation
 ### 📝 Summary
 Successfully implemented an automated cinematic capture system, enabling professional-grade screen recordings of the mission from Earth to the Moon.

@@ -776,61 +776,7 @@
             if (intersects.length > 0 && !isDraggingView) {
                 let target = intersects[0].object;
                 currentTargetObj = target; 
-                
-                if (target.name === "PROGRADE VECTOR") {
-                    document.getElementById('target-name').textContent = "PROGRADE VECTOR";
-                    document.getElementById('target-dist').textContent = "Velocity Heading";
-                    document.getElementById('target-hint').textContent = "Ship travels in this direction.";
-                    popup.style.display = 'block';
-                } else if (target.name) {
-                    let tDist = shipPos.distanceTo(target.position.clone().divideScalar(renderScale));
-                    document.getElementById('target-name').textContent = target.name;
-                    
-                    if(target.name === "THE MOON") {
-                        document.getElementById('target-dist').textContent = Math.round(tDist - radMoon).toLocaleString() + " km";
-                        document.getElementById('target-hint').textContent = telemetry.isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn.";
-                    } else if(target.name === "EARTH") {
-                        document.getElementById('target-dist').textContent = Math.round(tDist - radEarth).toLocaleString() + " km";
-                        document.getElementById('target-hint').textContent = "Origin / Communications Hub.";
-                    } else if (target.name === "THE SUN") {
-                        document.getElementById('target-dist').textContent = "149,597,870 km"; 
-                        document.getElementById('target-hint').textContent = "Solar Array Charging Nominal.";
-                    }
-                    popup.style.display = 'block';
-                }
-            } else {
-                popup.style.display = 'none';
-            }
-
-            // --- UI UPDATE LOGIC ---
-            let altE = shipPos.length() - radEarth;
-            let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
-            
-            if (altE > globalMaxAlt) globalMaxAlt = altE;
-            
-            document.getElementById('met-time').textContent = formatTime(metSeconds);
-            document.getElementById('alt-earth').textContent = altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
-            document.getElementById('dist-moon').textContent = distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
-            document.getElementById('velocity').textContent = shipVel.length().toFixed(2) + " km/s";
-            document.getElementById('fuel').textContent = ((fuel / maxFuel) * 100).toFixed(1) + "%";
-
-            // Update Consolidated Telemetry Panel Data
-            document.getElementById('max-alt').textContent = globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
-            
-            let dirToMoon = moon.position.clone().divideScalar(renderScale).sub(shipPos).normalize();
-            let camDir = new THREE.Vector3();
-            camera.getWorldDirection(camDir);
-            let angleToMoon = camDir.angleTo(dirToMoon) * (180 / Math.PI);
-            
-            const moonHeadingEl = document.getElementById('moon-heading');
-            if (angleToMoon > 40) {
-                moonHeadingEl.className = "caution";
-                moonHeadingEl.textContent = angleToMoon.toFixed(1) + "° (Pan to find)";
-            } else {
-                moonHeadingEl.className = "nominal";
-                moonHeadingEl.textContent = angleToMoon.toFixed(1) + "° (In View)";
-            }
-
+...
             // Region Logic & Milestone Alerts
             let region = "Low Earth Orbit";
             if (altE > 320000) region = "Lunar Sphere of Influence";
