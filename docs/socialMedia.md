@@ -12,7 +12,7 @@
 - [x] 🏆 **Live Deployment Verification**: Confirmed GitHub Pages link is working and accessible for social clicks. (Verified 2026-03-31)
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Cinematic Video Capture**: Record the TLI burn, cislunar coast (time-warped), and lunar flyby.
+- [ ] 🔥🔥🔥 **Cinematic Video Capture**: Record the TLI burn, cislunar coast (time-warped), and lunar flyby based on the parameters in `docs/videoShotScript.md`.
 - [ ] 🔥🔥 **Short-Form Content**: Create a <1 min portrait mode version for YouTube Shorts / TikTok / Reels.
 
 ## 🚀 High Priority (Ready to Forge)

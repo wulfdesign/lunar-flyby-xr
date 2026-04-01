@@ -2,6 +2,19 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-03-31 18:30] - Cinematic Video Planning & Shot Scripting
+### 📝 Summary
+Drafted a comprehensive shot script for the upcoming cinematic video release. This script outlines the sequence of simulation controls (TMI, warp, camera) to automate the recording process.
+
+### 🛠️ Work Done
+- **Scripting**: Created `docs/videoShotScript.md` with "Shot 01: The Cislunar Crossing" parameters.
+- **Sequence Design**: Defined a 3-phase recording plan including TMI ignition, a time-warped coast past GEO, and an incremental approach to the Moon.
+- **Workflow**: Updated `docs/socialMedia.md` and `Tasks.md` to transition from social "soft launch" to cinematic content production.
+- **Task Management**: Marked video shot script planning as completed (🏆).
+- **GitHub Sync**: Pushed the new shot script and updated project files to remote origin.
+
+---
+
 ## [2026-03-31 18:05] - Social Media Soft Launch & Strategy
 ### 📝 Summary
 Executed the first public social media wave to coincide with the Artemis II launch excitement and established a long-term content strategy.

@@ -8,6 +8,7 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Cinematic Video Scripting**: Created `docs/videoShotScript.md` with "Shot 01: The Cislunar Crossing" sequence parameters. (Verified 2026-03-31)
 - [x] 🏆 **LinkedIn & Facebook Soft Launch**: Published official launch posts and cross-posted to NASA/Space groups. (Verified 2026-03-31)
 - [x] 🏆 **Social Media Strategy**: Created `docs/socialMedia.md` with goals and content guidelines. (Verified 2026-03-31)
 - [x] 🏆 **Historical Artifact Archiving**: Preserved the 2018 dearMoon proposal email in `/archive` and updated project history. (Verified 2026-03-31)
@@ -29,7 +30,7 @@
 
 ## 🛠️ Current Work
 - [ ] 🔥🔥🔥 **Fix Lunar SOI Warp Stop**: Simulation "stops" or resets warp repeatedly upon entering Lunar Orbit. (Top Release Priority)
-- [ ] 🔥🔥🔥 **Social: Cinematic Video Capture**: Record TLI burn, coast, and flyby for YouTube.
+- [ ] 🔥🔥🔥 **Social: Cinematic Video Execution**: Record TLI burn, coast, and flyby using the Shot 01 Script.
 - [ ] 🔥🔥 **Social: Short-Form Content**: Prepare <1 min portrait mode videos (Shorts/Reels).
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
