@@ -3,9 +3,10 @@
 ## **Context**
 This is a high-fidelity WebXR orbital mechanics sandbox titled **"Artemis: The Free Return."** It is timed for the **Artemis II** launch on April 1, 2026. The project has been reconstructed from rescued logs and is now stable at **v1.9.1**.
 
-## **Current State (2026-03-31 23:55)**
-- **Stable Commit:** `2779de5` (includes refined cinematic capture v1.0, auto-tracking, and milestone alerts).
-- **Broken Attempt:** An attempt to add Phase 5 refinements (7.2kx warp, gear shifting, ETAs) resulted in physics instability and was rolled back. **Do not re-implement Phase 5 without solving the physics step jitter at high warp.**
+## **Current State (2026-04-01 01:00)**
+- **STABLE BASELINE:** Both local and public GitHub repos have been rolled back to **Commit 3e4074a**. 
+- **Rollback Reason:** Failed attempt to implement Phase 5 cinematic refinements (7.2kx warp, gear shifting) resulted in physics instability and blank screens.
+- **index.html:** Now contains the clean v1.9.1 source code (No "CINEMATIC CAPTURE" button or automation logic).
 
 ## **Project Structure**
 - `index.html`: The primary simulation file. Self-contained and supports standalone execution (double-click).
@@ -23,10 +24,7 @@ This is a high-fidelity WebXR orbital mechanics sandbox titled **"Artemis: The F
 
 ## **Immediate Objectives (Roadmap)**
 1.  **🔥 FIX LUNAR SOI WARP STOP (Critical):** The simulation resets warp or "stops" when entering the Moon's Sphere of Influence.
-2.  **Troubleshoot Phase 5 Refinements:**
-    - Fix the `formatTime` ReferenceError (ensure it is defined at the top of the script).
-    - Solve "Ship flying off" bug: Likely caused by high warp (7.2kx) and large `dt_step` in the physics loop.
-    - Fix "One item flight log": The log array was clearing or failing to push correctly during Phase 5.
+2.  **Cinematic Capture Re-Implementation:** Start fresh using the parameters in `docs/videoShotScript.md` but ensure physics stability and proper function scoping.
 3.  **Consolidated HUD:** Merge Environment and Telemetry panels.
 
 ## **Instructions for Gemini**

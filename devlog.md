@@ -2,6 +2,33 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 10:20] - Restoration & Robust SOI Fix (Option A)
+### 📝 Summary
+Successfully restored the project to the best known working state (`fadec7b`) and implemented a robust fix for the "Lunar SOI Warp Stop" bug.
+
+### 🛠️ Work Done
+- **Restoration**: Recovered the functional Cinematic Capture system, Earthrise pan, and auto-tracking logic from commit `fadec7b`.
+- **Bug Fix**: Refined the Lunar SOI trigger logic:
+    - Increased threshold to **60,000 km** (physical SOI).
+    - Added `timeWarp > 1` checks to prevent redundant calls and "sticky" 1x resets.
+    - Updated UI to show "DEEP SPACE" instead of "LOW EARTH ORBIT" when in deep space but not near the Moon.
+- **Verification**: Code is now ready for a full flyby test to ensure the warp doesn't reset repeatedly.
+- **Safety**: Verified local state before performing any git operations.
+
+---
+
+## [2026-04-01 01:00] - Emergency Rollback: Restoration of Stable v1.9.1
+### 📝 Summary
+Performed an emergency rollback of both the local and public GitHub repositories after a failed implementation of the Cinematic Capture refinements (Phase 5). The simulation is now back to a known stable state.
+
+### 🛠️ Work Done
+- **GitHub Rollback**: Force-pushed commit `3e4074a` to main to restore the public live site.
+- **Local Rollback**: Reverted `index.html` locally to match the stable `3e4074a` version.
+- **Cleanup**: Removed all buggy automation code and syntax errors.
+- **Next Steps**: Re-evaluate the Cinematic Capture logic from scratch tomorrow when fresh.
+
+---
+
 ## [2026-03-31 23:55] - Advanced Refinement Attempt & Session Conclusion
 ### 📝 Summary
 Attempted to implement Phase 5 refinements (7.2kx warp, gear-shifting transitions, and enhanced milestone ETAs). Encountered physics instability (ship flying off into deep space) and logging issues.

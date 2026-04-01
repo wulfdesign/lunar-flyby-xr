@@ -8,6 +8,9 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Fix Lunar SOI Warp Stop**: Simulation threshold increased to 60,000km with robust latching logic to prevent repeated resets. (Verified 2026-04-01)
+- [x] 🏆 **Restoration of Cinematic System**: Recovered Shot 01 automation and tracking from commit fadec7b. (Verified 2026-04-01)
+- [x] 🏆 **Rescue Artifact Archiving**: Created `index_Rescue_V02/03/04.html` and `rescueChatfeedback*.txt` for history preservation. (Verified 2026-04-01)
 - [x] 🏆 **Private Workspace Infrastructure**: Established `privTasks.md`, `privDevLog.md`, and `privCompleted.md` for confidential planning. (Verified 2026-03-31)
 - [x] 🏆 **Artemis II & dearMoon Research**: Created `ArtemisII.md` and `dearMoon.md` with mission history and context. (Verified 2026-03-31)
 - [x] 🏆 **Cinematic Video Scripting**: Created `docs/videoShotScript.md` with "Shot 01: The Cislunar Crossing" sequence parameters. (Verified 2026-03-31)
@@ -25,36 +28,22 @@
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
-- [ ] 🧪 **Cinematic Capture System**: Implemented "Shot 01" automation engine with dynamic warp and smooth camera pans. (Ready for QA 🧪 2026-03-31)
-- [ ] 🧪 **Project Credits & Resources**: Created `docs/credits.md` and updated `README.md` with full attribution (NASA, Three.js, Wikipedia, etc.). (Chalice 🏆 2026-03-31)
-- [ ] 🧪 **SOI Entrance Latch (Initial Version)**: Attempted fix for warp-reset when entering Moon's gravity. (Needs testing, User reports it still "stops" the sim).
+- [ ] 🧪 **Cinematic Capture System (V04 Baseline)**: Implemented "Shot 01" automation with 15s smooth Earthrise pan and auto-tracking. (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **Lunar SOI Warp Fix**: Threshold increased to 60,000km with a robust latch to prevent repeated warp resets. (Ready for QA 🧪 2026-04-01)
 - [ ] 🧪 **Mission Itinerary Checklist**: Checklist UI that tracks TLI, Coast, and Flyby phases.
 - [ ] 🧪 **Consolidated HUD**: Merging Environment and Telemetry panels into one list.
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Fix Lunar SOI Warp Stop**: Simulation "stops" or resets warp repeatedly upon entering Lunar Orbit. (Top Release Priority)
-- [ ] 🔥🔥🔥 **Troubleshoot Phase 5 Refinements**: Fix physics instability at 7.2kx, gear-shifting logic, and logging bugs encountered in the latest session.
-- [ ] 🔥🔥🔥 **Social: Cinematic Video Execution**: Record TLI burn, coast, and flyby using the stable automation system (Commit 2779de5).
+- [ ] 🔥🔥🔥 **Verification: Full Mission Run**: Test the entire cislunar crossing to verify the SOI fix and cinematic timing.
+- [ ] 🔥🔥🔥 **Refinement: Cinematic Phase Scaling**: Ensure warp transitions (Phase 7-10) are smooth and don't skip frames at 3.6kx.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
-- [ ] 🔥🔥🔥 **Bug Investigation: Time Warp Latch**: Refine the SOI trigger between Earth/Moon.
+- [ ] 🔥🔥🔥 **UI Alignment**: Ensure the "DEEP SPACE" region label correctly triggers and doesn't conflict with "LUNAR ENCOUNTER".
+- [ ] 🔥🔥🔥 **Physics Stability Check**: Monitor for "blank screen" or WebGL stalls during high-warp SOI transitions.
 
 ## 🔥🔥 Medium Priority
 - [ ] 🔥🔥 **V2.0 Roadmap Integration**: Move roadmap items from `index.html` comments into `tasks.md`.
 - [ ] 🔥🔥 **Mission: CubeSat Crowdfund**: Develop technical proof-of-concept for lunar flyby using consumer electronics (COTS).
 - [ ] 🔥🔥 **Prograde Marker Refinement**: Ensure 3D marker and crosshair don't confuse the user about ship heading.
-
-## 🧊 Icebox (Cold)
-- [ ] 🧊 **Post-Flight Mission Report**: Generate a UI report showing Max Gs, flight time, and fuel remaining.
-- [ ] 🧊 **Trajectory Trails**: Visual path rendering (White = Flown, Blue Dotted = Projected).
-- [ ] 🧊 **Overview Map**: 3/4 top-down orthographic minimap.
-- [ ] 🧊 **Mid-Course Correction (MCC)**: Off-course detection and correction burns.
-
-## ❄️ Frozen (Do much later)
-- [ ] ❄️ **Asset Testing**: Test server with custom elements and high-res models (.glb) required for download. (Deep Freeze ❄️❄️❄️)
-- [ ] ❄️ **Find True Timestamps**: Search Gemini history for exact message times.
-- [ ] ❄️ **Lagrangian Points (L1-L4)**: Add markers for Earth-Moon Lagrange points.
-- [ ] ❄️ **Lunar Orbit Insertion (LOI)**: Retrograde burn capability at perilune.
-- [ ] ❄️ **Asset Upgrades**: High-res NASA .glb models for Orion and SLS.
 
 ## 🏆 Completed Ready to Archive

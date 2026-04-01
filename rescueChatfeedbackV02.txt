@@ -1,0 +1,17 @@
+### 📝 Rescue Feedback Log - V02 (Commit 0c65e61)
+**Date/Time:** 2026-03-31 18:30 (Approx)
+**Context:** This was the first "Save Point" for the Shot 01 automation sequence before the camera pan speed was fine-tuned.
+
+#### 🛠️ Tasks & Edits Requested:
+1. **Initial Cinematic Sequence**: Build the foundation for an automated recording that handles TLI ignition and coast.
+2. **Phase Timing**: Implement 10 distinct mission phases (Phase 0 - 10) to guide the simulation.
+3. **Auto-Pilot Integration**: Ensure the cinematic script can force-enable the Autopilot button when the sequence starts.
+4. **Warp Control System**: Create the `updateWarpUI()` function to allow for smooth time-acceleration changes via script.
+5. **HUD Toggle**: Hide the manual flight controls and show only the recording status during the cinematic run.
+6. **Earthrise Setup**: First attempt at a camera movement to look back at Earth after Earth departure.
+
+#### ⚠️ Issues Observed:
+- Camera movement felt robotic (improved in V03/V04).
+- Time warp was sometimes shifting too early before orbit was fully stabilized.
+- Some HUD elements overlapping during high-speed transitions.
+- Blank screens reported by user if WebGL failed (likely what led to the V03 frustration).

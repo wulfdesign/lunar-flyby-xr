@@ -1,0 +1,17 @@
+### 📝 Rescue Feedback Log - V03 (Commit 2779de5)
+**Date/Time:** 2026-03-31 21:45 (Approx)
+**Context:** This was the functional baseline for the Cinematic Capture system (v1.0) with basic automation.
+
+#### 🛠️ Tasks & Edits Requested:
+1. **Shot 01 Implementation**: Automate a full mission sequence from Earth orbit to Lunar flyby.
+2. **Dynamic Warp Transitions**: Program the script to shift from 1x (Ignition) to 10x, 100x, 600x, and 3600x (Deep Space) automatically.
+3. **Control Safety Locks**: Disable manual camera dragging and HUD button clicks while the cinematic script is active.
+4. **Cinematic Button**: Add a "🔴 CINEMATIC CAPTURE" button to the UI to trigger the sequence.
+5. **Phase 6 Pan**: Add a smooth rotation to look at the Earth rising over the ship's shoulder at 35,000 km altitude.
+6. **Auto-Tracking Initiation**: Set up the logic to find and face the Moon once the pan completes.
+
+#### ⚠️ Issues Observed:
+- Camera pan was initially too fast (addressed in V04).
+- Target selection was sometimes finicky if multiple objects overlapped.
+- Initial SOI entrance logic occasionally reset warp (latch logic was first being drafted).
+- Blank screens reported by user if WebGL failed during high warp transitions (Physics/Time-step drift).

@@ -1,0 +1,15 @@
+### 📝 Rescue Feedback Log - V04 (Commit fadec7b)
+**Date/Time:** 2026-03-31 23:55 (Approx)
+**Context:** This version was the final "Save Point" before the Phase 5 Advanced Refinements (high warp/physics) caused the simulation to break.
+
+#### 🛠️ Tasks & Edits Requested:
+1. **Refine Cinematic Pan**: Slow down the 180° camera rotation (Shot 01) to exactly 15 seconds to make it look more professional.
+2. **Auto Camera Tracking**: Ensure the camera automatically tracks the Moon after the Earthrise pan.
+3. **Targeting Popup Cleanup**: Fix the raycaster so it doesn't intersect with invisible cockpit walls, only specific targets (Earth, Moon, Prograde).
+4. **Milestone Alerts**: Add flashing HUD indicators for major mission milestones (GEO transition, Midpoint, SOI entrance).
+5. **Phase Scaling**: Adjust the cinematic phases to handle the transition from Earth departure to Deep Space coast.
+6. **HUD HUD Consistency**: Ensure the "CINEMATIC STATUS" indicator flashes prominently during automation.
+
+#### ⚠️ Issues Observed:
+- Still some "stalling" when entering Lunar SOI (but latching logic was present).
+- Physics stable at 3.6kx warp, but needs testing for 7.2kx.
