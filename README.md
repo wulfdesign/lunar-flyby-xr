@@ -79,7 +79,7 @@ One of Larry's most impactful works is **"High Desert Eclipse,"** a 360-degree V
 
 *   **For Educators & Schools:** This experience is a powerful tool for Earth and Space science. It captures the eerie transition from day to twilight, the 360-degree "sunrise" on the horizon, and the breathtaking solar corona.
 *   **Watch for Free:** The 4K 360-degree timelapse is available on YouTube. **Tip:** For the best quality, especially in a VR headset, set the playback speed to **0.25x**. This allows the 4K stream to buffer smoothly and lets you soak in the subtle environmental changes.
-    *   [📺 Watch: High Desert Eclipse (YouTube)](https://www.youtube.com/watch?v=G_G8omlM_LC)
+    *   [📺 Watch: High Desert Eclipse (YouTube)](https://youtu.be/fzcFw_33iC8)
 *   **Immersive Edition:** A full-length version is available for the **Meta Quest** (via App Lab) and on [upliftvr.itch.io](https://upliftvr.itch.io/). It's a perfect addition to classroom VR kits to bring a "once-in-a-lifetime" celestial event to students anywhere.
 
 ### **🚀 The Vision Behind Artemis: The Free Return**
