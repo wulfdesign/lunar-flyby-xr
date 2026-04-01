@@ -143,12 +143,14 @@
                 </ul>
                 <div class="controls">
                     <button id="btn-save-log" title="Downloads a JSON file of your telemetry data at various mission timestamps. Includes G-Force data!">SAVE FLIGHT LOG</button>
+                    <button id="btn-cinematic" style="border-color: #ff4444; color: #ff4444;" title="Executes an automated cinematic flight sequence for video capture.">🔴 CINEMATIC CAPTURE</button>
                 </div>
             </div>
 
             <!-- BOTTOM RIGHT: Navigation -->
             <div class="panel" title="Ship control systems. Engage the autopilot or control the burn manually.">
                 <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
+                <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite;">[SEQUENCE RUNNING: SHOT 01]</p>
                 <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
                 <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn. Target phase angle is opposite the moon.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
                 <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically ignite and cut off engines to perfectly reach the Moon.">Autopilot:</span> <span id="autopilot-status" class="danger">OFF</span></p>
@@ -227,6 +229,124 @@
         let burnEndTime = -999;
         let currentGForce = 0; 
         let hasEnteredLunarSOI = false; // State lock to prevent warp resetting every frame
+
+        // --- CINEMATIC SCRIPT ENGINE ---
+        let cinematicActive = false;
+        let cinematicPhase = 0;
+        let cinematicTimer = 0;
+        let lookTargetLon = 0;
+        let lookTargetLat = 0;
+
+        function updateCinematic(dt, telemetry) {
+            if (!cinematicActive) return;
+            cinematicTimer += dt;
+            let altE = shipPos.length() - radEarth;
+            let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+
+            switch (cinematicPhase) {
+                case 0: // INIT
+                    resetMission();
+                    autoPilotEngaged = true;
+                    document.getElementById('btn-toggle-auto').textContent = "AUTOPILOT ON";
+                    document.getElementById('btn-toggle-auto').classList.add('active');
+                    document.getElementById('autopilot-status').textContent = "ENGAGED";
+                    document.getElementById('autopilot-status').className = "nominal";
+                    updateWarpUI(10);
+                    cinematicPhase = 1;
+                    logEvent("CINEMATIC: Phase 1 - Pre-Launch Alignment (10x Warp)");
+                    break;
+
+                case 1: // IGNITION PREP
+                    if (telemetry.timeToWindow < 15) {
+                        updateWarpUI(1);
+                        cinematicPhase = 2;
+                        logEvent("CINEMATIC: Phase 2 - Ignition Prep (1x Warp)");
+                    }
+                    break;
+
+                case 2: // BURN START
+                    if (isBurning) {
+                        cinematicTimer = 0; // Reset timer to track burn duration
+                        cinematicPhase = 3;
+                        logEvent("CINEMATIC: Phase 3 - TMI Ignition Recorded");
+                    }
+                    break;
+
+                case 3: // BURN MONITORING
+                    if (cinematicTimer > 30) {
+                        updateWarpUI(10);
+                        cinematicPhase = 4;
+                        logEvent("CINEMATIC: Phase 4 - Departure Acceleration (10x Warp)");
+                    }
+                    break;
+
+                case 4: // DEPARTURE
+                    if (telemetry.isTliCoast) {
+                        updateWarpUI(100);
+                        cinematicPhase = 5;
+                        logEvent("CINEMATIC: Phase 5 - Earth Departure (100x Warp)");
+                    }
+                    break;
+
+                case 5: // GEO TRANSITION
+                    if (altE > 35000) {
+                        updateWarpUI(10);
+                        cinematicTimer = 0;
+                        lookTargetLon = lookLon + 180;
+                        cinematicPhase = 6;
+                        logEvent("CINEMATIC: Phase 6 - GEO Transition & Earthrise Pan");
+                    }
+                    break;
+
+                case 6: // SMOOTH PAN
+                    let panProgress = Math.min(cinematicTimer / 10, 1);
+                    lookLon = THREE.MathUtils.lerp(lookLon, lookTargetLon, 0.05); // Smooth lerp
+                    if (panProgress >= 1 || Math.abs(lookLon - lookTargetLon) < 1) {
+                        updateWarpUI(3600);
+                        cinematicPhase = 7;
+                        logEvent("CINEMATIC: Phase 7 - Deep Space Coast (3600x Warp)");
+                    }
+                    break;
+
+                case 7: // LUNAR ARRIVAL
+                    if (distM < 50000) {
+                        updateWarpUI(600);
+                        cinematicPhase = 8;
+                        logEvent("CINEMATIC: Phase 8 - Lunar Proximity (600x Warp)");
+                    }
+                    break;
+
+                case 8: // FINAL APPROACH
+                    if (distM < 20000) {
+                        updateWarpUI(10);
+                        cinematicPhase = 9;
+                        logEvent("CINEMATIC: Phase 9 - Lunar Approach (10x Warp)");
+                    }
+                    break;
+
+                case 9: // LUNAR ENCOUNTER
+                    if (distM < 10000) {
+                        updateWarpUI(1);
+                        cinematicActive = false;
+                        document.getElementById('cinematic-status').style.display = 'none';
+                        logEvent("CINEMATIC: Shot 01 Complete. Manual control restored.");
+                    }
+                    break;
+            }
+        }
+
+        document.getElementById('btn-cinematic').addEventListener('click', () => {
+            cinematicActive = !cinematicActive;
+            if (cinematicActive) {
+                cinematicPhase = 0;
+                cinematicTimer = 0;
+                document.getElementById('cinematic-status').style.display = 'block';
+                logEvent("CINEMATIC: Starting Shot 01 - The Cislunar Crossing");
+            } else {
+                document.getElementById('cinematic-status').style.display = 'none';
+                logEvent("CINEMATIC: Sequence Aborted by User.");
+            }
+        });
 
         // --- CORE ENGINE SETUP ---
         const scene = new THREE.Scene();
@@ -352,10 +472,13 @@
 
         // --- MOUSE / TOUCH LOOK CONTROLS ---
         let lookLon = 0; let lookLat = 0; let isDraggingView = false; let prevMousePos = { x: 0, y: 0 };
-        document.addEventListener('mousedown', (e) => { if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; }});
+        document.addEventListener('mousedown', (e) => { 
+            if (cinematicActive) return;
+            if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; }
+        });
         document.addEventListener('mouseup', () => isDraggingView = false);
         document.addEventListener('mousemove', (e) => {
-            if (isDraggingView) {
+            if (isDraggingView && !cinematicActive) {
                 let deltaX = e.clientX - prevMousePos.x; let deltaY = e.clientY - prevMousePos.y;
                 lookLon -= deltaX * 0.2; lookLat -= deltaY * 0.2;
                 lookLat = Math.max(-85, Math.min(85, lookLat));
@@ -418,14 +541,22 @@
         });
 
         // --- BUTTON BINDINGS ---
-        document.getElementById('btn-abort').addEventListener('click', resetMission);
-        document.getElementById('btn-warp-1').addEventListener('click', () => { updateWarpUI(1); autoFastForward = false; });
-        document.getElementById('btn-warp-10').addEventListener('click', () => { updateWarpUI(10); autoFastForward = false; });
-        document.getElementById('btn-warp-60').addEventListener('click', () => { updateWarpUI(60); autoFastForward = false; });
-        document.getElementById('btn-warp-600').addEventListener('click', () => { updateWarpUI(600); autoFastForward = false; });
-        document.getElementById('btn-warp-3600').addEventListener('click', () => { updateWarpUI(3600); autoFastForward = false; });
+        document.getElementById('btn-abort').addEventListener('click', () => {
+            if (cinematicActive) {
+                cinematicActive = false;
+                document.getElementById('cinematic-status').style.display = 'none';
+                logEvent("CINEMATIC: Aborted via manual reset.");
+            }
+            resetMission();
+        });
+        document.getElementById('btn-warp-1').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(1); autoFastForward = false; });
+        document.getElementById('btn-warp-10').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(10); autoFastForward = false; });
+        document.getElementById('btn-warp-60').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(60); autoFastForward = false; });
+        document.getElementById('btn-warp-600').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(600); autoFastForward = false; });
+        document.getElementById('btn-warp-3600').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(3600); autoFastForward = false; });
         
         document.getElementById('btn-toggle-auto').addEventListener('click', (e) => {
+            if (cinematicActive) return;
             autoPilotEngaged = !autoPilotEngaged;
             e.target.textContent = autoPilotEngaged ? "AUTOPILOT ON" : "ENABLE AUTO TMI";
             if (autoPilotEngaged) {
@@ -437,9 +568,13 @@
             }
         });
 
-        document.getElementById('btn-skip-window').addEventListener('click', () => { autoFastForward = true; updateWarpUI(3600); });
+        document.getElementById('btn-skip-window').addEventListener('click', () => { 
+            if (cinematicActive) return;
+            autoFastForward = true; updateWarpUI(3600); 
+        });
         
         function startManualBurn() { 
+            if (cinematicActive) return;
             if(fuel > 0) { 
                 isBurning = true; autoPilotEngaged = false; autoBurnActive = false;
                 document.getElementById('btn-toggle-auto').textContent = "ENABLE AUTO TMI"; 
@@ -588,6 +723,9 @@
             let telemetry = null;
             for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
             metSeconds += simSecondsToProcess;
+
+            // Update cinematic sequence
+            if (cinematicActive) updateCinematic(dt_real, telemetry);
 
             // --- TARGETING / RAYCASTING TOOLTIP ---
             raycaster.setFromCamera(centerScreen, camera);
