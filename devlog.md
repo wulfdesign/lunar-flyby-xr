@@ -2,6 +2,26 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 13:45] - Warp Upgrades & Granular POIs
+### 📝 Summary
+Enhanced the simulation with new time-acceleration options, granular HUD points of interest, and synchronized cinematic/safety logic.
+
+### 🛠️ Work Done
+- **Warp Upgrades**:
+    - Added **30x (Steady)** and **7.2kx (Maximum)** buttons to the UI.
+    - Updated `warpLevels` and `updateWarpUI` to support these speeds.
+- **HUD POIs**:
+    - Implemented "Approaching Geosync" (>30,000km) and "Geosynchronous Orbit" (~35,786km).
+    - Implemented "Trans-Lunar Midpoint" alert with a ±10,000km buffer.
+    - Added "Approaching Lunar SOI" (>60,000km dist from Moon).
+- **Cinematic Sync**:
+    - Fixed the "warp bounce" at SOI entrance by allowing Cinematic Mode to suppress the safety 1x reset.
+    - Integrated the 7.2kx warp into the deep space coast phase of Shot 01.
+    - Added the 30x gear to the final approach deceleration for a smoother feel.
+- **Task Management**: Ready for final full mission verification before archiving rescue artifacts.
+
+---
+
 ## [2026-04-01 13:15] - Full Mission Verification: Shot 01 Stable
 ### 📝 Summary
 User performed a full mission run and confirmed that the Cinematic Capture sequence (Shot 01) is now fully functional, stable, and professional.

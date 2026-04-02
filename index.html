@@ -171,12 +171,14 @@
 
                 <div class="controls">
                     <button id="btn-warp-1" class="active" title="Realtime (1s = 1s)">1x</button>
-                    <button id="btn-warp-10" title="Accelerated (1s = 10s)">10x</button>
+                    <button id="btn-warp-10" title="1s = 10s">10x</button>
+                    <button id="btn-warp-30" title="1s = 30s">30x</button>
                     <button id="btn-warp-60" title="1s = 1 Minute">60x</button>
                     <button id="btn-warp-300" title="1s = 5 Minutes">300x</button>
                     <button id="btn-warp-600" title="1s = 10 Minutes">600x</button>
                     <button id="btn-warp-1800" title="1s = 30 Minutes">1.8kx</button>
                     <button id="btn-warp-3600" title="1s = 1 Hour">3.6kx</button>
+                    <button id="btn-warp-7200" title="1s = 2 Hours">7.2kx</button>
                 </div>
                 <div class="controls">
                     <button id="btn-thrust" class="btn-danger" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
@@ -247,7 +249,7 @@
         // --- GEAR SHIFTING WARP LOGIC ---
         let targetWarp = 1;
         let warpStepTimer = 0;
-        const warpLevels = [1, 10, 60, 300, 600, 1800, 3600];
+        const warpLevels = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200];
 
         function shiftWarp(target) {
             targetWarp = target;
@@ -323,35 +325,35 @@
                     }
                     break;
 
-                case 5: // DEEP SPACE TRANSITION
+                case 5: // DEEP SPACE ACCELERATION
                     if (altE > 100000) {
-                        shiftWarp(3600);
+                        shiftWarp(7200);
                         cinematicPhase = 7;
-                        logEvent("CINEMATIC: Phase 7 - Deep Space (Max Warp)");
+                        logEvent("CINEMATIC: Phase 7 - Deep Space (Maximum Warp)");
                     }
                     break;
 
                 case 7: // LUNAR APPROACH PREP
-                    if (distM < 100000) {
-                        shiftWarp(1800);
+                    if (distM < 150000) {
+                        shiftWarp(3600);
                         cinematicPhase = 8;
-                        logEvent("CINEMATIC: Phase 8 - Lunar Outskirts");
+                        logEvent("CINEMATIC: Phase 8 - Lunar Outskirts (3.6kx)");
                     }
                     break;
 
-                case 8: // LUNAR SOI ENTRY
-                    if (distM < 60000) { 
+                case 8: // LUNAR PROXIMITY
+                    if (distM < 80000) { 
                         shiftWarp(600);
                         cinematicPhase = 9;
-                        logEvent("CINEMATIC: Phase 9 - Lunar SOI Entry");
+                        logEvent("CINEMATIC: Phase 9 - Lunar SOI Proximity (600x)");
                     }
                     break;
 
                 case 9: // FINAL APPROACH
-                    if (distM < 25000) {
-                        shiftWarp(60);
+                    if (distM < 30000) {
+                        shiftWarp(30);
                         cinematicPhase = 10;
-                        logEvent("CINEMATIC: Phase 10 - Final Approach");
+                        logEvent("CINEMATIC: Phase 10 - Final Approach (30x)");
                     }
                     break;
 
@@ -637,21 +639,33 @@
         
         function updateWarpUI(w) {
             timeWarp = w;
+            shiftWarp(w); // Sync gear shifting target
             document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active'));
             if(document.getElementById(`btn-warp-${w}`)) document.getElementById(`btn-warp-${w}`).classList.add('active');
             const warpTextEl = document.getElementById('warp-text');
             if(warpTextEl) {
                 let speedLabel = w + "x";
                 if(w === 1) speedLabel = "1x (Realtime)";
+                if(w === 30) speedLabel = "30x (Steady)";
                 if(w === 60) speedLabel = "60x (1m/s)";
                 if(w === 300) speedLabel = "300x (5m/s)";
                 if(w === 600) speedLabel = "600x (10m/s)";
-                if(w === 1800) speedLabel = "1800x (30m/s)";
-                if(w === 3600) speedLabel = "3600x (1hr/s)";
+                if(w === 1800) speedLabel = "1.8kx (Fast)";
+                if(w === 3600) speedLabel = "3.6kx (Cruise)";
+                if(w === 7200) speedLabel = "7.2kx (Maximum)";
                 warpTextEl.textContent = speedLabel;
                 warpTextEl.className = w === 1 ? "nominal" : "caution";
             }
         }
+
+        [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+            const btn = document.getElementById(`btn-warp-${w}`);
+            if (btn) btn.addEventListener('click', () => {
+                cinematicActive = false; // Manual override
+                document.getElementById('cinematic-status').style.display = 'none';
+                updateWarpUI(w);
+            });
+        });
 
         // --- ORBITAL PHYSICS ENGINE (VELOCITY VERLET) ---
         function getAcceleration(pos) {
@@ -858,23 +872,28 @@
 
             // Region Logic & Milestone Alerts
             let region = "Low Earth Orbit";
-            if (altE > 320000) region = "Lunar Sphere of Influence";
-            else if (altE > 192200) {
-                region = "Deep Space (Past Halfway)";
+            if (distM < 60000) region = "Lunar Sphere of Influence";
+            else if (distM < 100000) region = "Approaching Lunar SOI";
+            else if (altE > 200000) region = "Deep Space (Past Midpoint)";
+            else if (altE > 182200 && altE < 202200) {
+                region = "Trans-Lunar Midpoint";
                 if (!hasReachedMidpoint) {
-                    logEvent("Milestone: Trans-Lunar Midpoint Reached");
+                    logEvent("Milestone: Midpoint Transition Reached");
                     hasReachedMidpoint = true;
                     triggerAlertFlash("region-text");
                 }
             }
-            else if (altE > 35786) {
-                region = "Beyond Geosynchronous";
+            else if (altE > 100000) region = "Deep Space (Outbound)";
+            else if (altE > 36300) region = "Beyond Geosynchronous";
+            else if (altE > 35286 && altE < 36286) {
+                region = "Geosynchronous Orbit";
                 if (!hasReachedGeosync) {
                     logEvent("Milestone: Geosynchronous Altitude Passed");
                     hasReachedGeosync = true;
                     triggerAlertFlash("region-text");
                 }
             }
+            else if (altE > 30000) region = "Approaching Geosync";
             else if (altE > 2000) region = "Medium Earth Orbit";
             document.getElementById('region-text').textContent = region;
 
@@ -976,8 +995,9 @@
                 document.getElementById('itin-coast').className = "complete";
                 document.getElementById('itin-flyby').className = "active";
                 if (!hasEnteredLunarSOI) {
-                    if (timeWarp > 1) updateWarpUI(1); 
-                    hasEnteredLunarSOI = true; // State latch engaged, will not force 1x again
+                    // Only force 1x if NOT in cinematic mode (cinematic has its own gear shifting)
+                    if (timeWarp > 1 && !cinematicActive) updateWarpUI(1); 
+                    hasEnteredLunarSOI = true; // State latch engaged
                     logEvent("Alert: Entered Lunar Sphere of Influence");
                 }
             } else if (telemetry.isTliCoast) {

@@ -30,11 +30,13 @@
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
-- [ ] 🧪 **Cinematic Capture System (Shot 01)**: Final verified version with gear-shifting warp and manual camera freedom. (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **Warp Button Upgrades**: Added **30x** and **7.2kx** buttons with professional labels and logic. (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **Granular HUD POIs**: Added "Approaching Geosync", "Geosynchronous Orbit", "Midpoint Transition", and "Approaching Lunar SOI" regions. (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **SOI Warp Sync**: Fixed "warp bounce" by allowing cinematic mode to handle its own deceleration inside the SOI. (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **Enhanced Cinematic Shot 01**: Integrated 7.2kx warp and smoother deceleration steps (using 30x gear). (Ready for QA 🧪 2026-04-01)
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **HUD: Midpoint Logic**: Implement hard midpoint calculation with a buffer range for the HUD and flight log.
-- [ ] 🔥🔥🔥 **HUD: Points of Interest (POIs)**: Add dynamic HUD markers/labels for Approaching Geosync, Geosync Orbit, and Beyond Geosync.
+- [ ] 🔥🔥🔥 **Verification: Full Mission Profile**: Test all new POI alerts and warp transitions from Earth to Moon.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **HUD: Deep Space Regions**: Refine labels for spaces between Earth POIs and the Midpoint.
