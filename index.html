@@ -633,10 +633,7 @@
                 altitude_km: r.toFixed(2), 
                 velocity_kms: v.toFixed(3), 
                 gforce: currentGForce.toFixed(2),
-                warp: timeWarp,
-                lon: lookLon.toFixed(2),
-                lat: lookLat.toFixed(2),
-                fov: camera.fov.toFixed(1)
+                warp: timeWarp
             });
         }
 
@@ -690,12 +687,6 @@
             while (playbackIndex < playbackLog.length && playbackLog[playbackIndex].met <= metSeconds) {
                 let entry = playbackLog[playbackIndex];
                 if (entry.warp !== undefined) updateWarpUI(entry.warp);
-                if (entry.lon !== undefined) lookLon = parseFloat(entry.lon);
-                if (entry.lat !== undefined) lookLat = parseFloat(entry.lat);
-                if (entry.fov !== undefined) {
-                    camera.fov = parseFloat(entry.fov);
-                    camera.updateProjectionMatrix();
-                }
                 playbackIndex++;
             }
         }
@@ -780,7 +771,6 @@
         });
 
         // Periodic State Logger (captures camera/fov for smooth playback)
-        let lastLogTime = 0;
         function updatePeriodicLogging(met) {
             if (playbackActive) return; // Don't log while playing back
             if (met - lastLogTime > 5) { // Log every 5 seconds of mission time
@@ -1103,27 +1093,25 @@
                 uiEngine.textContent = "STANDBY"; uiEngine.className = "nominal";
             }
 
-            // BUGFIX: Sphere of Influence State Latch. Only forces warp down ONCE.
+            // BUGFIX: Sphere of Influence State Latch.
             if (altE < 0) {
                 uiPhase.textContent = "HULL BREACH: CRASHED"; uiPhase.className = "danger";
                 uiStatus.textContent = "MISSION FAILURE"; uiStatus.className = "danger";
                 progradeMat.color.setHex(0xff0000); 
-                if (timeWarp > 1) updateWarpUI(1);
+                if (timeWarp > 1) updateWarpUI(1); // Keep safety 1x for crash
             } else if (altE < 100) {
                 uiPhase.textContent = "ATMOSPHERIC DRAG"; uiPhase.className = "danger";
                 uiStatus.textContent = "WARNING: ORBIT DECAYING"; uiStatus.className = "danger";
             } else if (distM < 0) {
                 uiPhase.textContent = "LITHOBRAKING (IMPACT)"; uiPhase.className = "danger";
                 uiStatus.textContent = "MISSION FAILURE"; uiStatus.className = "danger";
-                if (timeWarp > 1) updateWarpUI(1);
+                if (timeWarp > 1) updateWarpUI(1); // Keep safety 1x for crash
             } else if (distM <= 60000) {
                 uiPhase.textContent = "LUNAR ENCOUNTER"; uiPhase.className = "caution";
                 uiStatus.textContent = "GRAVITY WELL CAPTURE"; uiStatus.className = "caution";
                 document.getElementById('itin-coast').className = "complete";
                 document.getElementById('itin-flyby').className = "active";
                 if (!hasEnteredLunarSOI) {
-                    // Only force 1x if NOT in cinematic mode (cinematic has its own gear shifting)
-                    if (timeWarp > 1 && !cinematicActive) updateWarpUI(1); 
                     hasEnteredLunarSOI = true; // State latch engaged
                     logEvent("Alert: Entered Lunar Sphere of Influence");
                 }

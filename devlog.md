@@ -2,6 +2,32 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 15:30] - Warp Logic Freedom & Streamlined Logging
+### 📝 Summary
+Refined the simulation's safety logic to grant full creative control over time-acceleration and streamlined the flight log system for higher stability.
+
+### 🛠️ Work Done
+- **Warp Freedom**:
+    - Completely removed forced 1x warp resets upon entering the Lunar SOI or during encounter phases.
+    - All warp changes are now strictly manual or playback-driven, allowing for uninterrupted high-speed flybys if desired.
+- **Logging Refinement**:
+    - Stripped camera orientation (`lon`, `lat`) and FOV data from `logEvent()` and `updatePlayback()`.
+    - This shift focuses on solidifying the **Warp/MET synchronization** as the foundation for the playback engine before re-introducing complex camera data.
+- **Flight Log Analysis**: Reviewed `Artemis_FlightLog_2026-04-02.json` and confirmed raw MET storage is working correctly for frame-perfect playback.
+- **Task Management**: Mission is ready for "Warp-Only" playback verification.
+
+---
+
+## [2026-04-01 15:00] - Bugfix: Duplicate Declaration (Black Screen)
+### 📝 Summary
+Fixed a SyntaxError that caused the simulation to display a black screen.
+
+### 🛠️ Work Done
+- **Bug Fix**: Removed a duplicate declaration of `lastLogTime` at line 783. The variable was already correctly declared at line 228.
+- **Verification**: Verified that the console error "Identifier 'lastLogTime' has already been declared" is resolved.
+
+---
+
 ## [2026-04-01 14:45] - Data-Driven Flight Log Playback System
 ### 📝 Summary
 Revolutionized the Cinematic Capture workflow by implementing a data-driven flight log system. The simulation can now record manual creative choices and play them back with perfect fidelity.
