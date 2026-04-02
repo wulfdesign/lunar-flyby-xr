@@ -2,6 +2,24 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 14:45] - Data-Driven Flight Log Playback System
+### 📝 Summary
+Revolutionized the Cinematic Capture workflow by implementing a data-driven flight log system. The simulation can now record manual creative choices and play them back with perfect fidelity.
+
+### 🛠️ Work Done
+- **Playback Engine**:
+    - Implemented `playbackActive` and `updatePlayback()` logic.
+    - Added **LOAD FLIGHT LOG** button and JSON parser.
+    - Playback synchronizes `timeWarp`, `lookLon`, `lookLat`, and `camera.fov` based on mission elapsed time (MET).
+- **Advanced Logging**:
+    - Upgraded `logEvent()` to capture a complete state snapshot (Telemetry + Creative controls).
+    - Implemented **Periodic State Logging** (every 5s MET) to capture smooth camera movements during coasting.
+    - Manual warp button clicks now trigger immediate log events for precision.
+- **Safety Suppression**: Refined SOI and Encounter logic to suppress forced 1x warp resets when in Playback or Cinematic modes, allowing for professional, uninterrupted recordings.
+- **Task Management**: Ready for "Record once, Playback forever" verification.
+
+---
+
 ## [2026-04-01 14:15] - Professional Lunar Deceleration & HUD POIs
 ### 📝 Summary
 Finalized the professional-grade deceleration sequence for the Lunar encounter and added comprehensive mission regions to the HUD for better situational awareness.

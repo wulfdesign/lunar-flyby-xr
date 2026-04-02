@@ -143,6 +143,7 @@
                 </ul>
                 <div class="controls">
                     <button id="btn-save-log" title="Downloads a JSON file of your telemetry data at various mission timestamps. Includes G-Force data!">SAVE FLIGHT LOG</button>
+                    <button id="btn-load-log" title="Upload a flight log to play back the recorded mission.">LOAD FLIGHT LOG</button>
                     <button id="btn-cinematic" style="border-color: #ff4444; color: #ff4444;" title="Executes an automated cinematic flight sequence for video capture.">🔴 CINEMATIC CAPTURE</button>
                 </div>
             </div>
@@ -400,7 +401,7 @@
                 case 11: // ENCOUNTER
                     if (distM < 10000) {
                         shiftWarp(1);
-                        if (timeWarp === 1) { 
+                        if (timeWarp === 1 || playbackActive) { // Allow playback to continue through encounter
                             cinematicActive = false;
                             document.getElementById('cinematic-status').style.display = 'none';
                             logEvent("CINEMATIC: Shot 01 Complete. Flyby in progress.");
@@ -617,18 +618,87 @@
 
         resetMission();
 
+        let playbackActive = false;
+        let playbackLog = [];
+        let playbackIndex = 0;
+
         // --- LOGGING SYSTEM ---
         function logEvent(eventMsg) {
             let r = shipPos.length() - radEarth;
             let v = shipVel.length();
-            flightLog.push({ met: formatTime(metSeconds), event: eventMsg, altitude_km: r.toFixed(2), velocity_kms: v.toFixed(3), gforce: currentGForce.toFixed(2) });
+            flightLog.push({ 
+                met: metSeconds, // Store raw seconds for playback sync
+                met_formatted: formatTime(metSeconds),
+                event: eventMsg, 
+                altitude_km: r.toFixed(2), 
+                velocity_kms: v.toFixed(3), 
+                gforce: currentGForce.toFixed(2),
+                warp: timeWarp,
+                lon: lookLon.toFixed(2),
+                lat: lookLat.toFixed(2),
+                fov: camera.fov.toFixed(1)
+            });
         }
 
         document.getElementById('btn-save-log').addEventListener('click', () => {
             const blob = new Blob([JSON.stringify(flightLog, null, 2)], {type: "application/json"});
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'artemis_flight_log.json'; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = `Artemis_FlightLog_${new Date().toISOString().slice(0,10)}.json`; a.click();
         });
+
+        // Add file input for loading
+        const logInput = document.createElement('input');
+        logInput.type = 'file';
+        logInput.accept = '.json';
+        logInput.style.display = 'none';
+        document.body.appendChild(logInput);
+
+        document.getElementById('btn-load-log').addEventListener('click', () => logInput.click());
+
+        logInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    playbackLog = JSON.parse(event.target.result);
+                    playbackActive = true;
+                    playbackIndex = 0;
+                    resetMission();
+                    cinematicActive = false; // Disable hardcoded cinematic
+                    document.getElementById('cinematic-status').textContent = "[PLAYBACK ACTIVE]";
+                    document.getElementById('cinematic-status').style.display = 'block';
+                    logEvent("SYSTEM: Starting Flight Log Playback");
+                } catch (err) {
+                    alert("Error parsing flight log JSON.");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function updatePlayback(dt) {
+            if (!playbackActive || playbackIndex >= playbackLog.length) {
+                if (playbackActive) {
+                    playbackActive = false;
+                    document.getElementById('cinematic-status').style.display = 'none';
+                    logEvent("SYSTEM: Playback Complete.");
+                }
+                return;
+            }
+
+            // Find the next log entry that matches or has passed the current MET
+            while (playbackIndex < playbackLog.length && playbackLog[playbackIndex].met <= metSeconds) {
+                let entry = playbackLog[playbackIndex];
+                if (entry.warp !== undefined) updateWarpUI(entry.warp);
+                if (entry.lon !== undefined) lookLon = parseFloat(entry.lon);
+                if (entry.lat !== undefined) lookLat = parseFloat(entry.lat);
+                if (entry.fov !== undefined) {
+                    camera.fov = parseFloat(entry.fov);
+                    camera.updateProjectionMatrix();
+                }
+                playbackIndex++;
+            }
+        }
 
         // --- BUTTON BINDINGS ---
         document.getElementById('btn-abort').addEventListener('click', () => {
@@ -702,10 +772,22 @@
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
                 cinematicActive = false; // Manual override
+                playbackActive = false; // Manual override
                 document.getElementById('cinematic-status').style.display = 'none';
                 updateWarpUI(w);
+                logEvent(`MANUAL: Warp set to ${w}x`);
             });
         });
+
+        // Periodic State Logger (captures camera/fov for smooth playback)
+        let lastLogTime = 0;
+        function updatePeriodicLogging(met) {
+            if (playbackActive) return; // Don't log while playing back
+            if (met - lastLogTime > 5) { // Log every 5 seconds of mission time
+                logEvent("STATE_SNAPSHOT");
+                lastLogTime = met;
+            }
+        }
 
         // --- ORBITAL PHYSICS ENGINE (VELOCITY VERLET) ---
         function getAcceleration(pos) {
@@ -832,6 +914,8 @@
 
             // Update cinematic sequence
             if (cinematicActive) updateCinematic(dt_real, telemetry);
+            updatePlayback(dt_real);
+            updatePeriodicLogging(metSeconds);
 
             // --- AUTO TRACKING LOGIC ---
             if (isTrackingTarget && currentTargetObj) {
