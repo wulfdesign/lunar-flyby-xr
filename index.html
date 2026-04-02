@@ -975,7 +975,7 @@
 
             // --- UI UPDATE LOGIC ---
             let altE = shipPos.length() - radEarth;
-            let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+            distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
             
             if (altE > globalMaxAlt) globalMaxAlt = altE;
             
@@ -1175,8 +1175,8 @@
                 uiStatus.textContent = "GRAVITY WELL CAPTURE"; uiStatus.className = "caution";
                 document.getElementById('itin-coast').className = "complete";
                 document.getElementById('itin-flyby').className = "active";
-                if (!hasEnteredLunarSOI) {
-                    hasEnteredLunarSOI = true; // State latch engaged
+                if (!milestoneLatches.inSOI) {
+                    milestoneLatches.inSOI = true; // State latch engaged
                     logEvent("Alert: Entered Lunar Sphere of Influence");
                 }
             } else if (telemetry.isTliCoast) {

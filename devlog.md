@@ -2,6 +2,26 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 16:30] - Bugfix: ReferenceError (SOI Latch)
+### 📝 Summary
+Fixed a ReferenceError that caused the simulation to stall during Lunar SOI entry.
+
+### 🛠️ Work Done
+- **Bug Fix**: Replaced the outdated `hasEnteredLunarSOI` variable with the new `milestoneLatches.inSOI` object property in the UI update logic.
+- **Verification**: Verified that all state latches now consistently use the `milestoneLatches` schema.
+
+---
+
+## [2026-04-01 16:15] - Bugfix: Duplicate Declaration (distM)
+### 📝 Summary
+Fixed a SyntaxError that caused the simulation to fail due to a duplicate variable declaration.
+
+### 🛠️ Work Done
+- **Bug Fix**: Removed a duplicate `let` declaration for `distM` within the main animation loop. The variable is now declared once at the top of the loop for sub-stepping logic and reused later for UI updates.
+- **Verification**: Verified that the console error "Identifier 'distM' has already been declared" is resolved.
+
+---
+
 ## [2026-04-01 16:00] - Flight Log Optimization & Trajectory Data
 ### 📝 Summary
 Dramatically reduced the flight log file size while increasing the data utility for mission validation and trajectory analysis.
