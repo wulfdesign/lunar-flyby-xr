@@ -627,20 +627,25 @@
             let r = shipPos.length() - radEarth;
             let v = shipVel.length();
             flightLog.push({ 
-                met: metSeconds, // Store raw seconds for playback sync
+                met: metSeconds, 
                 met_formatted: formatTime(metSeconds),
                 event: eventMsg, 
                 altitude_km: r.toFixed(2), 
                 velocity_kms: v.toFixed(3), 
                 gforce: currentGForce.toFixed(2),
-                warp: timeWarp
+                warp: timeWarp,
+                x: shipPos.x.toFixed(4),
+                y: shipPos.y.toFixed(4),
+                z: shipPos.z.toFixed(4)
             });
         }
 
         document.getElementById('btn-save-log').addEventListener('click', () => {
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
             const blob = new Blob([JSON.stringify(flightLog, null, 2)], {type: "application/json"});
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Artemis_FlightLog_${new Date().toISOString().slice(0,10)}.json`; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = `Artemis_FlightLog_${timestamp}.json`; a.click();
         });
 
         // Add file input for loading
@@ -770,15 +775,6 @@
             });
         });
 
-        // Periodic State Logger (captures camera/fov for smooth playback)
-        function updatePeriodicLogging(met) {
-            if (playbackActive) return; // Don't log while playing back
-            if (met - lastLogTime > 5) { // Log every 5 seconds of mission time
-                logEvent("STATE_SNAPSHOT");
-                lastLogTime = met;
-            }
-        }
-
         // --- ORBITAL PHYSICS ENGINE (VELOCITY VERLET) ---
         function getAcceleration(pos) {
             let rEarthSq = pos.lengthSq();
@@ -905,7 +901,6 @@
             // Update cinematic sequence
             if (cinematicActive) updateCinematic(dt_real, telemetry);
             updatePlayback(dt_real);
-            updatePeriodicLogging(metSeconds);
 
             // --- AUTO TRACKING LOGIC ---
             if (isTrackingTarget && currentTargetObj) {

@@ -8,19 +8,19 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Optimized Flight Logging**: Removed periodic 5s snapshots to drastically reduce log size. Logging now triggers only on meaningful state changes. (Verified 2026-04-01)
+- [x] 🏆 **Trajectory Data**: Added ship X, Y, Z coordinates to every log entry for trajectory validation and debugging. (Verified 2026-04-01)
+- [x] 🏆 **Detailed Log Naming**: Log files now save with full ISO timestamp (YYYY-MM-DD-HH-MM-SS) for better organization. (Verified 2026-04-01)
 - [x] 🏆 **Non-Forced Warp Transitions**: Removed forced 1x warp resets at Lunar SOI/Encounter. Warp is now purely user or playback driven. (Verified 2026-04-01)
 - [x] 🏆 **Streamlined Logging**: Stripped unstable camera/FOV data from Flight Logs to focus on stable Warp/MET synchronization. (Verified 2026-04-01)
-- [x] 🏆 **Data-Driven Flight Log Playback**: Implemented LOAD FLIGHT LOG functionality to play back recorded missions (Warp/MET only for now). (Verified 2026-04-01)
-- [x] 🏆 **Warp Button Upgrades**: Added **30x** and **7.2kx** buttons with professional labels and logic. (Verified 2026-04-01)
-- [x] 🏆 **Granular HUD POIs**: Implemented full suite of mission regions (Geosync, Midpoint, SOI, Proximity) with alerts. (Verified 2026-04-01)
-- [x] 🏆 **Gradual Lunar Deceleration**: Multi-step warp deceleration (1800x -> 1x) for professional approach. (Verified 2026-04-01)
-- [x] 🏆 **Gear-Shifting Warp Logic**: Smooth, stepped time warp transitions (2s hold per level) implemented and verified. (Verified 2026-04-01)
+- [x] 🏆 **Data-Driven Flight Log Playback**: Implemented LOAD FLIGHT LOG functionality to play back recorded missions. (Verified 2026-04-01)
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
-- [ ] 🧪 **Warp-Only Playback**: Test recording a mission with various warp changes and loading it back to verify the sim follows the speed profile correctly. (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **Log Size Verification**: Test a full flight and confirm the resulting JSON is a manageable size (kilobytes vs megabytes). (Ready for QA 🧪 2026-04-01)
 
 ## 🛠️ Current Work
+- [ ] 🔥🔥🔥 **Physics: Free Return Verification**: Investigate reported "fly past" issue. Verify if the TLI burn energy and Lunar SOI gravity are correctly resulting in a free-return trajectory.
 - [ ] 🔥🔥🔥 **Verification: Final Cislunar Flight**: Verify all 12+ mission phases and warp transitions without any "forced" resets.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)

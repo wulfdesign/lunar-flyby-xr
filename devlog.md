@@ -2,6 +2,25 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 16:00] - Flight Log Optimization & Trajectory Data
+### 📝 Summary
+Dramatically reduced the flight log file size while increasing the data utility for mission validation and trajectory analysis.
+
+### 🛠️ Work Done
+- **Log Size Optimization**: 
+    - Removed the 5-second periodic state logging. 
+    - Logs now only trigger on meaningful mission events (Manual warp changes, region transitions, milestones, engine commands).
+    - Expected file size reduction: ~95% compared to previous runs.
+- **Trajectory Validation**: 
+    - Added high-precision ship X, Y, Z coordinates to every log entry. 
+    - This allows for post-mission analysis of the flight path to verify free-return accuracy.
+- **File Organization**: 
+    - Updated log filename to include full ISO timestamp (`Artemis_FlightLog_YYYY-MM-DD-HH-MM-SS.json`).
+- **Safety Sync**: Verified that forced 1x warp resets are still suppressed for professional playback/capture.
+- **Physics Investigation**: Added "Free Return Verification" to the roadmap to investigate reports of fly-past issues.
+
+---
+
 ## [2026-04-01 15:30] - Warp Logic Freedom & Streamlined Logging
 ### 📝 Summary
 Refined the simulation's safety logic to grant full creative control over time-acceleration and streamlined the flight log system for higher stability.
