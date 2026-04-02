@@ -2,6 +2,61 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 17:30] - Log Organization & Release Prep
+### 📝 Summary
+Organized the workspace for better record management and disabled unstable features in preparation for public release.
+
+### 🛠️ Work Done
+- **Workspace Organization**:
+    - Created a dedicated `/logs` directory to store mission records.
+    - Moved all existing `.json` flight logs into the new folder.
+- **UI & Controls**:
+    - Disabled the **LOAD FLIGHT LOG** button (Offline) to prevent state-reset issues for the public release.
+    - Added a clear tooltip explanation for the disabled state.
+- **Physics Investigation**:
+    - Analyzed the latest flight log and identified a potential burn discrepancy (Target vs Actual).
+    - Initiated a "Lunar Keyhole" investigation to address why recent automated flights are overshooting the Moon into deep space.
+- **Task Management**: Marked "Track Target" as functional and verified.
+
+---
+
+## [2026-04-01 17:30] - Log Organization & Release Prep
+### 📝 Summary
+Organized the workspace for better record management and disabled unstable features in preparation for public release.
+
+### 🛠️ Work Done
+- **Workspace Organization**:
+    - Created a dedicated `/logs` directory to store mission records.
+    - Moved all existing `.json` flight logs into the new folder.
+- **UI & Controls**:
+    - Disabled the **LOAD FLIGHT LOG** button (Offline) to prevent state-reset issues for the public release.
+    - Added a clear tooltip explanation for the disabled state.
+- **Physics Investigation**:
+    - Analyzed the latest flight log and identified a potential burn discrepancy (Target vs Actual).
+    - Initiated a "Lunar Keyhole" investigation to address why recent automated flights are overshooting the Moon into deep space.
+- **Task Management**: Marked "Track Target" as functional and verified.
+
+---
+
+## [2026-04-01 16:45] - Pre-Release Baseline & Logging Finalization
+### 📝 Summary
+Finalized the granular milestone logging system and established a stable baseline for public release. The simulation now provides a high-fidelity record of mission progress.
+
+### 🛠️ Work Done
+- **UI & Controls**:
+    - Temporarily disabled the "🔴 CINEMATIC CAPTURE" button to focus on the Data-Driven Playback workflow for the public release.
+    - Verified all 9 warp gears (1x to 7.2kx) are functional and correctly labeled.
+- **Logging Perfection**:
+    - Confirmed that "Approaching", "At", and "Beyond" milestones for all major POIs are correctly latched and logged once per mission.
+    - Verified that high-precision X, Y, Z coordinates are present in the flight logs for trajectory validation.
+- **Bug Fixes**:
+    - Resolved SyntaxErrors (`distM`, `lastLogTime`) and ReferenceErrors (`hasEnteredLunarSOI`) that were causing simulation stalls.
+- **Physics**:
+    - Integrated finer 0.1s sub-stepping within the Lunar SOI to improve capture accuracy at high warp.
+- **Next Steps**: Investigating "Lunar Keyhole" physics to ensure 100% reliable free-return trajectories.
+
+---
+
 ## [2026-04-01 16:30] - Bugfix: ReferenceError (SOI Latch)
 ### 📝 Summary
 Fixed a ReferenceError that caused the simulation to stall during Lunar SOI entry.

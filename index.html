@@ -143,8 +143,10 @@
                 </ul>
                 <div class="controls">
                     <button id="btn-save-log" title="Downloads a JSON file of your telemetry data at various mission timestamps. Includes G-Force data!">SAVE FLIGHT LOG</button>
-                    <button id="btn-load-log" title="Upload a flight log to play back the recorded mission.">LOAD FLIGHT LOG</button>
-                    <button id="btn-cinematic" style="border-color: #ff4444; color: #ff4444;" title="Executes an automated cinematic flight sequence for video capture.">🔴 CINEMATIC CAPTURE</button>
+                    <!-- <button id="btn-load-log" title="Upload a flight log to play back the recorded mission.">LOAD FLIGHT LOG</button> -->
+                    <button id="btn-load-log" style="border-color: #555; color: #555; cursor: not-allowed;" title="Playback system currently under maintenance." disabled>LOAD FLIGHT LOG (OFFLINE)</button>
+                    <!-- <button id="btn-cinematic" style="border-color: #ff4444; color: #ff4444;" title="Executes an automated cinematic flight sequence for video capture.">🔴 CINEMATIC CAPTURE</button> -->
+                    <button id="btn-cinematic" style="border-color: #555; color: #555; cursor: not-allowed;" title="Automation system currently under maintenance." disabled>🔴 CINEMATIC (OFFLINE)</button>
                 </div>
             </div>
 
