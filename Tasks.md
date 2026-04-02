@@ -8,6 +8,9 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Warp Button Upgrades**: Added **30x** and **7.2kx** buttons with professional labels and logic. (Verified 2026-04-01)
+- [x] 🏆 **Granular HUD POIs**: Implemented full suite of mission regions (Geosync, Midpoint, SOI, Proximity) with alerts. (Verified 2026-04-01)
+- [x] 🏆 **Gradual Lunar Deceleration**: Multi-step warp deceleration (1800x -> 1x) for professional approach. (Verified 2026-04-01)
 - [x] 🏆 **Gear-Shifting Warp Logic**: Smooth, stepped time warp transitions (2s hold per level) implemented and verified. (Verified 2026-04-01)
 - [x] 🏆 **Manual Camera Freedom**: Manual camera panning and tilting enabled during Cinematic Capture when tracking is off. (Verified 2026-04-01)
 - [x] 🏆 **Fix Lunar SOI Warp Stop**: Simulation threshold increased to 60,000km with robust latching logic to prevent repeated resets. (Verified 2026-04-01)
@@ -30,13 +33,10 @@
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
-- [ ] 🧪 **Warp Button Upgrades**: Added **30x** and **7.2kx** buttons with professional labels and logic. (Ready for QA 🧪 2026-04-01)
-- [ ] 🧪 **Granular HUD POIs**: Added "Approaching Geosync", "Geosynchronous Orbit", "Midpoint Transition", and "Approaching Lunar SOI" regions. (Ready for QA 🧪 2026-04-01)
-- [ ] 🧪 **SOI Warp Sync**: Fixed "warp bounce" by allowing cinematic mode to handle its own deceleration inside the SOI. (Ready for QA 🧪 2026-04-01)
-- [ ] 🧪 **Enhanced Cinematic Shot 01**: Integrated 7.2kx warp and smoother deceleration steps (using 30x gear). (Ready for QA 🧪 2026-04-01)
+- [ ] 🧪 **Shot 01 Enhanced Automation**: Final cislunar crossing sequence with granular gear-shifting and MEO speed adjustments. (Ready for QA 🧪 2026-04-01)
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Verification: Full Mission Profile**: Test all new POI alerts and warp transitions from Earth to Moon.
+- [ ] 🔥🔥🔥 **Verification: Final Cislunar Flight**: Verify all 12+ mission phases and warp transitions.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **HUD: Deep Space Regions**: Refine labels for spaces between Earth POIs and the Midpoint.

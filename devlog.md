@@ -2,6 +2,23 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 14:15] - Professional Lunar Deceleration & HUD POIs
+### 📝 Summary
+Finalized the professional-grade deceleration sequence for the Lunar encounter and added comprehensive mission regions to the HUD for better situational awareness.
+
+### 🛠️ Work Done
+- **Gradual Deceleration**:
+    - Implemented a multi-step "Shot 01" deceleration sequence: 3.6kx -> 1.8kx -> 600x -> 300x -> 60x -> 10x -> 1x.
+    - Each step holds for 2 seconds via the gear-shifting engine, providing a cinematic "arrival" feel.
+- **MEO Refinement**: Added a 60x "MEO Coast" phase between 15,000km and 30,000km altitude to provide a better view of Earth departure.
+- **HUD Region Granularity**:
+    - Added "Final Lunar Approach" (40,000 km) and "Lunar Proximity" (15,000 km).
+    - Refined deep space labels to distinguish between "Cislunar Outbound" and "Cislunar Inbound".
+- **Safety Sync**: Confirmed the SOI warp-reset suppression only occurs when `cinematicActive` is true, preserving safety for manual flight while allowing professional recording.
+- **Task Management**: Mission profile is now considered feature-complete for current requirements.
+
+---
+
 ## [2026-04-01 13:45] - Warp Upgrades & Granular POIs
 ### 📝 Summary
 Enhanced the simulation with new time-acceleration options, granular HUD points of interest, and synchronized cinematic/safety logic.

@@ -319,13 +319,29 @@
 
                 case 4: // EARLY DEPARTURE
                     if (telemetry.isTliCoast) {
-                        shiftWarp(600); 
-                        cinematicPhase = 5;
-                        logEvent("CINEMATIC: Phase 5 - Earth Departure Coast");
+                        shiftWarp(30); 
+                        cinematicPhase = 4.5;
+                        logEvent("CINEMATIC: Phase 4.5 - MEO Departure (30x)");
                     }
                     break;
 
-                case 5: // DEEP SPACE ACCELERATION
+                case 4.5: // MID MEO
+                    if (altE > 15000) {
+                        shiftWarp(60);
+                        cinematicPhase = 5;
+                        logEvent("CINEMATIC: Phase 5 - Climbing to Geosync (60x)");
+                    }
+                    break;
+
+                case 5: // GEOSYNC APPROACH
+                    if (altE > 30000) { // Approaching Geosync
+                        shiftWarp(600);
+                        cinematicPhase = 5.5;
+                        logEvent("CINEMATIC: Phase 5.5 - Passing Geosync (600x)");
+                    }
+                    break;
+
+                case 5.5: // DEEP SPACE ACCELERATION
                     if (altE > 100000) {
                         shiftWarp(7200);
                         cinematicPhase = 7;
@@ -341,26 +357,50 @@
                     }
                     break;
 
-                case 8: // LUNAR PROXIMITY
+                case 8: // LUNAR SOI ENTRY
                     if (distM < 80000) { 
+                        shiftWarp(1800);
+                        cinematicPhase = 8.5;
+                        logEvent("CINEMATIC: Phase 8.5 - Approaching SOI (1.8kx)");
+                    }
+                    break;
+
+                case 8.5: // SOI TRANSITION
+                    if (distM < 60000) { 
                         shiftWarp(600);
                         cinematicPhase = 9;
-                        logEvent("CINEMATIC: Phase 9 - Lunar SOI Proximity (600x)");
+                        logEvent("CINEMATIC: Phase 9 - Lunar SOI Entry (600x)");
                     }
                     break;
 
-                case 9: // FINAL APPROACH
-                    if (distM < 30000) {
-                        shiftWarp(30);
+                case 9: // CLOSE APPROACH
+                    if (distM < 40000) {
+                        shiftWarp(300);
+                        cinematicPhase = 9.5;
+                        logEvent("CINEMATIC: Phase 9.5 - Close Approach (300x)");
+                    }
+                    break;
+
+                case 9.5: // FINAL APPROACH
+                    if (distM < 25000) {
+                        shiftWarp(60);
                         cinematicPhase = 10;
-                        logEvent("CINEMATIC: Phase 10 - Final Approach (30x)");
+                        logEvent("CINEMATIC: Phase 10 - Final Approach (60x)");
                     }
                     break;
 
-                case 10: // ENCOUNTER
+                case 10: // PRE-FLYBY
+                    if (distM < 15000) {
+                        shiftWarp(10);
+                        cinematicPhase = 11;
+                        logEvent("CINEMATIC: Phase 11 - Pre-Flyby (10x)");
+                    }
+                    break;
+
+                case 11: // ENCOUNTER
                     if (distM < 10000) {
                         shiftWarp(1);
-                        if (timeWarp === 1) { // Wait for gear shift to finish
+                        if (timeWarp === 1) { 
                             cinematicActive = false;
                             document.getElementById('cinematic-status').style.display = 'none';
                             logEvent("CINEMATIC: Shot 01 Complete. Flyby in progress.");
@@ -872,9 +912,11 @@
 
             // Region Logic & Milestone Alerts
             let region = "Low Earth Orbit";
-            if (distM < 60000) region = "Lunar Sphere of Influence";
+            if (distM < 15000) region = "Lunar Proximity";
+            else if (distM < 40000) region = "Final Lunar Approach";
+            else if (distM < 60000) region = "Lunar Sphere of Influence";
             else if (distM < 100000) region = "Approaching Lunar SOI";
-            else if (altE > 200000) region = "Deep Space (Past Midpoint)";
+            else if (altE > 202200) region = "Deep Space (Cislunar Inbound)";
             else if (altE > 182200 && altE < 202200) {
                 region = "Trans-Lunar Midpoint";
                 if (!hasReachedMidpoint) {
@@ -883,7 +925,8 @@
                     triggerAlertFlash("region-text");
                 }
             }
-            else if (altE > 100000) region = "Deep Space (Outbound)";
+            else if (altE > 150000) region = "Approaching Midpoint";
+            else if (altE > 100000) region = "Deep Space (Cislunar Outbound)";
             else if (altE > 36300) region = "Beyond Geosynchronous";
             else if (altE > 35286 && altE < 36286) {
                 region = "Geosynchronous Orbit";
