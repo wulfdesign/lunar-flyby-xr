@@ -2,21 +2,20 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
-## [2026-04-01 17:30] - Log Organization & Release Prep
+## [2026-04-01 18:00] - Social Media Strategy & Reddit Research
 ### 📝 Summary
-Organized the workspace for better record management and disabled unstable features in preparation for public release.
+Developed a comprehensive social media strategy to expand the project's reach, focusing on Reddit communities and cross-promotion of historical eclipse content.
 
 ### 🛠️ Work Done
-- **Workspace Organization**:
-    - Created a dedicated `/logs` directory to store mission records.
-    - Moved all existing `.json` flight logs into the new folder.
-- **UI & Controls**:
-    - Disabled the **LOAD FLIGHT LOG** button (Offline) to prevent state-reset issues for the public release.
-    - Added a clear tooltip explanation for the disabled state.
-- **Physics Investigation**:
-    - Analyzed the latest flight log and identified a potential burn discrepancy (Target vs Actual).
-    - Initiated a "Lunar Keyhole" investigation to address why recent automated flights are overshooting the Moon into deep space.
-- **Task Management**: Marked "Track Target" as functional and verified.
+- **Strategy Documentation**:
+    - Created `private/lunar-flyby-xr_Social-Media-Posts.md` to track all public engagement.
+    - Logged official links for the initial Facebook and LinkedIn soft launches.
+- **Reddit Research**:
+    - Identified top-tier subreddits for technical (r/threejs, r/WebXR), scientific (r/space, r/NASA), and gaming (r/spacesimgames) audiences.
+    - Drafted three community-specific post templates with tailored "hooks" and value propositions.
+- **Cross-Promotion**:
+    - Integrated links to the *High Desert Eclipse 360* documentary into the outreach strategy to showcase long-term creator history.
+- **Task Management**: Prepared for the "Shot 01" video capture release.
 
 ---
 
