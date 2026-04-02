@@ -244,9 +244,37 @@
         let isTrackingTarget = false;
         let currentTargetObj = null;
 
+        // --- GEAR SHIFTING WARP LOGIC ---
+        let targetWarp = 1;
+        let warpStepTimer = 0;
+        const warpLevels = [1, 10, 60, 300, 600, 1800, 3600];
+
+        function shiftWarp(target) {
+            targetWarp = target;
+        }
+
+        function updateWarpStepping(dt) {
+            if (timeWarp === targetWarp) return;
+            
+            warpStepTimer += dt;
+            if (warpStepTimer > 2.0) { // Stay on each "gear" for 2 seconds
+                let currentIndex = warpLevels.indexOf(timeWarp);
+                let targetIndex = warpLevels.indexOf(targetWarp);
+                
+                if (currentIndex < targetIndex) {
+                    updateWarpUI(warpLevels[currentIndex + 1]);
+                } else if (currentIndex > targetIndex) {
+                    updateWarpUI(warpLevels[currentIndex - 1]);
+                }
+                warpStepTimer = 0;
+            }
+        }
+
         function updateCinematic(dt, telemetry) {
             if (!cinematicActive) return;
             cinematicTimer += dt;
+            updateWarpStepping(dt);
+
             let altE = shipPos.length() - radEarth;
             let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
 
@@ -258,16 +286,16 @@
                     document.getElementById('btn-toggle-auto').classList.add('active');
                     document.getElementById('autopilot-status').textContent = "ENGAGED";
                     document.getElementById('autopilot-status').className = "nominal";
-                    updateWarpUI(10);
+                    shiftWarp(10);
                     cinematicPhase = 1;
-                    logEvent("CINEMATIC: Phase 1 - Pre-Launch Alignment (10x Warp)");
+                    logEvent("CINEMATIC: Phase 1 - Pre-Launch Alignment");
                     break;
 
                 case 1: // IGNITION PREP
                     if (telemetry.timeToWindow < 15) {
-                        updateWarpUI(1);
+                        shiftWarp(1);
                         cinematicPhase = 2;
-                        logEvent("CINEMATIC: Phase 2 - Ignition Prep (1x Warp)");
+                        logEvent("CINEMATIC: Phase 2 - Ignition Prep");
                     }
                     break;
 
@@ -281,78 +309,60 @@
 
                 case 3: // BURN MONITORING
                     if (cinematicTimer > 15) {
-                        updateWarpUI(10);
+                        shiftWarp(10);
                         cinematicPhase = 4;
-                        logEvent("CINEMATIC: Phase 4 - Departure Acceleration (10x Warp)");
+                        logEvent("CINEMATIC: Phase 4 - Departure Acceleration");
                     }
                     break;
 
                 case 4: // EARLY DEPARTURE
                     if (telemetry.isTliCoast) {
-                        updateWarpUI(600); 
+                        shiftWarp(600); 
                         cinematicPhase = 5;
-                        logEvent("CINEMATIC: Phase 5 - Earth Departure (600x Warp)");
+                        logEvent("CINEMATIC: Phase 5 - Earth Departure Coast");
                     }
                     break;
 
-                case 5: // GEO TRANSITION
-                    if (altE > 35000) {
-                        updateWarpUI(10);
-                        cinematicTimer = 0;
-                        lookTargetLon = lookLon + 180;
-                        cinematicPhase = 6;
-                        logEvent("CINEMATIC: Phase 6 - GEO Transition & Earthrise Pan");
-                    }
-                    break;
-
-                case 6: // SMOOTH PAN (Slowed down to 15s)
-                    let panDur = 15;
-                    let panProgress = Math.min(cinematicTimer / panDur, 1);
-                    lookLon = THREE.MathUtils.lerp(lookLon, lookTargetLon, 0.02); 
-                    if (panProgress >= 1 || Math.abs(lookLon - lookTargetLon) < 0.5) {
-                        updateWarpUI(3600);
-                        isTrackingTarget = true;
-                        currentTargetObj = moon; // Auto-track the moon after pan
-                        document.getElementById('btn-track-target').textContent = "TRACK TARGET: ON";
-                        document.getElementById('btn-track-target').classList.add('active');
+                case 5: // DEEP SPACE TRANSITION
+                    if (altE > 100000) {
+                        shiftWarp(3600);
                         cinematicPhase = 7;
-                        logEvent("CINEMATIC: Phase 7 - Deep Space Coast (3600x Warp)");
+                        logEvent("CINEMATIC: Phase 7 - Deep Space (Max Warp)");
                     }
                     break;
 
-                case 7: // LUNAR ARRIVAL PREP
-                    if (distM < 80000) {
-                        updateWarpUI(1800);
+                case 7: // LUNAR APPROACH PREP
+                    if (distM < 100000) {
+                        shiftWarp(1800);
                         cinematicPhase = 8;
-                        logEvent("CINEMATIC: Phase 8 - Lunar Proximity (1.8kx Warp)");
+                        logEvent("CINEMATIC: Phase 8 - Lunar Outskirts");
                     }
                     break;
 
-                case 8: // LUNAR APPROACH
-                    if (distM < 40000) {
-                        updateWarpUI(300);
+                case 8: // LUNAR SOI ENTRY
+                    if (distM < 60000) { 
+                        shiftWarp(600);
                         cinematicPhase = 9;
-                        logEvent("CINEMATIC: Phase 9 - Lunar Approach (300x Warp)");
+                        logEvent("CINEMATIC: Phase 9 - Lunar SOI Entry");
                     }
                     break;
 
-                case 9: // FINAL DESCENT
-                    if (distM < 15000) {
-                        updateWarpUI(10);
+                case 9: // FINAL APPROACH
+                    if (distM < 25000) {
+                        shiftWarp(60);
                         cinematicPhase = 10;
-                        logEvent("CINEMATIC: Phase 10 - Final Approach (10x Warp)");
+                        logEvent("CINEMATIC: Phase 10 - Final Approach");
                     }
                     break;
 
                 case 10: // ENCOUNTER
-                    if (distM < 8000) {
-                        updateWarpUI(1);
-                        cinematicActive = false;
-                        isTrackingTarget = false;
-                        document.getElementById('btn-track-target').textContent = "TRACK TARGET: OFF";
-                        document.getElementById('btn-track-target').classList.remove('active');
-                        document.getElementById('cinematic-status').style.display = 'none';
-                        logEvent("CINEMATIC: Shot 01 Complete. Manual control restored.");
+                    if (distM < 10000) {
+                        shiftWarp(1);
+                        if (timeWarp === 1) { // Wait for gear shift to finish
+                            cinematicActive = false;
+                            document.getElementById('cinematic-status').style.display = 'none';
+                            logEvent("CINEMATIC: Shot 01 Complete. Flyby in progress.");
+                        }
                     }
                     break;
             }
@@ -368,6 +378,22 @@
             } else {
                 document.getElementById('cinematic-status').style.display = 'none';
                 logEvent("CINEMATIC: Sequence Aborted by User.");
+            }
+        });
+
+        document.getElementById('btn-track-target').addEventListener('click', (e) => {
+            isTrackingTarget = !isTrackingTarget;
+            e.target.textContent = isTrackingTarget ? "TRACK TARGET: ON" : "TRACK TARGET: OFF";
+            if (isTrackingTarget) {
+                e.target.classList.add('active');
+                // If we have a current target from the raycaster, lock onto it
+                // currentTargetObj is updated by the raycaster loop in the main render loop
+                if (currentTargetObj) {
+                    logEvent(`Tracking locked to: ${currentTargetObj.name || "Target"}`);
+                }
+            } else {
+                e.target.classList.remove('active');
+                logEvent("Target tracking disabled.");
             }
         });
 
@@ -495,20 +521,19 @@
 
         // --- MOUSE / TOUCH LOOK CONTROLS ---
         let lookLon = 0; let lookLat = 0; let isDraggingView = false; let prevMousePos = { x: 0, y: 0 };
-        document.addEventListener('mousedown', (e) => { 
-            if (cinematicActive) return;
+        document.addEventListener('mousedown', (e) => {
+            if (isTrackingTarget) return; // Still lock if tracking is actively engaged
             if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; }
         });
         document.addEventListener('mouseup', () => isDraggingView = false);
         document.addEventListener('mousemove', (e) => {
-            if (isDraggingView && !cinematicActive) {
+            if (isDraggingView && !isTrackingTarget) {
                 let deltaX = e.clientX - prevMousePos.x; let deltaY = e.clientY - prevMousePos.y;
                 lookLon -= deltaX * 0.2; lookLat -= deltaY * 0.2;
                 lookLat = Math.max(-85, Math.min(85, lookLat));
                 prevMousePos = { x: e.clientX, y: e.clientY };
             }
         });
-
         // --- ORBITAL MATH & INITIALIZATION ---
         function resetMission() {
             let startRadius = radEarth + 400; 

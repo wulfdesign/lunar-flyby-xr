@@ -2,6 +2,107 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-01 13:15] - Full Mission Verification: Shot 01 Stable
+### 📝 Summary
+User performed a full mission run and confirmed that the Cinematic Capture sequence (Shot 01) is now fully functional, stable, and professional.
+
+### 🛠️ Work Done
+- **QA Verification**: Confirmed smooth "gear-shifting" warp transitions (🏆).
+- **QA Verification**: Verified that the simulation no longer gets stuck at 10x warp during the cislunar crossing (🏆).
+- **QA Verification**: Confirmed robust Lunar SOI latching and warp reset behavior (🏆).
+- **Baseline established**: This version is now considered the "Gold Master" for Shot 01 automation.
+- **Next Steps**: Enhancing HUD telemetry with more granular points of interest (Geosync, Midpoint ranges).
+
+---
+
+## [2026-04-01 12:45] - Gear-Shifting Warp Logic (Professional Transitions)
+### 📝 Summary
+Implemented a new "gear-shifting" warp system for the Cinematic Capture sequence to provide smooth, professional transitions between simulation speeds.
+
+### 🛠️ Work Done
+- **Gear-Shifting System**:
+    - Introduced `targetWarp` and `updateWarpStepping()` logic.
+    - Instead of jumping directly (e.g., 1x -> 600x), the simulation now iterates through the `warpLevels` list ([1, 10, 60, 300, 600, 1800, 3600]).
+    - Transitions now hold for **2 seconds per step**, creating a more cinematic and stable acceleration/deceleration effect.
+- **Warp Logic Fixes**:
+    - Fixed Phase 5 where the simulation was getting "stuck" at 10x warp. It now correctly accelerates to Max Warp (3.6kx) once altitude exceeds 100,000 km.
+    - Synced all cinematic phases to use the `shiftWarp()` command for smoother mission progress.
+- **Task Management**: Ready for verification of smooth warp transitions.
+
+---
+
+## [2026-04-01 12:00] - Manual Camera Freedom Verified & Auto-Tracking Archived
+### 📝 Summary
+User verified that manual camera movement is now correctly working during Cinematic Capture. Automated tracking has been disabled and moved to the Icebox to focus on warp timing.
+
+### 🛠️ Work Done
+- **QA Verification**: Manual camera control (panning/tilting) confirmed working as intended during Cinematic Capture (🏆).
+- **Strategy Shift**: Automated camera pans (Phase 6, 7.5) and forced tracking are now permanently disabled in the production script.
+- **Roadmap Update**: "Refine Auto Camera Tracking" moved to **Icebox (Cold Storage)** for a future post-V2.0 update.
+- **Task Management**: Finalizing warp timing and SOI logic for the next full mission run.
+
+---
+
+## [2026-04-01 11:50] - Cinematic Camera Automation Disabled
+### 📝 Summary
+Removed all automated camera pans and tracking from the Cinematic Capture sequence to provide the user with full manual control over the view.
+
+### 🛠️ Work Done
+- **Cinematic Sequence**:
+    - Removed Phase 6 (Earthrise Pan) and Phase 7.5 (Midpoint Transition Pan).
+    - Disabled all `isTrackingTarget` force-activations within the script.
+    - Automation now focuses exclusively on **Time Warp Timing** (1x, 10x, 600x, 1.8kx, 3.6kx transitions).
+- **Manual Control**: User has 100% manual control over the camera during the entire "Shot 01" sequence unless they manually toggle "TRACK TARGET" on.
+- **Task Management**: Prepared for verification of warp-only automation.
+
+---
+
+## [2026-04-01 11:35] - Manual Camera Freedom & Midpoint Pan Lock
+### 📝 Summary
+Enabled manual camera controls during Cinematic Capture sequences while ensuring automated pans remain smooth and uninterrupted.
+
+### 🛠️ Work Done
+- **Manual Camera Freedom**:
+    - Modified `mousedown` and `mousemove` listeners to allow user-controlled panning and tilting during Cinematic Capture IF `isTrackingTarget` is false.
+    - Users can now manually adjust the shot during long coasts (Phase 7 and Phase 8-10) by toggling "TRACK TARGET" off.
+- **Cinematic Pan Locking**:
+    - Explicitly set `isTrackingTarget = true` during automated pan phases (Phase 6: Earthrise and Phase 7.5: Midpoint Transition) to prevent user input from causing "jitter" during these scripted shots.
+    - Once the pan completes, tracking remains active but can be manually toggled off for creative control.
+- **Task Management**: Prepared for verification of the manual control/tracking handoff.
+
+---
+
+## [2026-04-01 11:15] - Cinematic Camera & Tracking Refinement
+### 📝 Summary
+Refined the cinematic camera sequence for a more professional "shot flow" and restored manual tracking control with crosshair-locking capability.
+
+### 🛠️ Work Done
+- **Cinematic Sequence**:
+    - **Phase 7 (Departure Coast)**: Now continues tracking Earth after the initial pan, providing a long "looking back" shot during the 3.6kx warp coast.
+    - **Phase 7.5 (Midpoint Transition)**: Added a smooth 10-second pan from Earth to the Moon at the mission halfway point (192,200 km altitude).
+    - **Phase 8-10**: Transitions to Moon tracking for the final approach and encounter.
+- **Manual Tracking Control**:
+    - Re-implemented the `btn-track-target` event listener.
+    - Added "Crosshair Lock": When "TRACK TARGET" is toggled ON, it now captures and locks onto whatever object is currently in the simulation crosshairs.
+- **Task Management**: Prepared for verification of the midpoint pan and manual tracking.
+
+---
+
+## [2026-04-01 10:45] - Cinematic Refinement & UI Sync
+### 📝 Summary
+Refined the automated cinematic sequence to provide a smoother approach and better deceleration into the Moon's orbit. Synchronized UI region logic with the new SOI thresholds.
+
+### 🛠️ Work Done
+- **Cinematic Tuning**: Updated Shot 01 phases (7-10) for more gradual deceleration:
+    - 100,000km: 1.8kx Warp (Outskirts)
+    - 60,000km: 600x Warp (SOI Entry - Latch synced)
+    - 25,000km: 60x Warp (Final Approach)
+    - 10,000km: 1x Warp (Sequence Complete)
+- **UI Logic**: Refined the "DEEP SPACE" vs "LUNAR ENCOUNTER" priority to ensure accurate region reporting throughout the entire mission profile.
+- **Task Management**: Prepared for full mission verification.
+
+---
+
 ## [2026-04-01 10:20] - Restoration & Robust SOI Fix (Option A)
 ### 📝 Summary
 Successfully restored the project to the best known working state (`fadec7b`) and implemented a robust fix for the "Lunar SOI Warp Stop" bug.

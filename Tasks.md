@@ -8,6 +8,8 @@
 ---
 
 ## 🏆 Completed
+- [x] 🏆 **Gear-Shifting Warp Logic**: Smooth, stepped time warp transitions (2s hold per level) implemented and verified. (Verified 2026-04-01)
+- [x] 🏆 **Manual Camera Freedom**: Manual camera panning and tilting enabled during Cinematic Capture when tracking is off. (Verified 2026-04-01)
 - [x] 🏆 **Fix Lunar SOI Warp Stop**: Simulation threshold increased to 60,000km with robust latching logic to prevent repeated resets. (Verified 2026-04-01)
 - [x] 🏆 **Restoration of Cinematic System**: Recovered Shot 01 automation and tracking from commit fadec7b. (Verified 2026-04-01)
 - [x] 🏆 **Rescue Artifact Archiving**: Created `index_Rescue_V02/03/04.html` and `rescueChatfeedback*.txt` for history preservation. (Verified 2026-04-01)
@@ -28,22 +30,21 @@
 *(Archive items moved to COMPLETED.md)*
 
 ## 🧪 Waiting for QA
-- [ ] 🧪 **Cinematic Capture System (V04 Baseline)**: Implemented "Shot 01" automation with 15s smooth Earthrise pan and auto-tracking. (Ready for QA 🧪 2026-04-01)
-- [ ] 🧪 **Lunar SOI Warp Fix**: Threshold increased to 60,000km with a robust latch to prevent repeated warp resets. (Ready for QA 🧪 2026-04-01)
-- [ ] 🧪 **Mission Itinerary Checklist**: Checklist UI that tracks TLI, Coast, and Flyby phases.
-- [ ] 🧪 **Consolidated HUD**: Merging Environment and Telemetry panels into one list.
+- [ ] 🧪 **Cinematic Capture System (Shot 01)**: Final verified version with gear-shifting warp and manual camera freedom. (Ready for QA 🧪 2026-04-01)
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Verification: Full Mission Run**: Test the entire cislunar crossing to verify the SOI fix and cinematic timing.
-- [ ] 🔥🔥🔥 **Refinement: Cinematic Phase Scaling**: Ensure warp transitions (Phase 7-10) are smooth and don't skip frames at 3.6kx.
+- [ ] 🔥🔥🔥 **HUD: Midpoint Logic**: Implement hard midpoint calculation with a buffer range for the HUD and flight log.
+- [ ] 🔥🔥🔥 **HUD: Points of Interest (POIs)**: Add dynamic HUD markers/labels for Approaching Geosync, Geosync Orbit, and Beyond Geosync.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
-- [ ] 🔥🔥🔥 **UI Alignment**: Ensure the "DEEP SPACE" region label correctly triggers and doesn't conflict with "LUNAR ENCOUNTER".
-- [ ] 🔥🔥🔥 **Physics Stability Check**: Monitor for "blank screen" or WebGL stalls during high-warp SOI transitions.
+- [ ] 🔥🔥🔥 **HUD: Deep Space Regions**: Refine labels for spaces between Earth POIs and the Midpoint.
 
 ## 🔥🔥 Medium Priority
 - [ ] 🔥🔥 **V2.0 Roadmap Integration**: Move roadmap items from `index.html` comments into `tasks.md`.
 - [ ] 🔥🔥 **Mission: CubeSat Crowdfund**: Develop technical proof-of-concept for lunar flyby using consumer electronics (COTS).
 - [ ] 🔥🔥 **Prograde Marker Refinement**: Ensure 3D marker and crosshair don't confuse the user about ship heading.
+
+## 🧊 Icebox (Cold)
+- [ ] 🧊 **Refine Auto Camera Tracking**: Automated pans and tracking for "Cinematic hero shots" currently disabled in favor of manual control. (Moved to Icebox 2026-04-01)
 
 ## 🏆 Completed Ready to Archive
