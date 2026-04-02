@@ -11,7 +11,7 @@
 ![At the Moon](LunarFlybyXR_Screenshot_AtMoon_2026-03-31.png)
 *Arriving at the Moon after a 3-day cislunar coast.*
 
-> **🚀 Current Status (v1.9.1):** The simulation successfully achieves Trans-Lunar Injection and coast. Currently, the physics engine "stops" or resets warp upon entering the Lunar Sphere of Influence (SOI). This is the top priority for the V2.0 roadmap to allow for full flybys and Earth returns.
+> **🚀 Current Status (v1.9.5):** The simulation has reached a stable baseline for public release. Manual Trans-Lunar Injection, 7.2kx time-acceleration, and granular HUD POI milestones are fully functional. **Cinematic Capture** and **Load Flight Log** are temporarily disabled for maintenance. We are currently verifying the "Lunar Keyhole" physics to ensure 100% reliable free-return trajectories after reports of trajectory overshoot at high warp.
 
 ## **🚀 The Vision**
 

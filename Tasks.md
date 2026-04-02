@@ -15,8 +15,11 @@
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **Physics: Sub-stepping Refinement**: Ensure gravity integration remains precise during SOI entry at high warp. (In Progress)
 
-## 🔥🔥 Medium Priority
-- [ ] 🔥🔥 **V2.0 Roadmap Integration**: Move roadmap items from `index.html` comments into `tasks.md`.
+## 🔥🔥 V2.0 Mission Goals & Architecture
+- [ ] 🔥🔥 **Mission: Elliptical Earth Loop**: Add option for an initial high-eccentricity Earth orbit before the Moon transfer (Artemis II profile).
+- [ ] 🔥🔥 **UI: Mission Selection Panel**: Implement a splash screen or settings panel to choose between Direct TMI and Elliptical Earth Loop.
+- [ ] 🔥🔥 **Resource Integration**: Collate reference transcripts and video links into the simulation's educational docs.
+- [ ] 🔥🔥 **V2.0 Roadmap Integration**: Move roadmap items from `index.html` comments into this list.
 
 ## 🧊 Icebox (Cold)
 - [ ] 🧊 **Refine Auto Camera Tracking**: Automated pans and tracking for "Cinematic hero shots" currently disabled.
@@ -25,6 +28,7 @@
 - [ ] 🧊 **Restore Load Flight Log**: Re-enable log playback once the "wonkyness" and state reset issues are resolved.
 
 ## 🏆 Completed Ready to Archive
+- [x] 🏆 **Burn Precision Logging**: Added `target_burn_s` and `actual_burn_s` to logs for TMI troubleshooting. (Verified 2026-04-01)
 - [x] 🏆 **Log Folder Organization**: Established `/logs` directory for flight record management. (Verified 2026-04-01)
 - [x] 🏆 **Track Target Working**: Verified that manual and auto tracking (when enabled) correctly follows targets. (Verified 2026-04-01)
 - [x] 🏆 **Comprehensive Milestone Logging**: Tracked "Approaching", "At", and "Beyond" states for Geosync, Midpoint, and SOI. (Verified 2026-04-01)
