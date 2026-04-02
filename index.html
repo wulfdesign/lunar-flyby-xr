@@ -234,9 +234,18 @@
         let autoBurnActive = false;
         let burnEndTime = -999;
         let currentGForce = 0; 
-        let hasEnteredLunarSOI = false; 
-        let hasReachedGeosync = false;
-        let hasReachedMidpoint = false;
+        
+        let milestoneLatches = {
+            approachingGeosync: false,
+            atGeosync: false,
+            beyondGeosync: false,
+            approachingMidpoint: false,
+            atMidpoint: false,
+            pastMidpoint: false,
+            approachingSOI: false,
+            inSOI: false,
+            lunarProximity: false
+        };
 
         // --- CINEMATIC SCRIPT ENGINE ---
         let cinematicActive = false;
@@ -598,7 +607,20 @@
 
             fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0;
             actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; globalMaxAlt = 0;
-            hasEnteredLunarSOI = false; // Reset the SOI trigger lock
+            
+            // Reset State Latches
+            milestoneLatches = {
+                approachingGeosync: false,
+                atGeosync: false,
+                beyondGeosync: false,
+                approachingMidpoint: false,
+                atMidpoint: false,
+                pastMidpoint: false,
+                approachingSOI: false,
+                inSOI: false,
+                lunarProximity: false
+            };
+
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix();
             
             document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
@@ -870,13 +892,10 @@
             camera.rotation.y = THREE.MathUtils.degToRad(lookLon);
             camera.rotation.x = THREE.MathUtils.degToRad(lookLat);
 
-            earth.rotation.y += 0.0000727 * dt; 
-            
-            if (metSeconds - lastLogTime > 3600) { logEvent("Orbital Update: Nominal"); lastLogTime = metSeconds; }
+            earth.rotation.y += 0.0000727 * dt;
 
-            return { timeToWindow, isTliCoast, estimatedBurnTime }; 
-        }
-
+            return { timeToWindow, isTliCoast, estimatedBurnTime };
+            }
         function formatTime(totalSeconds) {
             let d = Math.floor(totalSeconds / 86400); let h = Math.floor((totalSeconds % 86400) / 3600);
             let m = Math.floor((totalSeconds % 3600) / 60); let s = Math.floor(totalSeconds % 60);
@@ -889,15 +908,19 @@
 
         // Main Simulation Loop
         renderer.setAnimationLoop(() => {
-            const dt_real = Math.min(clock.getDelta(), 0.1); 
+            const dt_real = Math.min(clock.getDelta(), 0.1);
             let simSecondsToProcess = dt_real * timeWarp;
-            let steps = Math.max(1, Math.ceil(simSecondsToProcess / 0.5)); 
+
+            // Sub-stepping for physics stability
+            // Use finer steps when near the Moon to prevent gravity "skipping"
+            let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+            let stepSize = distM < 60000 ? 0.1 : 0.5; 
+            let steps = Math.max(1, Math.ceil(simSecondsToProcess / stepSize));
             let dt_step = simSecondsToProcess / steps;
-            
+
             let telemetry = null;
             for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
             metSeconds += simSecondsToProcess;
-
             // Update cinematic sequence
             if (cinematicActive) updateCinematic(dt_real, telemetry);
             updatePlayback(dt_real);
@@ -981,31 +1004,77 @@
 
             // Region Logic & Milestone Alerts
             let region = "Low Earth Orbit";
-            if (distM < 15000) region = "Lunar Proximity";
-            else if (distM < 40000) region = "Final Lunar Approach";
-            else if (distM < 60000) region = "Lunar Sphere of Influence";
-            else if (distM < 100000) region = "Approaching Lunar SOI";
-            else if (altE > 202200) region = "Deep Space (Cislunar Inbound)";
+            if (distM < 15000) {
+                region = "Lunar Proximity";
+                if (!milestoneLatches.lunarProximity) {
+                    logEvent("Milestone: Entering Lunar Proximity");
+                    milestoneLatches.lunarProximity = true;
+                    triggerAlertFlash("region-text");
+                }
+            }
+            else if (distM < 40000) {
+                region = "Final Lunar Approach";
+            }
+            else if (distM < 60000) {
+                region = "Lunar Sphere of Influence";
+                if (!milestoneLatches.inSOI) {
+                    logEvent("Milestone: Entered Lunar Sphere of Influence");
+                    milestoneLatches.inSOI = true;
+                    triggerAlertFlash("region-text");
+                }
+            }
+            else if (distM < 100000) {
+                region = "Approaching Lunar SOI";
+                if (!milestoneLatches.approachingSOI) {
+                    logEvent("Milestone: Approaching Lunar SOI");
+                    milestoneLatches.approachingSOI = true;
+                }
+            }
+            else if (altE > 202200) {
+                region = "Deep Space (Cislunar Inbound)";
+                if (!milestoneLatches.pastMidpoint) {
+                    logEvent("Milestone: Beyond Trans-Lunar Midpoint");
+                    milestoneLatches.pastMidpoint = true;
+                }
+            }
             else if (altE > 182200 && altE < 202200) {
                 region = "Trans-Lunar Midpoint";
-                if (!hasReachedMidpoint) {
+                if (!milestoneLatches.atMidpoint) {
                     logEvent("Milestone: Midpoint Transition Reached");
-                    hasReachedMidpoint = true;
+                    milestoneLatches.atMidpoint = true;
                     triggerAlertFlash("region-text");
                 }
             }
-            else if (altE > 150000) region = "Approaching Midpoint";
+            else if (altE > 150000) {
+                region = "Approaching Midpoint";
+                if (!milestoneLatches.approachingMidpoint) {
+                    logEvent("Milestone: Approaching Midpoint");
+                    milestoneLatches.approachingMidpoint = true;
+                }
+            }
             else if (altE > 100000) region = "Deep Space (Cislunar Outbound)";
-            else if (altE > 36300) region = "Beyond Geosynchronous";
+            else if (altE > 36300) {
+                region = "Beyond Geosynchronous";
+                if (!milestoneLatches.beyondGeosync) {
+                    logEvent("Milestone: Beyond Geosynchronous Altitude");
+                    milestoneLatches.beyondGeosync = true;
+                }
+            }
             else if (altE > 35286 && altE < 36286) {
                 region = "Geosynchronous Orbit";
-                if (!hasReachedGeosync) {
-                    logEvent("Milestone: Geosynchronous Altitude Passed");
-                    hasReachedGeosync = true;
+                if (!milestoneLatches.atGeosync) {
+                    logEvent("Milestone: Geosynchronous Altitude Reached");
+                    milestoneLatches.atGeosync = true;
                     triggerAlertFlash("region-text");
                 }
             }
-            else if (altE > 30000) region = "Approaching Geosync";
+            else if (altE > 30000) {
+                region = "Approaching Geosync";
+                if (!milestoneLatches.approachingGeosync) {
+                    logEvent("Milestone: Approaching Geosync");
+                    milestoneLatches.approachingGeosync = true;
+                }
+            }
             else if (altE > 2000) region = "Medium Earth Orbit";
             document.getElementById('region-text').textContent = region;
 
