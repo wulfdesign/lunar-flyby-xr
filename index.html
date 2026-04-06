@@ -132,6 +132,14 @@
                 <p><span class="tooltip" title="Distance from the Moon's surface.">Dist (Moon):</span> <span id="dist-moon">380,000 km</span></p>
                 <p><span class="tooltip" title="Angle between the center of your view and the Moon. Use this to find it!">Moon Heading:</span> <span id="moon-heading" class="caution">0&deg;</span></p>
                 <p><span class="tooltip" title="Absolute velocity relative to Earth. Must reach ~10.9 km/s to escape to the Moon.">Velocity:</span> <span id="velocity">7.67 km/s</span></p>
+                <div id="velocity-vector-info" style="font-size: 0.7rem; color: #888; display: flex; justify-content: space-between;">
+                    <span>Vx: <span id="vx">0.0</span></span>
+                    <span>Vy: <span id="vy">0.0</span></span>
+                    <span>Vz: <span id="vz">0.0</span></span>
+                </div>
+                <hr style="border-color: #00ffff; opacity: 0.3;">
+                <p><span class="tooltip" title="Gravitational pull from Earth (km/s^2)">Earth Gravity:</span> <span id="grav-earth">0.00000</span></p>
+                <p><span class="tooltip" title="Gravitational pull from the Moon (km/s^2)">Moon Gravity:</span> <span id="grav-moon">0.00000</span></p>
                 <p><span class="tooltip" title="Remaining propellant in the Trans-Lunar Injection stage.">Fuel (TLI Stage):</span> <span id="fuel">100%</span></p>
                 <div class="controls">
                     <button id="btn-abort" class="btn-danger" title="Emergency stop. Resets spacecraft back to a stable 400km Low Earth Orbit.">ABORT / RESTART</button>
@@ -710,7 +718,7 @@
             
             // Reset UI
             flightLog = [];
-            logEvent("Mission Started - System initialized in LEO.");
+            logEvent("Mission Started - System initialized in LEO.", { magEarth: muEarth/Math.pow(radEarth+400, 2), magMoon: 0 });
             const autoBtn = document.getElementById('btn-toggle-auto');
             autoBtn.classList.remove('active'); autoBtn.textContent = "ENABLE AUTO TMI";
             document.getElementById('autopilot-status').textContent = "OFF"; document.getElementById('autopilot-status').className = "danger";
@@ -727,7 +735,7 @@
         let playbackIndex = 0;
 
         // --- LOGGING SYSTEM ---
-        function logEvent(eventMsg) {
+        function logEvent(eventMsg, telemetry) {
             let r = shipPos.length() - radEarth;
             let v = shipVel.length();
             flightLog.push({ 
@@ -735,8 +743,13 @@
                 met_formatted: formatTime(metSeconds),
                 event: eventMsg, 
                 altitude_km: r.toFixed(2), 
-                velocity_kms: v.toFixed(3), 
+                velocity_kms: v.toFixed(3),
+                vx: shipVel.x.toFixed(5),
+                vy: shipVel.y.toFixed(5),
+                vz: shipVel.z.toFixed(5),
                 gforce: currentGForce.toFixed(2),
+                magEarth: telemetry ? telemetry.magEarth.toFixed(8) : "0",
+                magMoon: telemetry ? telemetry.magMoon.toFixed(8) : "0",
                 warp: timeWarp,
                 x: shipPos.x.toFixed(4),
                 y: shipPos.y.toFixed(4),
@@ -877,7 +890,7 @@
                 playbackActive = false; // Manual override
                 document.getElementById('cinematic-status').style.display = 'none';
                 updateWarpUI(w);
-                logEvent(`MANUAL: Warp set to ${w}x`);
+                logEvent(`MANUAL: Warp set to ${w}x`, {});
             });
         });
 
@@ -885,15 +898,21 @@
         function getAcceleration(pos) {
             // Gravity from Earth
             let rEarth = pos.length();
+            let magEarth = muEarth / Math.pow(rEarth, 2); // Acceleration magnitude (km/s^2)
             let aEarth = pos.clone().multiplyScalar(-muEarth / Math.pow(rEarth, 3));
             
             // Gravity from Moon
             let moonPos = moon.position.clone().divideScalar(renderScale);
             let dirMoon = new THREE.Vector3().subVectors(moonPos, pos);
             let rMoon = dirMoon.length();
+            let magMoon = muMoon / Math.pow(rMoon, 2); // Acceleration magnitude (km/s^2)
             let aMoon = dirMoon.multiplyScalar(muMoon / Math.pow(rMoon, 3));
             
-            return aEarth.add(aMoon);
+            return {
+                total: aEarth.add(aMoon),
+                magEarth: magEarth,
+                magMoon: magMoon
+            };
         }
 
         function updatePhysics(dt) {
@@ -943,9 +962,9 @@
                 autoBurnActive = false;
             }
 
-            if(isBurning && !wasBurning) logEvent("Main Engine Start (MES). Executing TLI Burn.");
+            if(isBurning && !wasBurning) logEvent("Main Engine Start (MES). Executing TLI Burn.", {});
             if(!isBurning && wasBurning) {
-                logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.");
+                logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.", {});
                 if (isTliCoast) burnEndTime = metSeconds;
             }
 
@@ -953,7 +972,8 @@
 
             // Standard Velocity Verlet Integration
             let currentMass = shipEmptyMass + fuel;
-            let accel = getAcceleration(shipPos);
+            let accelData = getAcceleration(shipPos);
+            let accel = accelData.total;
             
             currentGForce = 0; 
             let thrustAcc = new THREE.Vector3(0,0,0);
@@ -970,7 +990,8 @@
             shipPos.add(shipVel.clone().multiplyScalar(dt)).add(totalAccel.clone().multiplyScalar(0.5 * dt * dt));
             
             // 2. a(t + dt)
-            let nextAccel = getAcceleration(shipPos);
+            let nextAccelData = getAcceleration(shipPos);
+            let nextAccel = nextAccelData.total;
             let nextThrustAcc = new THREE.Vector3(0,0,0);
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass);
@@ -991,7 +1012,13 @@
 
             earth.rotation.y += 0.0000727 * dt;
 
-            return { timeToWindow, isTliCoast, estimatedBurnTime };
+            return { 
+                timeToWindow, 
+                isTliCoast, 
+                estimatedBurnTime,
+                magEarth: accelData.magEarth,
+                magMoon: accelData.magMoon
+            };
         }
         function formatTime(totalSeconds) {
             let d = Math.floor(totalSeconds / 86400); let h = Math.floor((totalSeconds % 86400) / 3600);
@@ -1100,6 +1127,11 @@
                 safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
                 safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
                 safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
+                safeSetText('vx', shipVel.x.toFixed(3));
+                safeSetText('vy', shipVel.y.toFixed(3));
+                safeSetText('vz', shipVel.z.toFixed(3));
+                safeSetText('grav-earth', telemetry.magEarth.toFixed(6) + " km/s²");
+                safeSetText('grav-moon', telemetry.magMoon.toFixed(6) + " km/s²");
                 safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%");
                 safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
                 
@@ -1115,7 +1147,7 @@
                 if (distM < 15000) {
                     region = "Lunar Proximity";
                     if (!milestoneLatches.lunarProximity) {
-                        logEvent("Milestone: Entering Lunar Proximity");
+                        logEvent("Milestone: Entering Lunar Proximity", telemetry);
                         milestoneLatches.lunarProximity = true;
                         triggerAlertFlash("region-text");
                     }
@@ -1124,7 +1156,7 @@
                 else if (distM < 60000) {
                     region = "Lunar Sphere of Influence";
                     if (!milestoneLatches.inSOI) {
-                        logEvent("Milestone: Entered Lunar Sphere of Influence");
+                        logEvent("Milestone: Entered Lunar Sphere of Influence", telemetry);
                         milestoneLatches.inSOI = true;
                         triggerAlertFlash("region-text");
                     }
@@ -1132,21 +1164,21 @@
                 else if (distM < 100000) {
                     region = "Approaching Lunar SOI";
                     if (!milestoneLatches.approachingSOI) {
-                        logEvent("Milestone: Approaching Lunar SOI");
+                        logEvent("Milestone: Approaching Lunar SOI", telemetry);
                         milestoneLatches.approachingSOI = true;
                     }
                 }
                 else if (altE > 202200) {
                     region = "Deep Space (Cislunar Inbound)";
                     if (!milestoneLatches.pastMidpoint) {
-                        logEvent("Milestone: Beyond Trans-Lunar Midpoint");
+                        logEvent("Milestone: Beyond Trans-Lunar Midpoint", telemetry);
                         milestoneLatches.pastMidpoint = true;
                     }
                 }
                 else if (altE > 182200 && altE < 202200) {
                     region = "Trans-Lunar Midpoint";
                     if (!milestoneLatches.atMidpoint) {
-                        logEvent("Milestone: Midpoint Transition Reached");
+                        logEvent("Milestone: Midpoint Transition Reached", telemetry);
                         milestoneLatches.atMidpoint = true;
                         triggerAlertFlash("region-text");
                     }
@@ -1154,7 +1186,7 @@
                 else if (altE > 150000) {
                     region = "Approaching Midpoint";
                     if (!milestoneLatches.approachingMidpoint) {
-                        logEvent("Milestone: Approaching Midpoint");
+                        logEvent("Milestone: Approaching Midpoint", telemetry);
                         milestoneLatches.approachingMidpoint = true;
                     }
                 }
@@ -1162,14 +1194,14 @@
                 else if (altE > 36300) {
                     region = "Beyond Geosynchronous";
                     if (!milestoneLatches.beyondGeosync) {
-                        logEvent("Milestone: Beyond Geosynchronous Altitude");
+                        logEvent("Milestone: Beyond Geosynchronous Altitude", telemetry);
                         milestoneLatches.beyondGeosync = true;
                     }
                 }
                 else if (altE > 35286 && altE < 36286) {
                     region = "Geosynchronous Orbit";
                     if (!milestoneLatches.atGeosync) {
-                        logEvent("Milestone: Geosynchronous Altitude Reached");
+                        logEvent("Milestone: Geosynchronous Altitude Reached", telemetry);
                         milestoneLatches.atGeosync = true;
                         triggerAlertFlash("region-text");
                     }
@@ -1177,7 +1209,7 @@
                 else if (altE > 30000) {
                     region = "Approaching Geosync";
                     if (!milestoneLatches.approachingGeosync) {
-                        logEvent("Milestone: Approaching Geosync");
+                        logEvent("Milestone: Approaching Geosync", telemetry);
                         milestoneLatches.approachingGeosync = true;
                     }
                 }

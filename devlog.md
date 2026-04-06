@@ -39,7 +39,12 @@ Successfully addressed high-priority cross-platform issues and improved simulati
     - Integrated WebXR controller support, mapping the left trigger to "Manual Burn" and the right trigger to "Toggle Tracking".
     - Fixed "HUD Out-of-Bounds" by enabling `dom-overlay` for the UI layer in VR.
 - **Physics Precision**:
-    - Updated the energy calculation in the autopilot and telemetry to include the Moon's gravitational potential, addressing the "Lunar Keyhole" overshoot issue.
+    - Re-implemented the physics engine using textbook **Velocity Verlet** for superior energy conservation.
+    - Upgraded sub-stepping to **0.01s** during close lunar encounters (<20,000 km) to ensure gravitational capture.
+- **Enhanced Telemetry & HUD**:
+    - Added **Gravitational Magnitude** displays for Earth and Moon to the HUD (km/s²).
+    - Expanded Flight Logs and HUD to include **Velocity Vectors (Vx, Vy, Vz)** for detailed trajectory analysis.
+    - Updated `logEvent` to capture full physics state at every milestone.
 - **UI & Stability**:
     - Fixed a critical `TypeError` that caused the simulation to freeze when switching warp speeds at mission milestones.
     - Implemented `safeSetText` helper function to handle missing DOM elements gracefully.

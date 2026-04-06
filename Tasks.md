@@ -15,6 +15,7 @@
 - [ ] 🧪 **Physics: Velocity Verlet Integration**: Standardized integration for better energy conservation and lunar capture.
 - [ ] 🧪 **Physics: Ultra-fine Sub-stepping**: Implemented 0.01s steps for close lunar flybys to prevent "drifting past".
 - [ ] 🧪 **Warp: Smooth Gearbox**: Automated gradual ramp-up/down implemented globally for all warp changes.
+- [ ] 🧪 **Telemetry: Enhanced Vectors & Gravity**: Added Vx, Vy, Vz and Gravity Field magnitudes (Earth/Moon) to logs and HUD.
 - [ ] 🧪 **Mobile: UI Layout (Landscape/Portrait)**: Responsive scaling, scrolling, and orientation-specific layouts (🏆).
 - [ ] 🧪 **Quest 3: VR HUD Visibility**: Updated z-index and panel background for `dom-overlay` visibility.
 - [ ] 🧪 **Quest 3: VR Session Restoration**: User confirmed VR works via Link (🏆).
