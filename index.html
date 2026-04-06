@@ -955,17 +955,21 @@
                 if (timeToWindow < 5) autoBurnActive = true; 
             }
             
-            if (autoBurnActive && !isTliCoast) {
-                isBurning = true; 
-            } else if (autoPilotEngaged && isTliCoast && autoBurnActive) {
-                isBurning = false; 
-                autoBurnActive = false;
+            // EXECUTE BURN (Switch to time-based for higher precision)
+            if (autoBurnActive) {
+                if (actualBurnTime < initialTargetBurnTime) {
+                    isBurning = true;
+                } else {
+                    isBurning = false;
+                    autoBurnActive = false;
+                    autoPilotEngaged = false; // Disengage after complete
+                }
             }
 
             if(isBurning && !wasBurning) logEvent("Main Engine Start (MES). Executing TLI Burn.", {});
             if(!isBurning && wasBurning) {
-                logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.", {});
-                if (isTliCoast) burnEndTime = metSeconds;
+                logEvent("Main Engine Cutoff (MECO). Burn Time Reached.", {});
+                burnEndTime = metSeconds;
             }
 
             if (isBurning) actualBurnTime += dt;
@@ -1011,6 +1015,11 @@
             camera.rotation.x = THREE.MathUtils.degToRad(lookLat);
 
             earth.rotation.y += 0.0000727 * dt;
+
+            // Safety: Force warp down if we are deep in SOI and integration is at risk
+            if (distToMoon < 60000 && timeWarp > 60 && !cinematicActive && !playbackActive) {
+                updateWarpUI(60);
+            }
 
             return { 
                 timeToWindow, 
@@ -1150,6 +1159,7 @@
                         logEvent("Milestone: Entering Lunar Proximity", telemetry);
                         milestoneLatches.lunarProximity = true;
                         triggerAlertFlash("region-text");
+                        if (!cinematicActive && !playbackActive) updateWarpUI(1);
                     }
                 }
                 else if (distM < 40000) region = "Final Lunar Approach";
@@ -1159,6 +1169,7 @@
                         logEvent("Milestone: Entered Lunar Sphere of Influence", telemetry);
                         milestoneLatches.inSOI = true;
                         triggerAlertFlash("region-text");
+                        if (!cinematicActive && !playbackActive) updateWarpUI(10);
                     }
                 }
                 else if (distM < 100000) {
@@ -1166,6 +1177,7 @@
                     if (!milestoneLatches.approachingSOI) {
                         logEvent("Milestone: Approaching Lunar SOI", telemetry);
                         milestoneLatches.approachingSOI = true;
+                        if (!cinematicActive && !playbackActive) updateWarpUI(30);
                     }
                 }
                 else if (altE > 202200) {
