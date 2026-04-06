@@ -1,36 +1,31 @@
-# 🚀 New Chat Instructions: Lunar Flyby XR
+# 🧠 New Chat Instructions (Memory Boot)
 
-## **Context**
-This is a high-fidelity WebXR orbital mechanics sandbox titled **"Artemis: The Free Return."** It is timed for the **Artemis II** launch on April 1, 2026. The project has been reconstructed from rescued logs and is now stable at **v1.9.1**.
+> **Context:** This file is read by the AI at the start of a new session to restore project state and mission intent without relying on chat history.
 
-## **Current State (2026-04-01 01:00)**
-- **STABLE BASELINE:** Both local and public GitHub repos have been rolled back to **Commit 3e4074a**. 
-- **Rollback Reason:** Failed attempt to implement Phase 5 cinematic refinements (7.2kx warp, gear shifting) resulted in physics instability and blank screens.
-- **index.html:** Now contains the clean v1.9.1 source code (No "CINEMATIC CAPTURE" button or automation logic).
+## 🛰️ Current Mission Status (v1.9.5)
+- **Baseline:** Stable baseline for public release. Manual TLI and flyby are functional.
+- **Architecture:** Single-file `index.html` using Three.js (r128) and custom Velocity Verlet integration.
+- **Logging:** High-fidelity JSON logging in `/logs` capturing raw MET, Warp, and X,Y,Z coordinates.
+- **Controls:** 9-speed gear-shifting warp system (1x to 7.2kx).
 
-## **Project Structure**
-- `index.html`: The primary simulation file. Self-contained and supports standalone execution (double-click).
-- `Tasks.md`: Main roadmap and priority list.
-- `devlog.md`: Chronological history of development.
-- `COMPLETED.md`: Archive of finished tasks.
-- `docs/`: Supplemental documentation (Social Media, Video Scripts, Credits, Artemis/dearMoon research).
-- `start_lunar_flyby.bat`: Dev server script (npx serve) on **Port 3550**.
+## 🛠️ Active Work Tracks (Priority)
+1. **Quest 3 Optimization:** Resolve WebXR session entry errors and map controller inputs.
+2. **Mobile Readiness:** Responsive HUD design and touch-drag navigation.
+3. **Artemis II Telemetry:** Reverse-engineer NASA AROW data for real-world mission replay.
+4. **Physics Check:** Verify the "Lunar Keyhole" maths for 100% reliable free-return capture.
 
-## **Technical Stack**
-- **Engine:** Three.js (r128).
-- **Physics:** Custom Velocity Verlet integration (km/kg/s units).
-- **UI:** Vanilla HTML5/CSS3 HUD.
-- **VR:** WebXR Device API.
+## 🛡️ Foundational Mandates (CRITICAL)
+- **NEVER** push to GitHub without explicit user confirmation.
+- **NEVER** overwrite stable v1.9.5 logic without a verified test run.
+- **Surgical Edits:** Use `replace` or `read_file` with line numbers to avoid context blowup.
+- **Safety Suppression:** The 1x warp reset at Lunar SOI is suppressed in professional modes (Playback/Cine).
 
-## **Immediate Objectives (Roadmap)**
-1.  **🔥 FIX LUNAR SOI WARP STOP (Critical):** The simulation resets warp or "stops" when entering the Moon's Sphere of Influence.
-2.  **Cinematic Capture Re-Implementation:** Start fresh using the parameters in `docs/videoShotScript.md` but ensure physics stability and proper function scoping.
-3.  **Consolidated HUD:** Merge Environment and Telemetry panels.
+## 📂 Directory Structure
+- `/logs`: Mission telemetry JSON records.
+- `/debug`: Recovery HTML artifacts and rescue chat logs.
+- `/docs`: Artemis mission research and video scripts.
+- `/private`: Confidential roadmap, NorWesCon notes, and social media post drafts.
 
-## **Instructions for Gemini**
-- Follow the "Research -> Strategy -> Execution" workflow.
-- Always update `Tasks.md` and `devlog.md` after changes.
-- Append new devlog entries to the top, below header instructions.
-- Mark completed tasks with 🧪 for QA first, then 🏆 once verified.
-- **STRICT MANDATE:** Do not reference the `/private` folder or its contents in public-facing files or commits.
-- **STRICT MANDATE:** NEVER push to public GitHub until the user has verified changes locally.
+## 📡 Social Strategy
+- Reddit outreach plan is ready in `private/SocialMedia/` with 18+ target communities identified.
+- Cross-promotion with *High Desert Eclipse 360* is integrated into outreach.

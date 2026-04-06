@@ -2,6 +2,22 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-06 10:00] - NorWesCon Insights & Real-World Telemetry Track
+### 📝 Summary
+Returned from NorWesCon with fresh insights on lunar architecture and mission visualization. Transitioning the project to prioritize real-world Artemis II data integration and cross-platform (Mobile/Quest 3) stability.
+
+### 🛠️ Work Done
+- **Strategic Shift**: 
+    - Added "Artemis II Real-Time Replay" to the V2.0 roadmap.
+    - Initiated research into NASA AROW (Artemis Real-time Orbit Website) and OEM data formats for state-vector mapping.
+- **Hardware QA**:
+    - Identified critical mobile issues: HUD scaling, missing touch navigation.
+    - Identified Quest 3 VR entry failure ("three blinking dots") and controller mapping conflicts.
+- **Task Management**: Updated `Tasks.md` and `privTasks.md` with 7+ new critical and high-priority items.
+- **Notes Collation**: Commenced collation of private NorWesCon panel notes for strategic planning.
+
+---
+
 ## [2026-04-01 18:00] - Social Media Strategy & Reddit Research
 ### 📝 Summary
 Developed a comprehensive social media strategy to expand the project's reach, focusing on Reddit communities and cross-promotion of historical eclipse content.
