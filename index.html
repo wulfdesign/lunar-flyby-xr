@@ -16,10 +16,11 @@
 
         /* Tooltip hover effect for entire panels */
         .panel {
-            background: rgba(0, 20, 40, 0.4); border: 1px solid rgba(0, 255, 255, 0.4);
-            padding: 15px; border-radius: 8px; backdrop-filter: blur(3px);
-            pointer-events: auto; width: 360px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.4);
+            padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);
+            pointer-events: auto; width: 360px; max-width: 90vw; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
             margin-bottom: 10px; transition: border-color 0.3s;
+            z-index: 20; /* Ensure visibility in VR dom-overlay */
         }
         .panel:hover { border-color: rgba(0, 255, 255, 0.8); }
 
@@ -56,11 +57,12 @@
             100% { background: rgba(255, 255, 68, 0.2); color: #ffff44; border-color: #ffff44; box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); }
         }
 
-        .controls { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap;}
+        .controls { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; justify-content: flex-start;}
         button {
             background: rgba(0, 255, 255, 0.1); color: #00ffff; border: 1px solid #00ffff;
             padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;
             flex-grow: 1; transition: all 0.2s; font-size: 0.8rem; pointer-events: auto;
+            min-width: 60px; /* Prevent shrinking too small */
         }
         button:hover { background: #00ffff; color: #000; box-shadow: 0 0 10px #00ffff;}
         button:active { transform: scale(0.95); }
@@ -90,6 +92,24 @@
             position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
             color: #00ffff; font-size: 0.9rem; font-weight: bold; text-shadow: 0 0 5px #000;
             pointer-events: auto; cursor: help;
+        }
+
+        /* Responsive UI for Mobile */
+        @media (max-width: 600px) {
+            #ui-layer { padding: 10px; overflow-y: auto; pointer-events: auto; }
+            .panel { padding: 8px; width: 100%; box-sizing: border-box; }
+            h1 { font-size: 0.85rem; margin-bottom: 5px; }
+            p { font-size: 0.7rem; margin: 2px 0; }
+            .controls { gap: 4px; margin-top: 8px; }
+            button { padding: 5px 8px; font-size: 0.65rem; min-width: 45px; }
+            #zoom-indicator { bottom: 60px; font-size: 0.75rem; }
+            ul.checklist li { font-size: 0.7rem; margin-bottom: 3px; }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            #ui-layer { flex-direction: row; align-items: flex-start; }
+            .panel { width: 45vw; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
+            #zoom-indicator { bottom: 20px; }
         }
     </style>
     <!-- Import Three.js -->
@@ -473,11 +493,46 @@
         btnVR.addEventListener('click', async () => {
             if (navigator.xr) {
                 try {
-                    const session = await navigator.xr.requestSession('immersive-vr');
+                    const session = await navigator.xr.requestSession('immersive-vr', {
+                        requiredFeatures: ['local-floor'],
+                        optionalFeatures: ['dom-overlay'],
+                        domOverlay: { root: document.getElementById('ui-layer') }
+                    });
                     renderer.xr.setSession(session);
                     btnVR.style.display = 'none';
                     btnResetView.style.display = 'none';
-                } catch (e) { alert("VR Session not supported or failed to start."); }
+                    
+                    // WebXR Controller Setup
+                    const setupController = (controller, index) => {
+                        controller.addEventListener('selectstart', () => {
+                            if (index === 0) { // Left Controller: Manual Burn
+                                if (fuel > 0) isBurning = true;
+                            } else { // Right Controller: Toggle Tracking
+                                isTrackingTarget = !isTrackingTarget;
+                                const trackBtn = document.getElementById('btn-track-target');
+                                trackBtn.textContent = isTrackingTarget ? "TRACK TARGET: ON" : "TRACK TARGET: OFF";
+                                if (isTrackingTarget) trackBtn.classList.add('active');
+                                else trackBtn.classList.remove('active');
+                            }
+                        });
+                        controller.addEventListener('selectend', () => {
+                            if (index === 0) isBurning = false;
+                        });
+                        scene.add(controller);
+                    };
+
+                    setupController(renderer.xr.getController(0), 0);
+                    setupController(renderer.xr.getController(1), 1);
+                    
+                    // WebXR session management
+                    session.addEventListener('end', () => {
+                        btnVR.style.display = 'block';
+                        btnResetView.style.display = 'block';
+                    });
+                } catch (e) { 
+                    console.error("VR Session failed:", e);
+                    alert("VR Session not supported or failed to start. Check if you are using HTTPS and a compatible browser."); 
+                }
             } else { alert("WebXR not supported in this browser."); }
         });
 
@@ -588,6 +643,31 @@
                 prevMousePos = { x: e.clientX, y: e.clientY };
             }
         });
+
+        // --- TOUCH LOOK CONTROLS ---
+        document.addEventListener('touchstart', (e) => {
+            if (isTrackingTarget) return;
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+                isDraggingView = true;
+                prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => isDraggingView = false);
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDraggingView && !isTrackingTarget) {
+                let deltaX = e.touches[0].clientX - prevMousePos.x;
+                let deltaY = e.touches[0].clientY - prevMousePos.y;
+                lookLon -= deltaX * 0.3; // Slightly higher sensitivity for touch
+                lookLat -= deltaY * 0.3;
+                lookLat = Math.max(-85, Math.min(85, lookLat));
+                prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                
+                // Prevent scrolling when dragging the view
+                if (e.cancelable) e.preventDefault();
+            }
+        }, { passive: false });
         // --- ORBITAL MATH & INITIALIZATION ---
         function resetMission() {
             let startRadius = radEarth + 400; 
@@ -803,11 +883,16 @@
 
         // --- ORBITAL PHYSICS ENGINE (VELOCITY VERLET) ---
         function getAcceleration(pos) {
-            let rEarthSq = pos.lengthSq();
-            let aEarth = pos.clone().normalize().multiplyScalar(-muEarth / rEarthSq);
-            let dirMoon = new THREE.Vector3().subVectors(moon.position.clone().divideScalar(renderScale), pos);
-            let rMoonSq = dirMoon.lengthSq();
-            let aMoon = dirMoon.normalize().multiplyScalar(muMoon / rMoonSq);
+            // Gravity from Earth
+            let rEarth = pos.length();
+            let aEarth = pos.clone().multiplyScalar(-muEarth / Math.pow(rEarth, 3));
+            
+            // Gravity from Moon
+            let moonPos = moon.position.clone().divideScalar(renderScale);
+            let dirMoon = new THREE.Vector3().subVectors(moonPos, pos);
+            let rMoon = dirMoon.length();
+            let aMoon = dirMoon.multiplyScalar(muMoon / Math.pow(rMoon, 3));
+            
             return aEarth.add(aMoon);
         }
 
@@ -818,15 +903,16 @@
 
             let r = shipPos.length();
             let currentVelMag = shipVel.length();
+            let distToMoon = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale));
             
-            // Target Energy
-            let currentEnergy = (currentVelMag * currentVelMag) / 2 - (muEarth / r);
-            let a_transfer = (6371 + 400 + distMoon) / 2; // Semi-major axis of transfer orbit
+            // Target Energy (including Earth and Moon potential for higher precision)
+            let currentEnergy = (currentVelMag * currentVelMag) / 2 - (muEarth / r) - (muMoon / Math.max(1, distToMoon));
+            let a_transfer = (radEarth + 400 + distMoon) / 2; 
             let targetEnergy = -muEarth / (2 * a_transfer);
             let isTliCoast = currentEnergy >= targetEnergy; 
             
             // Calculate remaining $\Delta V$ for UI
-            let targetVelAtCurrentAlt = Math.sqrt(2 * (targetEnergy + muEarth/r));
+            let targetVelAtCurrentAlt = Math.sqrt(2 * (targetEnergy + (muEarth / r) + (muMoon / Math.max(1, distToMoon))));
             let dvRequired = Math.max(0, targetVelAtCurrentAlt - currentVelMag);
             let estimatedBurnTime = dvRequired / (thrustForce / (shipEmptyMass + fuel));
 
@@ -865,28 +951,35 @@
 
             if (isBurning) actualBurnTime += dt;
 
-            // Velocity Verlet Integration
+            // Standard Velocity Verlet Integration
             let currentMass = shipEmptyMass + fuel;
             let accel = getAcceleration(shipPos);
             
             currentGForce = 0; 
+            let thrustAcc = new THREE.Vector3(0,0,0);
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass); 
-                accel.add(shipVel.clone().normalize().multiplyScalar(thrustAccMag));
+                thrustAcc = shipVel.clone().normalize().multiplyScalar(thrustAccMag);
                 fuel -= (massFlowRate * dt); 
                 if(fuel < 0) fuel = 0;
-                currentGForce = thrustAccMag / 0.00980665; // Convert km/s^2 to Gs
+                currentGForce = thrustAccMag / 0.00980665; 
             }
 
-            shipPos.add(shipVel.clone().multiplyScalar(dt)).add(accel.clone().multiplyScalar(0.5 * dt * dt));
+            // 1. pos(t + dt) = pos(t) + v(t)dt + 0.5 * a(t)dt^2
+            let totalAccel = accel.clone().add(thrustAcc);
+            shipPos.add(shipVel.clone().multiplyScalar(dt)).add(totalAccel.clone().multiplyScalar(0.5 * dt * dt));
             
+            // 2. a(t + dt)
             let nextAccel = getAcceleration(shipPos);
+            let nextThrustAcc = new THREE.Vector3(0,0,0);
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass);
-                nextAccel.add(shipVel.clone().normalize().multiplyScalar(thrustAccMag));
+                nextThrustAcc = shipVel.clone().normalize().multiplyScalar(thrustAccMag);
             }
+            let nextTotalAccel = nextAccel.add(nextThrustAcc);
 
-            shipVel.add(accel.add(nextAccel).multiplyScalar(0.5 * dt));
+            // 3. v(t + dt) = v(t) + 0.5 * (a(t) + a(t + dt))dt
+            shipVel.add(totalAccel.add(nextTotalAccel).multiplyScalar(0.5 * dt));
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
             let lookTarget = shipGroup.position.clone().add(shipVel.clone().normalize());
@@ -899,7 +992,7 @@
             earth.rotation.y += 0.0000727 * dt;
 
             return { timeToWindow, isTliCoast, estimatedBurnTime };
-            }
+        }
         function formatTime(totalSeconds) {
             let d = Math.floor(totalSeconds / 86400); let h = Math.floor((totalSeconds % 86400) / 3600);
             let m = Math.floor((totalSeconds % 3600) / 60); let s = Math.floor(totalSeconds % 60);
@@ -910,293 +1003,307 @@
         const raycaster = new THREE.Raycaster();
         const centerScreen = new THREE.Vector2(0, 0);
 
+        function safeSetText(id, text, className) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (text !== undefined) el.textContent = text;
+                if (className !== undefined) el.className = className;
+            }
+            return el;
+        }
+
         // Main Simulation Loop
         renderer.setAnimationLoop(() => {
-            const dt_real = Math.min(clock.getDelta(), 0.1);
-            let simSecondsToProcess = dt_real * timeWarp;
+            try {
+                const dt_real = Math.min(clock.getDelta(), 0.1);
+                let simSecondsToProcess = dt_real * timeWarp;
 
-            // Sub-stepping for physics stability
-            // Use finer steps when near the Moon to prevent gravity "skipping"
-            let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
-            let stepSize = distM < 60000 ? 0.1 : 0.5; 
-            let steps = Math.max(1, Math.ceil(simSecondsToProcess / stepSize));
-            let dt_step = simSecondsToProcess / steps;
+                // Sub-stepping for physics stability
+                // High warp (7.2kx) needs much finer sub-stepping to capture gravity gradients
+                let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+                let stepSize = 0.5; // Default 0.5s step
+                if (distM < 100000) stepSize = 0.1; // Finer near SOI
+                if (distM < 20000) stepSize = 0.01; // Ultra-fine for close flyby
+                
+                // Cap maximum steps per frame to prevent "spiral of death" (performance freeze)
+                // but allow enough for 7.2kx (7200 / 0.1 = 72,000 steps per second)
+                // If dt_real is 0.016 (60fps), simSeconds is ~115s. 115 / 0.1 = 1150 steps.
+                let steps = Math.max(1, Math.min(5000, Math.ceil(simSecondsToProcess / stepSize)));
+                let dt_step = simSecondsToProcess / steps;
 
-            let telemetry = null;
-            for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
-            metSeconds += simSecondsToProcess;
-            // Update cinematic sequence
-            if (cinematicActive) updateCinematic(dt_real, telemetry);
-            updatePlayback(dt_real);
+                let telemetry = null;
+                for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
+                metSeconds += simSecondsToProcess;
+                
+                // Update Smooth Gearbox (Gradual Warp Ramp-up/down)
+                updateWarpStepping(dt_real);
+                
+                // Update cinematic sequence
+                if (cinematicActive) updateCinematic(dt_real, telemetry);
+                updatePlayback(dt_real);
 
-            // --- AUTO TRACKING LOGIC ---
-            if (isTrackingTarget && currentTargetObj) {
-                let targetWorldPos = new THREE.Vector3();
-                currentTargetObj.getWorldPosition(targetWorldPos);
-                
-                let localTarget = shipGroup.worldToLocal(targetWorldPos.clone());
-                localTarget.normalize();
-                
-                let targetLat = THREE.MathUtils.radToDeg(Math.asin(localTarget.y));
-                let targetLon = THREE.MathUtils.radToDeg(Math.atan2(-localTarget.x, -localTarget.z));
-                
-                lookLon = THREE.MathUtils.lerp(lookLon, targetLon, 0.05);
-                lookLat = THREE.MathUtils.lerp(lookLat, targetLat, 0.05);
-            }
-
-            // --- TARGETING / RAYCASTING TOOLTIP ---
-            raycaster.setFromCamera(centerScreen, camera);
-            const intersects = raycaster.intersectObjects([earth, moon, sunMesh, progradeMesh]); 
-            const popup = document.getElementById('target-popup');
-            if (intersects.length > 0 && !isDraggingView) {
-                let target = intersects[0].object;
-                currentTargetObj = target; 
-                
-                if (target.name === "PROGRADE VECTOR") {
-                    document.getElementById('target-name').textContent = "PROGRADE VECTOR";
-                    document.getElementById('target-dist').textContent = "Velocity Heading";
-                    document.getElementById('target-hint').textContent = "Ship travels in this direction.";
-                    popup.style.display = 'block';
-                } else if (target.name) {
-                    let tDist = shipPos.distanceTo(target.position.clone().divideScalar(renderScale));
-                    document.getElementById('target-name').textContent = target.name;
+                // --- AUTO TRACKING LOGIC ---
+                if (isTrackingTarget && currentTargetObj) {
+                    let targetWorldPos = new THREE.Vector3();
+                    currentTargetObj.getWorldPosition(targetWorldPos);
                     
-                    if(target.name === "THE MOON") {
-                        document.getElementById('target-dist').textContent = Math.round(tDist - radMoon).toLocaleString() + " km";
-                        document.getElementById('target-hint').textContent = telemetry.isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn.";
-                    } else if(target.name === "EARTH") {
-                        document.getElementById('target-dist').textContent = Math.round(tDist - radEarth).toLocaleString() + " km";
-                        document.getElementById('target-hint').textContent = "Origin / Communications Hub.";
-                    } else if (target.name === "THE SUN") {
-                        document.getElementById('target-dist').textContent = "149,597,870 km"; 
-                        document.getElementById('target-hint').textContent = "Solar Array Charging Nominal.";
+                    let localTarget = shipGroup.worldToLocal(targetWorldPos.clone());
+                    localTarget.normalize();
+                    
+                    let targetLat = THREE.MathUtils.radToDeg(Math.asin(localTarget.y));
+                    let targetLon = THREE.MathUtils.radToDeg(Math.atan2(-localTarget.x, -localTarget.z));
+                    
+                    lookLon = THREE.MathUtils.lerp(lookLon, targetLon, 0.05);
+                    lookLat = THREE.MathUtils.lerp(lookLat, targetLat, 0.05);
+                }
+
+                // --- TARGETING / RAYCASTING TOOLTIP ---
+                raycaster.setFromCamera(centerScreen, camera);
+                const intersects = raycaster.intersectObjects([earth, moon, sunMesh, progradeMesh]); 
+                const popup = document.getElementById('target-popup');
+                if (intersects.length > 0 && !isDraggingView) {
+                    let target = intersects[0].object;
+                    currentTargetObj = target; 
+                    
+                    if (target.name === "PROGRADE VECTOR") {
+                        safeSetText('target-name', "PROGRADE VECTOR");
+                        safeSetText('target-dist', "Velocity Heading");
+                        safeSetText('target-hint', "Ship travels in this direction.");
+                        if (popup) popup.style.display = 'block';
+                    } else if (target.name) {
+                        let tDist = shipPos.distanceTo(target.position.clone().divideScalar(renderScale));
+                        safeSetText('target-name', target.name);
+                        
+                        if(target.name === "THE MOON") {
+                            safeSetText('target-dist', Math.round(tDist - radMoon).toLocaleString() + " km");
+                            safeSetText('target-hint', telemetry.isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn.");
+                        } else if(target.name === "EARTH") {
+                            safeSetText('target-dist', Math.round(tDist - radEarth).toLocaleString() + " km");
+                            safeSetText('target-hint', "Origin / Communications Hub.");
+                        } else if (target.name === "THE SUN") {
+                            safeSetText('target-dist', "149,597,870 km"); 
+                            safeSetText('target-hint', "Solar Array Charging Nominal.");
+                        }
+                        if (popup) popup.style.display = 'block';
                     }
-                    popup.style.display = 'block';
-                }
-            } else {
-                popup.style.display = 'none';
-            }
-
-            // --- UI UPDATE LOGIC ---
-            let altE = shipPos.length() - radEarth;
-            distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
-            
-            if (altE > globalMaxAlt) globalMaxAlt = altE;
-            
-            document.getElementById('met-time').textContent = formatTime(metSeconds);
-            document.getElementById('alt-earth').textContent = altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
-            document.getElementById('dist-moon').textContent = distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
-            document.getElementById('velocity').textContent = shipVel.length().toFixed(2) + " km/s";
-            document.getElementById('fuel').textContent = ((fuel / maxFuel) * 100).toFixed(1) + "%";
-
-            // Update Consolidated Telemetry Panel Data
-            document.getElementById('max-alt').textContent = globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km";
-            
-            let dirToMoon = moon.position.clone().divideScalar(renderScale).sub(shipPos).normalize();
-            let camDir = new THREE.Vector3();
-            camera.getWorldDirection(camDir);
-            let angleToMoon = camDir.angleTo(dirToMoon) * (180 / Math.PI);
-            
-            const moonHeadingEl = document.getElementById('moon-heading');
-            if (angleToMoon > 40) {
-                moonHeadingEl.className = "caution";
-                moonHeadingEl.textContent = angleToMoon.toFixed(1) + "° (Pan to find)";
-            } else {
-                moonHeadingEl.className = "nominal";
-                moonHeadingEl.textContent = angleToMoon.toFixed(1) + "° (In View)";
-            }
-
-            // Region Logic & Milestone Alerts
-            let region = "Low Earth Orbit";
-            if (distM < 15000) {
-                region = "Lunar Proximity";
-                if (!milestoneLatches.lunarProximity) {
-                    logEvent("Milestone: Entering Lunar Proximity");
-                    milestoneLatches.lunarProximity = true;
-                    triggerAlertFlash("region-text");
-                }
-            }
-            else if (distM < 40000) {
-                region = "Final Lunar Approach";
-            }
-            else if (distM < 60000) {
-                region = "Lunar Sphere of Influence";
-                if (!milestoneLatches.inSOI) {
-                    logEvent("Milestone: Entered Lunar Sphere of Influence");
-                    milestoneLatches.inSOI = true;
-                    triggerAlertFlash("region-text");
-                }
-            }
-            else if (distM < 100000) {
-                region = "Approaching Lunar SOI";
-                if (!milestoneLatches.approachingSOI) {
-                    logEvent("Milestone: Approaching Lunar SOI");
-                    milestoneLatches.approachingSOI = true;
-                }
-            }
-            else if (altE > 202200) {
-                region = "Deep Space (Cislunar Inbound)";
-                if (!milestoneLatches.pastMidpoint) {
-                    logEvent("Milestone: Beyond Trans-Lunar Midpoint");
-                    milestoneLatches.pastMidpoint = true;
-                }
-            }
-            else if (altE > 182200 && altE < 202200) {
-                region = "Trans-Lunar Midpoint";
-                if (!milestoneLatches.atMidpoint) {
-                    logEvent("Milestone: Midpoint Transition Reached");
-                    milestoneLatches.atMidpoint = true;
-                    triggerAlertFlash("region-text");
-                }
-            }
-            else if (altE > 150000) {
-                region = "Approaching Midpoint";
-                if (!milestoneLatches.approachingMidpoint) {
-                    logEvent("Milestone: Approaching Midpoint");
-                    milestoneLatches.approachingMidpoint = true;
-                }
-            }
-            else if (altE > 100000) region = "Deep Space (Cislunar Outbound)";
-            else if (altE > 36300) {
-                region = "Beyond Geosynchronous";
-                if (!milestoneLatches.beyondGeosync) {
-                    logEvent("Milestone: Beyond Geosynchronous Altitude");
-                    milestoneLatches.beyondGeosync = true;
-                }
-            }
-            else if (altE > 35286 && altE < 36286) {
-                region = "Geosynchronous Orbit";
-                if (!milestoneLatches.atGeosync) {
-                    logEvent("Milestone: Geosynchronous Altitude Reached");
-                    milestoneLatches.atGeosync = true;
-                    triggerAlertFlash("region-text");
-                }
-            }
-            else if (altE > 30000) {
-                region = "Approaching Geosync";
-                if (!milestoneLatches.approachingGeosync) {
-                    logEvent("Milestone: Approaching Geosync");
-                    milestoneLatches.approachingGeosync = true;
-                }
-            }
-            else if (altE > 2000) region = "Medium Earth Orbit";
-            document.getElementById('region-text').textContent = region;
-
-            function triggerAlertFlash(elementId) {
-                const el = document.getElementById(elementId);
-                el.classList.add('flash-yellow');
-                setTimeout(() => el.classList.remove('flash-yellow'), 5000);
-            }
-
-            const uiPhase = document.getElementById('phase-text');
-            const uiStatus = document.getElementById('nav-status');
-            const uiWindow = document.getElementById('window-timer');
-            const uiEngine = document.getElementById('engine-status');
-            const uiBurnActual = document.getElementById('burn-actual');
-            const uiGForce = document.getElementById('g-force');
-
-            // Autopilot Warning Flashing
-            const autoBtn = document.getElementById('btn-toggle-auto');
-            if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 300) { 
-                autoBtn.classList.add('caution-btn'); 
-            } else { 
-                autoBtn.classList.remove('caution-btn'); 
-            }
-
-            // Diagnostics & G-Force
-            document.getElementById('burn-target').textContent = (initialTargetBurnTime > 0 ? initialTargetBurnTime : telemetry.estimatedBurnTime).toFixed(1) + " s";
-            uiBurnActual.textContent = actualBurnTime.toFixed(1) + " s";
-            
-            uiGForce.textContent = currentGForce.toFixed(2) + " G";
-            if (currentGForce > 0) {
-                uiGForce.className = "caution"; 
-            } else {
-                uiGForce.className = "nominal"; 
-            }
-
-            if (isBurning) {
-                let ratio = actualBurnTime / (initialTargetBurnTime || 145.0);
-                if (ratio < 0.8) {
-                    uiBurnActual.className = "flash-red";
                 } else {
-                    uiBurnActual.className = "flash-yellow";
+                    if (popup) popup.style.display = 'none';
                 }
-            } else if (telemetry.isTliCoast) {
-                if (metSeconds - burnEndTime < 5) {
-                    uiBurnActual.className = "flash-green";
+
+                // --- UI UPDATE LOGIC ---
+                let altE = shipPos.length() - radEarth;
+                distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+                
+                if (altE > globalMaxAlt) globalMaxAlt = altE;
+                
+                safeSetText('met-time', formatTime(metSeconds));
+                safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
+                safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%");
+                safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                
+                let dirToMoon = moon.position.clone().divideScalar(renderScale).sub(shipPos).normalize();
+                let camDir = new THREE.Vector3();
+                camera.getWorldDirection(camDir);
+                let angleToMoon = camDir.angleTo(dirToMoon) * (180 / Math.PI);
+                
+                safeSetText('moon-heading', angleToMoon.toFixed(1) + (angleToMoon > 40 ? "° (Pan to find)" : "° (In View)"), angleToMoon > 40 ? "caution" : "nominal");
+
+                // Region Logic & Milestone Alerts
+                let region = "Low Earth Orbit";
+                if (distM < 15000) {
+                    region = "Lunar Proximity";
+                    if (!milestoneLatches.lunarProximity) {
+                        logEvent("Milestone: Entering Lunar Proximity");
+                        milestoneLatches.lunarProximity = true;
+                        triggerAlertFlash("region-text");
+                    }
+                }
+                else if (distM < 40000) region = "Final Lunar Approach";
+                else if (distM < 60000) {
+                    region = "Lunar Sphere of Influence";
+                    if (!milestoneLatches.inSOI) {
+                        logEvent("Milestone: Entered Lunar Sphere of Influence");
+                        milestoneLatches.inSOI = true;
+                        triggerAlertFlash("region-text");
+                    }
+                }
+                else if (distM < 100000) {
+                    region = "Approaching Lunar SOI";
+                    if (!milestoneLatches.approachingSOI) {
+                        logEvent("Milestone: Approaching Lunar SOI");
+                        milestoneLatches.approachingSOI = true;
+                    }
+                }
+                else if (altE > 202200) {
+                    region = "Deep Space (Cislunar Inbound)";
+                    if (!milestoneLatches.pastMidpoint) {
+                        logEvent("Milestone: Beyond Trans-Lunar Midpoint");
+                        milestoneLatches.pastMidpoint = true;
+                    }
+                }
+                else if (altE > 182200 && altE < 202200) {
+                    region = "Trans-Lunar Midpoint";
+                    if (!milestoneLatches.atMidpoint) {
+                        logEvent("Milestone: Midpoint Transition Reached");
+                        milestoneLatches.atMidpoint = true;
+                        triggerAlertFlash("region-text");
+                    }
+                }
+                else if (altE > 150000) {
+                    region = "Approaching Midpoint";
+                    if (!milestoneLatches.approachingMidpoint) {
+                        logEvent("Milestone: Approaching Midpoint");
+                        milestoneLatches.approachingMidpoint = true;
+                    }
+                }
+                else if (altE > 100000) region = "Deep Space (Cislunar Outbound)";
+                else if (altE > 36300) {
+                    region = "Beyond Geosynchronous";
+                    if (!milestoneLatches.beyondGeosync) {
+                        logEvent("Milestone: Beyond Geosynchronous Altitude");
+                        milestoneLatches.beyondGeosync = true;
+                    }
+                }
+                else if (altE > 35286 && altE < 36286) {
+                    region = "Geosynchronous Orbit";
+                    if (!milestoneLatches.atGeosync) {
+                        logEvent("Milestone: Geosynchronous Altitude Reached");
+                        milestoneLatches.atGeosync = true;
+                        triggerAlertFlash("region-text");
+                    }
+                }
+                else if (altE > 30000) {
+                    region = "Approaching Geosync";
+                    if (!milestoneLatches.approachingGeosync) {
+                        logEvent("Milestone: Approaching Geosync");
+                        milestoneLatches.approachingGeosync = true;
+                    }
+                }
+                else if (altE > 2000) region = "Medium Earth Orbit";
+                safeSetText('region-text', region);
+
+                function triggerAlertFlash(elementId) {
+                    const el = document.getElementById(elementId);
+                    if (el) {
+                        el.classList.add('flash-yellow');
+                        setTimeout(() => el.classList.remove('flash-yellow'), 5000);
+                    }
+                }
+
+                // Diagnostics & G-Force
+                safeSetText('burn-target', (initialTargetBurnTime > 0 ? initialTargetBurnTime : telemetry.estimatedBurnTime).toFixed(1) + " s");
+                safeSetText('g-force', currentGForce.toFixed(2) + " G", currentGForce > 0 ? "caution" : "nominal");
+
+                const burnActualEl = document.getElementById('burn-actual');
+                if (burnActualEl) {
+                    burnActualEl.textContent = actualBurnTime.toFixed(1) + " s";
+                    if (isBurning) {
+                        let ratio = actualBurnTime / (initialTargetBurnTime || 145.0);
+                        burnActualEl.className = ratio < 0.8 ? "flash-red" : "flash-yellow";
+                    } else if (telemetry.isTliCoast) {
+                        burnActualEl.className = (metSeconds - burnEndTime < 5) ? "flash-green" : "solid-green";
+                    } else {
+                        burnActualEl.className = "nominal"; 
+                    }
+                }
+
+                // Itinerary
+                const itinTli = document.getElementById('itin-tli');
+                const itinCoast = document.getElementById('itin-coast');
+                const tliEstEl = document.getElementById('tli-est-time');
+                const tliEtaEl = document.getElementById('tli-eta');
+                
+                if(telemetry.isTliCoast) {
+                    if (itinTli) {
+                        itinTli.className = "complete";
+                        if (!itinTli.dataset.done) {
+                            itinTli.innerHTML = `[X] TLI Burn Complete`;
+                            itinTli.dataset.done = "true";
+                        }
+                    }
+                    if (itinCoast) itinCoast.className = "active";
+                    if (tliEtaEl) {
+                        let etaSeconds = distM / Math.max(0.1, shipVel.length());
+                        tliEtaEl.textContent = formatTime(etaSeconds);
+                    }
+                    progradeMat.color.setHex(0x00ff00);
                 } else {
-                    uiBurnActual.className = "solid-green";
+                    if (itinTli) {
+                        itinTli.className = "active";
+                        if (itinTli.dataset.done) {
+                            itinTli.innerHTML = `[ ] TLI Burn (Target: <span id="tli-est-time">${Math.ceil(telemetry.estimatedBurnTime)}</span>s)`;
+                            delete itinTli.dataset.done;
+                        }
+                    }
+                    if (tliEstEl) tliEstEl.textContent = Math.ceil(telemetry.estimatedBurnTime);
+                    progradeMat.color.setHex(isBurning ? 0xffff00 : 0x00ffff); 
                 }
-            } else {
-                uiBurnActual.className = "nominal"; 
-            }
 
-            // Itinerary
-            if(telemetry.isTliCoast) {
-                document.getElementById('itin-tli').className = "complete";
-                document.getElementById('itin-tli').innerHTML = `[X] TLI Burn Complete`;
-                document.getElementById('itin-coast').className = "active";
-                let etaSeconds = distM / 1.5;
-                document.getElementById('tli-eta').textContent = formatTime(etaSeconds);
-                progradeMat.color.setHex(0x00ff00);
-            } else {
-                document.getElementById('tli-est-time').textContent = Math.ceil(telemetry.estimatedBurnTime);
-                progradeMat.color.setHex(isBurning ? 0xffff00 : 0x00ffff); 
-            }
-
-            // Timers & Hazards
-            if (telemetry.isTliCoast) {
-                uiWindow.textContent = "N/A (EN ROUTE)"; uiWindow.className = "nominal";
-            } else {
-                uiWindow.textContent = "T- " + formatTime(telemetry.timeToWindow).substring(3);
-                if (telemetry.timeToWindow < 60) { uiWindow.className = "danger"; } 
-                else if (telemetry.timeToWindow < 300) { uiWindow.className = "caution"; } 
-                else { uiWindow.className = "nominal"; }
-            }
-
-            if (isBurning) {
-                uiEngine.textContent = autoPilotEngaged ? "AUTO TLI FIRING" : "MANUAL FIRING";
-                uiEngine.className = "danger";
-            } else {
-                uiEngine.textContent = "STANDBY"; uiEngine.className = "nominal";
-            }
-
-            // BUGFIX: Sphere of Influence State Latch.
-            if (altE < 0) {
-                uiPhase.textContent = "HULL BREACH: CRASHED"; uiPhase.className = "danger";
-                uiStatus.textContent = "MISSION FAILURE"; uiStatus.className = "danger";
-                progradeMat.color.setHex(0xff0000); 
-                if (timeWarp > 1) updateWarpUI(1); // Keep safety 1x for crash
-            } else if (altE < 100) {
-                uiPhase.textContent = "ATMOSPHERIC DRAG"; uiPhase.className = "danger";
-                uiStatus.textContent = "WARNING: ORBIT DECAYING"; uiStatus.className = "danger";
-            } else if (distM < 0) {
-                uiPhase.textContent = "LITHOBRAKING (IMPACT)"; uiPhase.className = "danger";
-                uiStatus.textContent = "MISSION FAILURE"; uiStatus.className = "danger";
-                if (timeWarp > 1) updateWarpUI(1); // Keep safety 1x for crash
-            } else if (distM <= 60000) {
-                uiPhase.textContent = "LUNAR ENCOUNTER"; uiPhase.className = "caution";
-                uiStatus.textContent = "GRAVITY WELL CAPTURE"; uiStatus.className = "caution";
-                document.getElementById('itin-coast').className = "complete";
-                document.getElementById('itin-flyby').className = "active";
-                if (!milestoneLatches.inSOI) {
-                    milestoneLatches.inSOI = true; // State latch engaged
-                    logEvent("Alert: Entered Lunar Sphere of Influence");
-                }
-            } else if (telemetry.isTliCoast) {
-                uiPhase.textContent = "TRANS-LUNAR COAST"; uiPhase.className = "nominal";
-                uiStatus.textContent = "EN ROUTE TO MOON"; uiStatus.className = "nominal";
-            } else {
-                uiPhase.textContent = altE > 100000 ? "DEEP SPACE" : "LOW EARTH ORBIT"; 
-                uiPhase.className = "nominal";
-                if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) {
-                    uiStatus.textContent = "ACTION REQ: ENABLE AUTOPILOT"; uiStatus.className = "caution";
+                // Timers & Hazards
+                if (telemetry.isTliCoast) {
+                    safeSetText('window-timer', "N/A (EN ROUTE)", "nominal");
                 } else {
-                    uiStatus.textContent = "ORBIT STABLE"; uiStatus.className = "nominal";
+                    const winClass = telemetry.timeToWindow < 60 ? "danger" : (telemetry.timeToWindow < 300 ? "caution" : "nominal");
+                    safeSetText('window-timer', "T- " + formatTime(telemetry.timeToWindow).substring(3), winClass);
                 }
-            }
 
-            renderer.render(scene, camera);
+                if (isBurning) {
+                    safeSetText('engine-status', autoPilotEngaged ? "AUTO TLI FIRING" : "MANUAL FIRING", "danger");
+                } else {
+                    safeSetText('engine-status', "STANDBY", "nominal");
+                }
+
+                // State-based Phase/Status UI
+                if (altE < 0) {
+                    safeSetText('phase-text', "HULL BREACH: CRASHED", "danger");
+                    safeSetText('nav-status', "MISSION FAILURE", "danger");
+                    progradeMat.color.setHex(0xff0000); 
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (altE < 100) {
+                    safeSetText('phase-text', "ATMOSPHERIC DRAG", "danger");
+                    safeSetText('nav-status', "WARNING: ORBIT DECAYING", "danger");
+                } else if (distM < 0) {
+                    safeSetText('phase-text', "LITHOBRAKING (IMPACT)", "danger");
+                    safeSetText('nav-status', "MISSION FAILURE", "danger");
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (distM <= 60000) {
+                    safeSetText('phase-text', "LUNAR ENCOUNTER", "caution");
+                    safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");
+                    if (itinCoast) itinCoast.className = "complete";
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (itinFlyby) itinFlyby.className = "active";
+                    if (!milestoneLatches.inSOI) {
+                        milestoneLatches.inSOI = true;
+                        logEvent("Alert: Entered Lunar Sphere of Influence");
+                    }
+                } else if (telemetry.isTliCoast) {
+                    safeSetText('phase-text', "TRANS-LUNAR COAST", "nominal");
+                    safeSetText('nav-status', "EN ROUTE TO MOON", "nominal");
+                } else {
+                    safeSetText('phase-text', altE > 100000 ? "DEEP SPACE" : "LOW EARTH ORBIT", "nominal");
+                    if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) {
+                        safeSetText('nav-status', "ACTION REQ: ENABLE AUTOPILOT", "caution");
+                    } else {
+                        safeSetText('nav-status', "ORBIT STABLE", "nominal");
+                    }
+                }
+
+                // Autopilot Warning Flashing
+                const autoBtn = document.getElementById('btn-toggle-auto');
+                if (autoBtn) {
+                    if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 300) { 
+                        autoBtn.classList.add('caution-btn'); 
+                    } else { 
+                        autoBtn.classList.remove('caution-btn'); 
+                    }
+                }
+
+                renderer.render(scene, camera);
+            } catch (err) {
+                console.error("Simulation Loop Error:", err);
+            }
         });
 
         window.addEventListener('resize', () => {

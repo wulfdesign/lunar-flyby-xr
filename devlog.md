@@ -2,6 +2,54 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-06 12:30] - Discovery: VR Success & Mobile UI Challenges
+### 📝 Summary
+Empirical testing on Quest 3 (via Link) confirmed a functional and "amazing" VR experience, though native browser support and HUD visibility remain challenges. Mobile testing revealed critical HUD scaling issues in both orientations.
+
+### 🛠️ Work Done
+- **Hardware QA Insights**:
+    - **Quest 3 (Link)**: Simulation is stable and immersive. HUD is currently invisible in VR despite `dom-overlay` (likely a z-index or rendering order issue).
+    - **Quest 3 (Native)**: "Not supported" error in internal browser; likely requires HTTPS or specific flag enabling.
+    - **Mobile (Landscape)**: Time-warp buttons are clipped off-screen.
+    - **Mobile (Portrait)**: UI panels are overlapping and text is too small for reliable interaction.
+- **Physics Analysis**:
+    - **Burn Discrepancy**: Identified a 43s under-burn (154s target vs 111s actual). The energy-based cutoff is triggering too early because it doesn't account for the "rising" lunar potential during the burn.
+    - **Sun Gravity**: Evaluated impact. Sun's gravity will be added to the roadmap for v2.1 to achieve "Gold Master" precision, though current errors are more likely due to TLI cutoff logic.
+- **Warp Logic Refinement**:
+    - **Gradual Ramp-up**: Confirmed that jumping directly to high warp (e.g., 7.2kx) causes integration "jumps". Will implement a global "Warp Gearbox" that ramps speed smoothly (e.g., 2x increments) to preserve physics stability.
+- **Architectural Decision**:
+    - **File Splitting**: Agreed on a "Multi-file Source, Single-file Build" strategy. We will keep the portable `index.html` for distribution but prepare a modular version for easier development.
+
+### 🧪 QA Discovery Log
+- `InvalidStateError`: Occurs when attempting to start a VR session while one is already active.
+- `TypeError (cancelAnimationFrame)`: Occurs when the Three.js renderer attempts to clean up a session that was abruptly terminated.
+
+---
+
+## [2026-04-06 11:30] - Mobile, VR, and Physics Refinement
+### 📝 Summary
+Successfully addressed high-priority cross-platform issues and improved simulation physics. The mission is now ready for QA across Mobile and Quest 3.
+
+### 🛠️ Work Done
+- **Mobile Optimization**:
+    - Implemented full touch navigation for camera rotation using `touchstart`, `touchmove`, and `touchend`.
+    - Added CSS media queries for a responsive HUD, ensuring panels fit on smaller screens.
+- **Quest 3 & WebXR**:
+    - Resolved "three blinking dots" and VR entry failures by updating the `immersive-vr` session request with `local-floor` and `dom-overlay`.
+    - Integrated WebXR controller support, mapping the left trigger to "Manual Burn" and the right trigger to "Toggle Tracking".
+    - Fixed "HUD Out-of-Bounds" by enabling `dom-overlay` for the UI layer in VR.
+- **Physics Precision**:
+    - Updated the energy calculation in the autopilot and telemetry to include the Moon's gravitational potential, addressing the "Lunar Keyhole" overshoot issue.
+- **UI & Stability**:
+    - Fixed a critical `TypeError` that caused the simulation to freeze when switching warp speeds at mission milestones.
+    - Implemented `safeSetText` helper function to handle missing DOM elements gracefully.
+    - Added a `try...catch` block to the main animation loop to prevent simulation halts on unexpected UI or data errors.
+- **Telemetry Track**:
+    - Commenced research into NASA AROW/OEM JSON formats and documented findings in `docs/ArtemisII_Telemetry_Notes.md`.
+- **Task Management**: Moved 6 critical items to **Ready for QA** (🧪).
+
+---
+
 ## [2026-04-06 10:00] - NorWesCon Insights & Real-World Telemetry Track
 ### 📝 Summary
 Returned from NorWesCon with fresh insights on lunar architecture and mission visualization. Transitioning the project to prioritize real-world Artemis II data integration and cross-platform (Mobile/Quest 3) stability.
