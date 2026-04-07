@@ -12,10 +12,11 @@
 - [ ] 🔥🔥 **Mission: Elliptical Earth Loop**: Artemis II initial high-eccentricity orbit option.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
+- [ ] 🧪 **Versioning: Internal tracking**: Added `SIM_VERSION` to `index.html` and included it in every flight log entry (🏆).
+- [ ] 🧪 **Bug: Stuck Warp Gearbox**: Fixed race condition where gear-shifting would stop after one step due to redundant state resets (🏆).
+- [ ] 🧪 **Telemetry: Gear Shift Logging**: Each step of the incremental warp transition is now logged with full physics data (🏆).
 - [ ] 🧪 **Physics: Refine Mission Lead Angle**: Increased targetPhaseAngle offset to 0.91 rad to fix Moon rendezvous phase lag (🏆).
 - [ ] 🧪 **UX: Suggested Warp Alerts**: Replaced forced resets with flashing buttons and `nav-msg` prompts for milestone guidance (🏆).
-- [ ] 🧪 **HUD: Gravity Units (m/s²)**: Converted gravity display from km/s² to m/s² for human-scale readability (🏆).
-- [ ] 🧪 **Physics: Rocket Equation Burn Estimation**: Uses Tsiolkovsky math for mass-aware target time calculation (🏆).
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **VR: Controller Troubleshooting**: Investigate why controllers might not be appearing in WebXR; add check for `select` events.

@@ -221,22 +221,11 @@
 
     <script>
         /**
-         * EDUCATIONAL ORBITAL DYNAMICS ENGINE - V1.9.1
+         * Artemis: Lunar Flyby VR - Educational Orbital Dynamics Engine
          * Features: Velocity Verlet Integration, Real-world units, Orbital Energy Targeting, 
          * Latching Autopilot, Target Scanning, Burn Diagnostics, G-Force, Milestone Tracking.
-         * * ==========================================
-         * V2.0 ROADMAP (Future Implementation List)
-         * ==========================================
-         * - [ ] Bug Investigation: Time warp seems to halt/reset repeatedly when deep inside 
-         * the Lunar Sphere of Influence. Need to refine the SOI trigger latch.
-         * - [ ] Mid-Course Correction (MCC): Add an "Off Course Detected" warning and a 
-         * "Recalculate Destination" button to execute a burn midway to the Moon if alignment drifts.
-         * - [ ] Trajectory Trails: Render the actual path flown (white line) vs projected path (blue dotted line).
-         * - [ ] Overview Map: A 3/4 top-down orthographic minimap overlay showing Earth, Moon, and ship position.
-         * - [ ] Post-Flight Report: After flyby/crash, generate a UI report showing Max Gs, flight time, and fuel remaining.
-         * - [ ] Lagrangian Points (L1-L4): Add invisible targets/markers to the raycaster for L1 (between Earth/Moon), L2 (behind Moon), etc.
-         * - [ ] Lunar Orbit Insertion (LOI): Add capability to do a retrograde burn at perilune to establish Lunar Orbit instead of a Free Return.
          */
+        const SIM_VERSION = "1.10.5";
 
         // --- REAL-WORLD PHYSICS CONSTANTS ---
         const muEarth = 398600.4418; // km^3/s^2
@@ -296,7 +285,7 @@
             targetWarp = target;
         }
 
-        function updateWarpStepping(dt) {
+        function updateWarpStepping(dt, telemetry) {
             if (timeWarp === targetWarp) return;
             
             warpStepTimer += dt;
@@ -304,11 +293,15 @@
                 let currentIndex = warpLevels.indexOf(timeWarp);
                 let targetIndex = warpLevels.indexOf(targetWarp);
                 
+                let nextWarp = timeWarp;
                 if (currentIndex < targetIndex) {
-                    updateWarpUI(warpLevels[currentIndex + 1]);
+                    nextWarp = warpLevels[currentIndex + 1];
                 } else if (currentIndex > targetIndex) {
-                    updateWarpUI(warpLevels[currentIndex - 1]);
+                    nextWarp = warpLevels[currentIndex - 1];
                 }
+                
+                updateWarpUI(nextWarp);
+                logEvent(`AUTO: Gear shift to ${nextWarp}x`, telemetry);
                 warpStepTimer = 0;
             }
         }
@@ -316,7 +309,6 @@
         function updateCinematic(dt, telemetry) {
             if (!cinematicActive) return;
             cinematicTimer += dt;
-            updateWarpStepping(dt);
 
             let altE = shipPos.length() - radEarth;
             let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
@@ -740,6 +732,7 @@
             let r = shipPos.length() - radEarth;
             let v = shipVel.length();
             flightLog.push({ 
+                version: SIM_VERSION,
                 met: metSeconds, 
                 met_formatted: formatTime(metSeconds),
                 event: eventMsg, 
@@ -871,7 +864,6 @@
         
         function updateWarpUI(w) {
             timeWarp = w;
-            shiftWarp(w); // Sync gear shifting target
             document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active'));
             if(document.getElementById(`btn-warp-${w}`)) document.getElementById(`btn-warp-${w}`).classList.add('active');
             const warpTextEl = document.getElementById('warp-text');
@@ -1111,7 +1103,7 @@
                 metSeconds += simSecondsToProcess;
                 
                 // Update Smooth Gearbox (Gradual Warp Ramp-up/down)
-                updateWarpStepping(dt_real);
+                updateWarpStepping(dt_real, telemetry);
                 
                 // Update cinematic sequence
                 if (cinematicActive) updateCinematic(dt_real, telemetry);

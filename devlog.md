@@ -2,6 +2,22 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 02:45] - Gearbox Fix & Version Tracking
+### 📝 Summary
+Resolved a critical bug that caused the incremental warp transitions to halt prematurely. Implemented internal versioning to ensure flight logs can be traced back to specific simulation builds.
+
+### 🛠️ Work Done
+- **Bug Fixes**:
+    - **Warp Gearbox**: Identified and fixed a race condition where `updateWarpUI` was resetting the `targetWarp` state during each gear change, effectively "sticking" the simulation at the first increment.
+    - **Cinematic Cleanup**: Removed redundant `updateWarpStepping` call from the cinematic engine to prevent potential double-increment errors.
+- **Versioning & Logging**:
+    - **Internal Versioning**: Added `SIM_VERSION` (v1.10.5) to `index.html`.
+    - **Traceable Logs**: Every entry in the flight log now includes the `version` property, allowing for reliable post-flight analysis across different builds.
+    - **Incremental Logging**: Added automatic event logging for every gear shift in the Smooth Gearbox (e.g., "AUTO: Gear shift to 60x"), providing granular debug info for time-acceleration transitions.
+- **Manual Overrides**: Verified that all manual UI interactions (Abort, Autopilot, Manual Burn, Warp) consistently disable active cinematic sequences.
+
+---
+
 ## [2026-04-07 01:30] - Trajectory Analysis & UX Pivot
 ### 📝 Summary
 Successfully addressed disruptive warp resets by transitioning to a "Suggested Warp" notification system. Improved HUD readability with a unit conversion for gravity and refined the mission lead angle to resolve the "Phase Lag" observed in recent flight logs.
