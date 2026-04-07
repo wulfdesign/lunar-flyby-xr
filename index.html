@@ -825,16 +825,17 @@
             }
             resetMission();
         });
-        document.getElementById('btn-warp-1').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(1); autoFastForward = false; });
-        document.getElementById('btn-warp-10').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(10); autoFastForward = false; });
-        document.getElementById('btn-warp-60').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(60); autoFastForward = false; });
-        document.getElementById('btn-warp-300').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(300); autoFastForward = false; });
-        document.getElementById('btn-warp-600').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(600); autoFastForward = false; });
-        document.getElementById('btn-warp-1800').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(1800); autoFastForward = false; });
-        document.getElementById('btn-warp-3600').addEventListener('click', () => { if(cinematicActive) return; updateWarpUI(3600); autoFastForward = false; });
+        document.getElementById('btn-warp-1').addEventListener('click', () => { shiftWarp(1); autoFastForward = false; });
+        document.getElementById('btn-warp-10').addEventListener('click', () => { shiftWarp(10); autoFastForward = false; });
+        document.getElementById('btn-warp-60').addEventListener('click', () => { shiftWarp(60); autoFastForward = false; });
+        document.getElementById('btn-warp-300').addEventListener('click', () => { shiftWarp(300); autoFastForward = false; });
+        document.getElementById('btn-warp-600').addEventListener('click', () => { shiftWarp(600); autoFastForward = false; });
+        document.getElementById('btn-warp-1800').addEventListener('click', () => { shiftWarp(1800); autoFastForward = false; });
+        document.getElementById('btn-warp-3600').addEventListener('click', () => { shiftWarp(3600); autoFastForward = false; });
         
         document.getElementById('btn-toggle-auto').addEventListener('click', (e) => {
-            if (cinematicActive) return;
+            cinematicActive = false; // Manual override
+            document.getElementById('cinematic-status').style.display = 'none';
             autoPilotEngaged = !autoPilotEngaged;
             e.target.textContent = autoPilotEngaged ? "AUTOPILOT ON" : "ENABLE AUTO TMI";
             if (autoPilotEngaged) {
@@ -847,18 +848,23 @@
         });
 
         document.getElementById('btn-skip-window').addEventListener('click', () => { 
-            if (cinematicActive) return;
-            autoFastForward = true; updateWarpUI(3600); 
+            cinematicActive = false; // Manual override
+            document.getElementById('cinematic-status').style.display = 'none';
+            autoFastForward = true; 
+            shiftWarp(3600); 
         });
         
         function startManualBurn() { 
-            if (cinematicActive) return;
+            cinematicActive = false; // Manual override
+            document.getElementById('cinematic-status').style.display = 'none';
             if(fuel > 0) { 
                 isBurning = true; autoPilotEngaged = false; autoBurnActive = false;
-                document.getElementById('btn-toggle-auto').textContent = "ENABLE AUTO TMI"; 
-                document.getElementById('btn-toggle-auto').classList.remove('active'); 
-                document.getElementById('autopilot-status').textContent="OFF"; 
-                document.getElementById('autopilot-status').className="danger";
+                const autoBtn = document.getElementById('btn-toggle-auto');
+                if (autoBtn) {
+                    autoBtn.textContent = "ENABLE AUTO TMI"; 
+                    autoBtn.classList.remove('active'); 
+                }
+                safeSetText('autopilot-status', "OFF", "danger");
             } 
         }
         function stopManualBurn() { isBurning = false; }
@@ -897,11 +903,6 @@
             if (btn) btn.classList.add('caution-btn');
         }
 
-        function triggerButtonFlash(w) {
-            const btn = document.getElementById(`btn-warp-${w}`);
-            if (btn) btn.classList.add('caution-btn');
-        }
-
         [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
@@ -919,8 +920,8 @@
                     if(b) b.classList.remove('caution-btn');
                 });
 
-                updateWarpUI(w);
-                logEvent(`MANUAL: Warp set to ${w}x`, {});
+                shiftWarp(w); // Set target warp for incremental shifting
+                logEvent(`MANUAL: Target Warp set to ${w}x`, {});
             });
         });
 
@@ -982,7 +983,6 @@
             let angleDiff = targetPhaseAngle - shipAngle; if(angleDiff < 0) angleDiff += Math.PI * 2;
             let shipAngularVel = currentVelMag / r;
             let timeToWindow = angleDiff / Math.max(0.0001, (shipAngularVel - moonAngularVel));
-            // Fast forward cutoff
             if(autoFastForward && timeToWindow < 60 && !isTliCoast) { autoFastForward = false; updateWarpUI(1); }
 
             // Latching Autopilot
