@@ -138,8 +138,8 @@
                     <span>Vz: <span id="vz">0.0</span></span>
                 </div>
                 <hr style="border-color: #00ffff; opacity: 0.3;">
-                <p><span class="tooltip" title="Gravitational pull from Earth (km/s^2)">Earth Gravity:</span> <span id="grav-earth">0.00000</span></p>
-                <p><span class="tooltip" title="Gravitational pull from the Moon (km/s^2)">Moon Gravity:</span> <span id="grav-moon">0.00000</span></p>
+                <p><span class="tooltip" title="Gravitational pull from Earth (m/s²)">Earth Gravity:</span> <span id="grav-earth">0.00000</span></p>
+                <p><span class="tooltip" title="Gravitational pull from the Moon (m/s²)">Moon Gravity:</span> <span id="grav-moon">0.00000</span></p>
                 <p><span class="tooltip" title="Remaining propellant in the Trans-Lunar Injection stage.">Fuel (TLI Stage):</span> <span id="fuel">100%</span></p>
                 <div class="controls">
                     <button id="btn-abort" class="btn-danger" title="Emergency stop. Resets spacecraft back to a stable 400km Low Earth Orbit.">ABORT / RESTART</button>
@@ -892,6 +892,16 @@
             }
         }
 
+        function triggerButtonFlash(w) {
+            const btn = document.getElementById(`btn-warp-${w}`);
+            if (btn) btn.classList.add('caution-btn');
+        }
+
+        function triggerButtonFlash(w) {
+            const btn = document.getElementById(`btn-warp-${w}`);
+            if (btn) btn.classList.add('caution-btn');
+        }
+
         [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
@@ -902,6 +912,13 @@
                 cinematicActive = false; // Manual override
                 playbackActive = false; // Manual override
                 document.getElementById('cinematic-status').style.display = 'none';
+                
+                // Clear any flashing suggestions
+                [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(wVal => {
+                    const b = document.getElementById(`btn-warp-${wVal}`);
+                    if(b) b.classList.remove('caution-btn');
+                });
+
                 updateWarpUI(w);
                 logEvent(`MANUAL: Warp set to ${w}x`, {});
             });
@@ -958,12 +975,13 @@
             }
 
             // Phase Angle Window Logic
-            let targetPhaseAngle = (moonAngle + Math.PI + 0.83) % (Math.PI * 2);
+            // Refined Lead Angle: Artemis II / Apollo style free-return requires precise lead
+            // Increasing offset to ~52 degrees (0.91 rad) to account for 3.5 day transit
+            let targetPhaseAngle = (moonAngle + Math.PI + 0.91) % (Math.PI * 2);
             let shipAngle = Math.atan2(shipPos.z, shipPos.x); if(shipAngle < 0) shipAngle += Math.PI * 2;
             let angleDiff = targetPhaseAngle - shipAngle; if(angleDiff < 0) angleDiff += Math.PI * 2;
             let shipAngularVel = currentVelMag / r;
             let timeToWindow = angleDiff / Math.max(0.0001, (shipAngularVel - moonAngularVel));
-
             // Fast forward cutoff
             if(autoFastForward && timeToWindow < 60 && !isTliCoast) { autoFastForward = false; updateWarpUI(1); }
 
@@ -1039,9 +1057,9 @@
 
             earth.rotation.y += 0.0000727 * dt;
 
-            // Safety: Force warp down if we are deep in SOI and integration is at risk
+            // Safety Warning only: Do not force warp down per user feedback
             if (distToMoon < 60000 && timeWarp > 600 && !cinematicActive && !playbackActive) {
-                updateWarpUI(600);
+                showNavMsg("ADVISORY: REDUCE WARP FOR SOI STABILITY");
             }
 
             return { 
@@ -1150,37 +1168,50 @@
                 // --- UI UPDATE LOGIC ---
                 let altE = shipPos.length() - radEarth;
                 distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
-                
+
                 if (altE > globalMaxAlt) globalMaxAlt = altE;
-                
+
                 safeSetText('met-time', formatTime(metSeconds));
                 safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
                 safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+
                 safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
                 safeSetText('vx', shipVel.x.toFixed(3));
                 safeSetText('vy', shipVel.y.toFixed(3));
                 safeSetText('vz', shipVel.z.toFixed(3));
-                safeSetText('grav-earth', telemetry.magEarth.toFixed(6) + " km/s²");
-                safeSetText('grav-moon', telemetry.magMoon.toFixed(6) + " km/s²");
+
+                // Units: Convert km/s² to m/s² (x1000) for better readability
+                safeSetText('grav-earth', (telemetry.magEarth * 1000).toFixed(4) + " m/s²");
+                safeSetText('grav-moon', (telemetry.magMoon * 1000).toFixed(4) + " m/s²");
                 safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%");
                 safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
-                
+
                 let dirToMoon = moon.position.clone().divideScalar(renderScale).sub(shipPos).normalize();
                 let camDir = new THREE.Vector3();
                 camera.getWorldDirection(camDir);
                 let angleToMoon = camDir.angleTo(dirToMoon) * (180 / Math.PI);
-                
+
                 safeSetText('moon-heading', angleToMoon.toFixed(1) + (angleToMoon > 40 ? "° (Pan to find)" : "° (In View)"), angleToMoon > 40 ? "caution" : "nominal");
 
-                // Region Logic & Milestone Alerts
+                // Region Logic & Milestone Alerts (Removed forced resets, replaced with suggestions)
                 let region = "Low Earth Orbit";
+                const clearWarpSuggestions = () => {
+                    [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+                        const btn = document.getElementById(`btn-warp-${w}`);
+                        if(btn) btn.classList.remove('caution-btn');
+                    });
+                };
+
                 if (distM < 15000) {
                     region = "Lunar Proximity";
                     if (!milestoneLatches.lunarProximity) {
                         logEvent("Milestone: Entering Lunar Proximity", telemetry);
                         milestoneLatches.lunarProximity = true;
                         triggerAlertFlash("region-text");
-                        if (!cinematicActive && !playbackActive) updateWarpUI(1);
+                        if (!cinematicActive && !playbackActive && timeWarp > 1) {
+                            showNavMsg("SUGGESTED WARP: 1x");
+                            const b = document.getElementById('btn-warp-1'); if(b) b.classList.add('caution-btn');
+                        }
                     }
                 }
                 else if (distM < 40000) region = "Final Lunar Approach";
@@ -1190,7 +1221,10 @@
                         logEvent("Milestone: Entered Lunar Sphere of Influence", telemetry);
                         milestoneLatches.inSOI = true;
                         triggerAlertFlash("region-text");
-                        if (!cinematicActive && !playbackActive) updateWarpUI(10);
+                        if (!cinematicActive && !playbackActive && timeWarp > 10) {
+                            showNavMsg("SUGGESTED WARP: 10x");
+                            const b = document.getElementById('btn-warp-10'); if(b) b.classList.add('caution-btn');
+                        }
                     }
                 }
                 else if (distM < 100000) {
@@ -1198,7 +1232,10 @@
                     if (!milestoneLatches.approachingSOI) {
                         logEvent("Milestone: Approaching Lunar SOI", telemetry);
                         milestoneLatches.approachingSOI = true;
-                        if (!cinematicActive && !playbackActive) updateWarpUI(30);
+                        if (!cinematicActive && !playbackActive && timeWarp > 30) {
+                            showNavMsg("SUGGESTED WARP: 30x");
+                            const b = document.getElementById('btn-warp-30'); if(b) b.classList.add('caution-btn');
+                        }
                     }
                 }
                 else if (altE > 202200) {
