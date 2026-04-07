@@ -2,6 +2,16 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 15:20] - Realism Check: TLI Targeting vs God-Mode
+### 📝 Summary
+The user rightly pointed out that in reality, we cannot "move" the Moon (via `MISSION_LEAD_ANGLE` delay) to fix our trajectory timing. To achieve true realism, we must fix the Moon to its natural ephemeris and adjust our **Trans-Lunar Injection (TMI) parameters**: Specifically, the Ejection Angle (orbit phase at burn start) and the Transit Time (burn duration/$\Delta V$). We also planned a Flight Computer module to help calculate these mid-course rendezvous trajectories and corrections on the fly. 
+
+### 🛠️ Work Done
+- **Tasks Updated:** Added True TLI Targeting Engine to the `Current Work` queue, shifting focus away from tweaking `MISSION_LEAD_ANGLE`.
+- **Tasks Updated:** Added Avionics Flight Computer UI to `V2.0 Mission Goals` to enable in-flight calculations from exact state vectors.
+
+---
+
 ## [2026-04-07 15:15] - Orbital Mechanics & Trailing-Edge Analysis
 ### 📝 Summary
 Investigated the 20km flyby trajectory that failed to result in a "figure-8" free-return loop. Confirmed physics vectors are accurate; the issue stems from passing *behind* the Moon (Trailing-Edge pass) which acts as a gravitational slingshot, rather than passing *in front* (Leading-Edge pass) which cancels velocity and creates the loop. Also exposed time warp auto-slowdown speeds as configurable constants per user request.
