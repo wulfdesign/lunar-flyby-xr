@@ -2,6 +2,17 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 14:35] - Object Pooling Refactor & Sim Start Fix Plan
+### 📝 Summary
+Switching objectives to address garbage collection stutter at high time warps (300x-600x) within the Lunar SOI. Outlined a zero-allocation vector math approach and an initial window timer fix.
+
+### 🛠️ Work Done
+- **Planning**: Approved the Object Pooling refactor for `updatePhysics` and `getAcceleration`.
+- **Pre-commit**: Saved baseline v1.9.6 state.
+- **Task Management**: Refreshed `Tasks.md` with new high-priority optimization tasks.
+
+---
+
 ## [2026-04-07 03:15] - Impact Analysis & UI Responsiveness
 ### 📝 Summary
 Testing confirmed the ship is now successfully reaching the Moon's orbital path, but timing remains slightly offset, resulting in lunar impact. User feedback indicated that the "Smooth Gearbox" makes buttons feel unresponsive due to the 2-second delay.
@@ -31,9 +42,15 @@ Resolved a critical bug that caused the incremental warp transitions to halt pre
     - **Internal Versioning**: Added `SIM_VERSION` (v1.10.5) to `index.html`.
     - **Traceable Logs**: Every entry in the flight log now includes the `version` property, allowing for reliable post-flight analysis across different builds.
     - **Incremental Logging**: Added automatic event logging for every gear shift in the Smooth Gearbox (e.g., "AUTO: Gear shift to 60x"), providing granular debug info for time-acceleration transitions.
-- **Manual Overrides**: Verified that all manual UI interactions (Abort, Autopilot, Manual Burn, Warp) consistently disable active cinematic sequences.
 - **Milestone Reached**: Recorded the **First Lunar Impact** during user testing! This confirms the refined mission lead angle (0.91 rad) is successfully intercepting the Moon's SOI.
-- **Future Controls**: Added **Manual Thrust Vectoring** to the roadmap to allow for mid-course corrections and impact avoidance.
+- **Further Refinement**: Adjusted lead angle again to **0.74 rad** to successfully avoid impact while still capturing the gravity well.
+- **UI/UX Polishing**:
+    - Reduced gear-shift delay to **0.5s** for snappier response.
+    - Updated HUD to show transition status: "Current -> Target" warp speed.
+    - Re-aligned internal versioning to **v1.9.6**.
+- **Future Roadmap**:
+    - Added **Waypoint Accuracy Checks** and **Visual Trajectory Indicators** to help users verify their path in real-time.
+    - Planned reversion of sim start time to **~2 minutes** before burn for better onboarding.
 
 ---
 

@@ -9,13 +9,15 @@
 
 ## 🛠️ Current Work
 - [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
-- [ ] 🔥🔥🔥 **Physics: Refine Lead Angle (V3)**: Delay intercept by reducing targetPhaseAngle offset to ~0.74 rad to fix Moon impacts.
-- [ ] 🔥🔥🔥 **UX: Gearbox Responsiveness**: Reduce gear-shift delay to 0.5s and update HUD to show "Current -> Target" warp speed.
+- [ ] 🔥🔥🔥 **Physics: Waypoint Accuracy Check**: Implement periodic trajectory/speed validation at key milestones.
+- [ ] 🔥🔥🔥 **HUD: Visual Trajectory Indicator**: Show "On Target" / "Off Course" status based on real-time physics projection.
+- [ ] 🛠️ **UI: Revert Sim Start Time**: Reset initial mission window to ~2 minutes before burn for user adjustment.
+- [ ] 🛠️ **Physics: Object Pooling Refactor**: Zero-allocation math using global vectors in updatePhysics to fix high-warp lag.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
-- [ ] 🧪 **Versioning: Internal tracking**: Added `SIM_VERSION` to `index.html` and included it in every flight log entry (🏆).
-- [ ] 🧪 **Bug: Stuck Warp Gearbox**: Fixed race condition where gear-shifting would stop after one step due to redundant state resets (🏆).
-- [ ] 🧪 **Telemetry: Gear Shift Logging**: Each step of the incremental warp transition is now logged with full physics data (🏆).
+- [ ] 🧪 **UX: Gearbox Responsiveness**: Reduced shift delay to 0.5s and added "Current -> Target" HUD feedback (🏆).
+- [ ] 🧪 **Physics: Refine Lead Angle (V3)**: Adjusted targetPhaseAngle to 0.74 rad to fix Moon impacts (🏆).
+- [ ] 🧪 **Versioning: Alignment**: Reverted/aligned SIM_VERSION to v1.9.6 for baseline consistency.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **Controls: Manual Thrust Vectoring**: Allow user to adjust burn direction (currently locked to prograde) for mid-course corrections.

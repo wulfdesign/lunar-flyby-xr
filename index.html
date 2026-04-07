@@ -225,9 +225,10 @@
          * Features: Velocity Verlet Integration, Real-world units, Orbital Energy Targeting, 
          * Latching Autopilot, Target Scanning, Burn Diagnostics, G-Force, Milestone Tracking.
          */
-        const SIM_VERSION = "1.10.5";
+        const SIM_VERSION = "1.9.6";
 
         // --- REAL-WORLD PHYSICS CONSTANTS ---
+        const MISSION_LEAD_ANGLE = 0.74; // Global Phase Angle offset for Artemis II
         const muEarth = 398600.4418; // km^3/s^2
         const muMoon = 4902.8000;    // km^3/s^2
         const radEarth = 6371;       // km
@@ -289,7 +290,7 @@
             if (timeWarp === targetWarp) return;
             
             warpStepTimer += dt;
-            if (warpStepTimer > 2.0) { // Stay on each "gear" for 2 seconds
+            if (warpStepTimer > 0.5) { // Responsive shifting: 0.5s per gear
                 let currentIndex = warpLevels.indexOf(timeWarp);
                 let targetIndex = warpLevels.indexOf(targetWarp);
                 
@@ -675,8 +676,8 @@
             let vOrbit = Math.sqrt(muEarth / startRadius); 
             moonAngle = 0; 
             
-            const leadAngle = 0.83; 
-            const targetPhaseAngle = (moonAngle + Math.PI + leadAngle) % (Math.PI * 2);
+            // Use global Phase Angle for synchronized window calculation
+            const targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
             
             const shipAngularVel = vOrbit / startRadius;
             const moonAngularVel = Math.sqrt(muEarth / Math.pow(distMoon, 3));
@@ -865,7 +866,9 @@
         function updateWarpUI(w) {
             timeWarp = w;
             document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active'));
-            if(document.getElementById(`btn-warp-${w}`)) document.getElementById(`btn-warp-${w}`).classList.add('active');
+            // Highlight the TARGET button if we are still shifting
+            if(document.getElementById(`btn-warp-${targetWarp}`)) document.getElementById(`btn-warp-${targetWarp}`).classList.add('active');
+            
             const warpTextEl = document.getElementById('warp-text');
             if(warpTextEl) {
                 let speedLabel = w + "x";
@@ -877,7 +880,13 @@
                 if(w === 1800) speedLabel = "1.8kx (Fast)";
                 if(w === 3600) speedLabel = "3.6kx (Cruise)";
                 if(w === 7200) speedLabel = "7.2kx (Maximum)";
-                warpTextEl.textContent = speedLabel;
+                
+                // Show transition in HUD
+                if (timeWarp !== targetWarp) {
+                    warpTextEl.textContent = `${speedLabel} (Shifting to ${targetWarp}x...)`;
+                } else {
+                    warpTextEl.textContent = speedLabel;
+                }
                 warpTextEl.className = w === 1 ? "nominal" : "caution";
             }
         }
@@ -913,26 +922,47 @@
                 });
 
                 shiftWarp(w); // Set target warp for incremental shifting
+                updateWarpUI(timeWarp); // Immediate visual feedback
                 logEvent(`MANUAL: Target Warp set to ${w}x`, {});
             });
         });
 
         // --- ORBITAL PHYSICS ENGINE (VELOCITY VERLET) ---
-        function getAcceleration(pos) {
+        // --- PRE-ALLOCATED MATH VECTORS (ZERO-ALLOCATION LOOP) ---
+        const _aEarth = new THREE.Vector3();
+        const _aMoon = new THREE.Vector3();
+        const _dirMoon = new THREE.Vector3();
+        const _moonPos = new THREE.Vector3();
+        const _accel = new THREE.Vector3();
+        const _nextAccel = new THREE.Vector3();
+        const _thrustAcc = new THREE.Vector3();
+        const _nextThrustAcc = new THREE.Vector3();
+        const _totalAccel = new THREE.Vector3();
+        const _nextTotalAccel = new THREE.Vector3();
+        const _tempVec1 = new THREE.Vector3();
+        const _tempVec2 = new THREE.Vector3();
+        const _camDir = new THREE.Vector3();
+        const _dirToMoon = new THREE.Vector3();
+        const _lookTarget = new THREE.Vector3();
+
+        // Optimized physics step to avoid GC lag at high warp.
+        // Uses pre-allocated vectors to achieve zero allocations per function call.
+        function getAcceleration(pos, accelOut) {
             // Gravity from Earth
             let rEarth = pos.length();
-            let magEarth = muEarth / Math.pow(rEarth, 2); // Acceleration magnitude (km/s^2)
-            let aEarth = pos.clone().multiplyScalar(-muEarth / Math.pow(rEarth, 3));
+            let magEarth = muEarth / (rEarth * rEarth); // Acceleration magnitude (km/s^2)
+            _aEarth.copy(pos).multiplyScalar(-muEarth / (rEarth * rEarth * rEarth));
             
             // Gravity from Moon
-            let moonPos = moon.position.clone().divideScalar(renderScale);
-            let dirMoon = new THREE.Vector3().subVectors(moonPos, pos);
-            let rMoon = dirMoon.length();
-            let magMoon = muMoon / Math.pow(rMoon, 2); // Acceleration magnitude (km/s^2)
-            let aMoon = dirMoon.multiplyScalar(muMoon / Math.pow(rMoon, 3));
+            _moonPos.copy(moon.position).divideScalar(renderScale);
+            _dirMoon.subVectors(_moonPos, pos);
+            let rMoon = Math.max(0.0001, _dirMoon.length()); // Prevent dev by zero
+            let magMoon = muMoon / (rMoon * rMoon); // Acceleration magnitude (km/s^2)
+            _aMoon.copy(_dirMoon).multiplyScalar(muMoon / (rMoon * rMoon * rMoon));
+            
+            accelOut.copy(_aEarth).add(_aMoon);
             
             return {
-                total: aEarth.add(aMoon),
                 magEarth: magEarth,
                 magMoon: magMoon
             };
@@ -945,7 +975,8 @@
 
             let r = shipPos.length();
             let currentVelMag = shipVel.length();
-            let distToMoon = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale));
+            _moonPos.copy(moon.position).divideScalar(renderScale);
+            let distToMoon = shipPos.distanceTo(_moonPos);
             
             // Target Energy (including Earth and Moon potential for higher precision)
             let currentEnergy = (currentVelMag * currentVelMag) / 2 - (muEarth / r) - (muMoon / Math.max(1, distToMoon));
@@ -968,9 +999,8 @@
             }
 
             // Phase Angle Window Logic
-            // Refined Lead Angle: Artemis II / Apollo style free-return requires precise lead
-            // Increasing offset to ~52 degrees (0.91 rad) to account for 3.5 day transit
-            let targetPhaseAngle = (moonAngle + Math.PI + 0.91) % (Math.PI * 2);
+            // Use global Phase Angle for synchronized window calculation
+            let targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
             let shipAngle = Math.atan2(shipPos.z, shipPos.x); if(shipAngle < 0) shipAngle += Math.PI * 2;
             let angleDiff = targetPhaseAngle - shipAngle; if(angleDiff < 0) angleDiff += Math.PI * 2;
             let shipAngularVel = currentVelMag / r;
@@ -1007,41 +1037,43 @@
 
             if (isBurning) actualBurnTime += dt;
 
-            // Standard Velocity Verlet Integration
+            // --- Standard Velocity Verlet Integration (Zero-Allocation) ---
             let currentMass = shipEmptyMass + fuel;
-            let accelData = getAcceleration(shipPos);
-            let accel = accelData.total;
+            let accelData = getAcceleration(shipPos, _accel);
             
             currentGForce = 0; 
-            let thrustAcc = new THREE.Vector3(0,0,0);
+            _thrustAcc.set(0,0,0);
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass); 
-                thrustAcc = shipVel.clone().normalize().multiplyScalar(thrustAccMag);
+                _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
                 fuel -= (massFlowRate * dt); 
                 if(fuel < 0) fuel = 0;
                 currentGForce = thrustAccMag / 0.00980665; 
             }
 
             // 1. pos(t + dt) = pos(t) + v(t)dt + 0.5 * a(t)dt^2
-            let totalAccel = accel.clone().add(thrustAcc);
-            shipPos.add(shipVel.clone().multiplyScalar(dt)).add(totalAccel.clone().multiplyScalar(0.5 * dt * dt));
+            _totalAccel.copy(_accel).add(_thrustAcc);
+            _tempVec1.copy(shipVel).multiplyScalar(dt);
+            _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt);
+            shipPos.add(_tempVec1).add(_tempVec2);
             
             // 2. a(t + dt)
-            let nextAccelData = getAcceleration(shipPos);
-            let nextAccel = nextAccelData.total;
-            let nextThrustAcc = new THREE.Vector3(0,0,0);
+            getAcceleration(shipPos, _nextAccel);
+            _nextThrustAcc.set(0,0,0);
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass);
-                nextThrustAcc = shipVel.clone().normalize().multiplyScalar(thrustAccMag);
+                _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
             }
-            let nextTotalAccel = nextAccel.add(nextThrustAcc);
+            _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
 
             // 3. v(t + dt) = v(t) + 0.5 * (a(t) + a(t + dt))dt
-            shipVel.add(totalAccel.add(nextTotalAccel).multiplyScalar(0.5 * dt));
+            _tempVec1.copy(_totalAccel).add(_nextTotalAccel).multiplyScalar(0.5 * dt);
+            shipVel.add(_tempVec1);
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
-            let lookTarget = shipGroup.position.clone().add(shipVel.clone().normalize());
-            shipGroup.lookAt(lookTarget); 
+            _tempVec1.copy(shipVel).normalize();
+            _lookTarget.copy(shipGroup.position).add(_tempVec1);
+            shipGroup.lookAt(_lookTarget); 
             
             camera.rotation.order = 'YXZ';
             camera.rotation.y = THREE.MathUtils.degToRad(lookLon);
@@ -1089,7 +1121,8 @@
 
                 // Sub-stepping for physics stability
                 // High warp (7.2kx) needs finer sub-stepping to capture gravity gradients
-                let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+                _moonPos.copy(moon.position).divideScalar(renderScale);
+                let distM = shipPos.distanceTo(_moonPos) - radMoon;
                 let stepSize = 0.5; // Default 0.5s step
                 if (distM < 60000) stepSize = 0.1; // Standard SOI precision
                 if (distM < 5000) stepSize = 0.01; // Ultra-fine for close flyby only
@@ -1178,10 +1211,10 @@
                 safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%");
                 safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
 
-                let dirToMoon = moon.position.clone().divideScalar(renderScale).sub(shipPos).normalize();
-                let camDir = new THREE.Vector3();
-                camera.getWorldDirection(camDir);
-                let angleToMoon = camDir.angleTo(dirToMoon) * (180 / Math.PI);
+                _moonPos.copy(moon.position).divideScalar(renderScale);
+                _dirToMoon.subVectors(_moonPos, shipPos).normalize();
+                camera.getWorldDirection(_camDir);
+                let angleToMoon = _camDir.angleTo(_dirToMoon) * (180 / Math.PI);
 
                 safeSetText('moon-heading', angleToMoon.toFixed(1) + (angleToMoon > 40 ? "° (Pan to find)" : "° (In View)"), angleToMoon > 40 ? "caution" : "nominal");
 
