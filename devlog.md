@@ -2,6 +2,23 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 03:15] - Impact Analysis & UI Responsiveness
+### 📝 Summary
+Testing confirmed the ship is now successfully reaching the Moon's orbital path, but timing remains slightly offset, resulting in lunar impact. User feedback indicated that the "Smooth Gearbox" makes buttons feel unresponsive due to the 2-second delay.
+
+### 🛠️ Work Done
+- **Trajectory Analysis**:
+    - Identified "Phase Lead": Ship is now arriving too early. In the latest log (v1.10.5), the ship hit the Moon because it arrived at the intercept point while the Moon was still several degrees ahead in its orbit.
+    - Planned Fix: Refine `targetPhaseAngle` offset from 0.91 rad to **0.74 rad (~42.4°)** to delay arrival.
+- **UI/UX Improvements (Planned)**:
+    - **Reduced Shift Delay**: Shortening the gearbox delay from 2.0s to **0.5s** per gear to make buttons feel more responsive.
+    - **HUD Target Display**: Updating the "Time Warp" display to show both the current speed and the *target* speed (e.g., "1x -> 600x").
+    - **Visual Feedback**: Manual button clicks will now immediately highlight the target button, even while shifting.
+- **Versioning Alignment**:
+    - Reverting simulation version from 1.10.5 to **1.9.6** to better align with the user's v1.9.5 baseline while still tracking the "Gearbox" update.
+
+---
+
 ## [2026-04-07 02:45] - Gearbox Fix & Version Tracking
 ### 📝 Summary
 Resolved a critical bug that caused the incremental warp transitions to halt prematurely. Implemented internal versioning to ensure flight logs can be traced back to specific simulation builds.
@@ -15,6 +32,8 @@ Resolved a critical bug that caused the incremental warp transitions to halt pre
     - **Traceable Logs**: Every entry in the flight log now includes the `version` property, allowing for reliable post-flight analysis across different builds.
     - **Incremental Logging**: Added automatic event logging for every gear shift in the Smooth Gearbox (e.g., "AUTO: Gear shift to 60x"), providing granular debug info for time-acceleration transitions.
 - **Manual Overrides**: Verified that all manual UI interactions (Abort, Autopilot, Manual Burn, Warp) consistently disable active cinematic sequences.
+- **Milestone Reached**: Recorded the **First Lunar Impact** during user testing! This confirms the refined mission lead angle (0.91 rad) is successfully intercepting the Moon's SOI.
+- **Future Controls**: Added **Manual Thrust Vectoring** to the roadmap to allow for mid-course corrections and impact avoidance.
 
 ---
 
