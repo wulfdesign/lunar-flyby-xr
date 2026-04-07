@@ -213,6 +213,9 @@
                     <button id="btn-warp-7200" title="1s = 2 Hours">7.2kx</button>
                 </div>
                 <div class="controls">
+                    <button id="btn-autopilot-mcc" class="btn-danger caution-btn" style="display:none; font-size: 0.9rem; margin-bottom: 10px;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE MCC AUTOPILOT</button>
+                </div>
+                <div class="controls">
                     <button id="btn-thrust" class="btn-danger" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
                 </div>
             </div>
@@ -260,6 +263,14 @@
         let lastLogTime = 0;
         let globalMaxAlt = 0;
         
+        // --- WAYPOINTS ---
+        const MISSION_WAYPOINTS = [
+            { name: "Geosynchronous Orbit Check", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Trans-Lunar Midpoint", distance_km: 192200, passed: false, type: "MCC" },
+            { name: "Lunar SOI Approach", distance_km: 320000, passed: false, type: "MCC" }
+        ];
+        let activeMCCWaypoint = null;
+
         // --- BURN DIAGNOSTICS & STATE LATCHES ---
         let actualBurnTime = 0;
         let initialTargetBurnTime = 0;
@@ -988,6 +999,16 @@
             let currentVelMag = shipVel.length();
             _moonPos.copy(moon.position).divideScalar(renderScale);
             let distToMoon = shipPos.distanceTo(_moonPos);
+
+            // Waypoint Checks
+            for (let wp of MISSION_WAYPOINTS) {
+                if (r >= wp.distance_km && !wp.passed) {
+                    wp.passed = true;
+                    logEvent(`WAYPOINT REACHED: ${wp.name}`);
+                    if (timeWarp > 1) updateWarpUI(1);
+                    evaluateMCC(wp);
+                }
+            }
             
             // Target Energy (including Earth and Moon potential for higher precision)
             let currentEnergy = (currentVelMag * currentVelMag) / 2 - (muEarth / r) - (muMoon / Math.max(1, distToMoon));
@@ -1443,6 +1464,29 @@
                 console.error("Simulation Loop Error:", err);
             }
         });
+
+        // --- AVIONICS: WAYPOINT & MCC EXECUTION ---
+        function evaluateMCC(waypoint) {
+            showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`);
+            activeMCCWaypoint = waypoint;
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) btn.style.display = 'block';
+        }
+
+        function executeAutopilotBurn() {
+            if (!activeMCCWaypoint) return;
+            
+            // Instant placeholder delta-V translation (just shifts velocity 0.05 km/s prograde for visual effect)
+            let prograde = shipVel.clone().normalize();
+            shipVel.add(prograde.multiplyScalar(0.05));
+            
+            logEvent(`MCC EXECUTED: +0.05 km/s delta-v (${activeMCCWaypoint.name})`);
+            showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL");
+            
+            activeMCCWaypoint = null;
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) btn.style.display = 'none';
+        }
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;

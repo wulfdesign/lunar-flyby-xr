@@ -27,6 +27,7 @@
 - [ ] 🔥🔥🔥 **Artemis II: State Vector Interpolation**: Create the linear/cubic spline interpolation engine for 10-minute samples.
 
 ## 🔥🔥 V2.0 Mission Goals & Architecture
+- [ ] 🔥🔥 **UI: Mission Control Radio Feed**: Add a "CAPCOM" text box to display authentic radio readouts and telemetry instructions (e.g. "Houston, we are go for TMI").
 - [ ] 🔥🔥 **Physics: Lunar Orbit Insertion (LOI)**: Transition beyond Free-Return trajectories to calculate decel burns for stable lunar captures.
 - [ ] 🔥🔥 **Avionics: Flight Computer UI**: Build a targeting console to read current state vectors and calculate maneuver nodes (intercepts, rendezvous, MCCs).
 - [ ] 🔥🔥 **Physics: Sun Gravity Integration**: Add solar mass to N-body calculation for v2.1 "Gold Master" accuracy.

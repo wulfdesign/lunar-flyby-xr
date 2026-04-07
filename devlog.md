@@ -2,6 +2,17 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 16:35] - MILESTONE: First Successful Local Flyby
+### 📝 Summary
+The user manually flew the Artemis II simulation using the new Mid-Course Correction (MCC) Autopilot placeholder system! The Waypoints triggered perfectly at range, automatically pausing the simulation warp as designed to allow for the trajectory correction, leading to a successful and highly immersive lunar flyby.
+
+### 🛠️ Work Done
+- **Validation:** Waypoint `dist_km` checking loop successfully drops time warp.
+- **Validation:** Placeholder Delta-V vector implementation shifts orbit successfully.
+- **Milestone:** First documented successful simulated flight through the entire TLI and Coast phases.
+
+---
+
 ## [2026-04-07 15:28] - Waypoints, MCC Autopilot, & Orbit Planning
 ### 📝 Summary
 Shifted focus to implement explicit Waypoints (Geosync, Midpoint, and Lunar Approach) that calculate required Mid-Course Corrections (MCC). To ease user complexity, we will implement an "Autopilot" feature that blinks when a burn is required, executing the MCC vectors automatically when tapped. Full manual vector control will follow later. We also set a V2.0 goal for Lunar Orbit Insertion (LOI) to go beyond simple free-returns.
