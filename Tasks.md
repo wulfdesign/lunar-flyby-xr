@@ -8,15 +8,14 @@
 ---
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Physics: Refine Mission Lead Angle**: Investigate why ship arrives at orbital path but misses Moon phase; update 0.83 rad offset.
-- [ ] 🔥🔥🔥 **UX: Suggested Warp Alerts**: Replace forced resets at milestones with flashing UI buttons and `nav-msg` prompts.
-- [ ] 🔥🔥🔥 **HUD: Gravity Units (m/s²)**: Convert gravity display from km/s² to m/s² for human-scale readability.
+- [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
+- [ ] 🔥🔥 **Mission: Elliptical Earth Loop**: Artemis II initial high-eccentricity orbit option.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
+- [ ] 🧪 **Physics: Refine Mission Lead Angle**: Increased targetPhaseAngle offset to 0.91 rad to fix Moon rendezvous phase lag (🏆).
+- [ ] 🧪 **UX: Suggested Warp Alerts**: Replaced forced resets with flashing buttons and `nav-msg` prompts for milestone guidance (🏆).
+- [ ] 🧪 **HUD: Gravity Units (m/s²)**: Converted gravity display from km/s² to m/s² for human-scale readability (🏆).
 - [ ] 🧪 **Physics: Rocket Equation Burn Estimation**: Uses Tsiolkovsky math for mass-aware target time calculation (🏆).
-- [ ] 🧪 **Physics: Optimized Sub-stepping**: Lifted budget to 10k steps and refined SOI thresholds for high-warp stability (🏆).
-- [ ] 🧪 **Controls: Warp Reset at MES**: Engines now automatically force 1x warp at ignition for maximum physics precision.
-- [ ] 🧪 **Bug: Logging TypeError**: Fixed "Cannot read properties of undefined" crash when logging events with partial telemetry.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **VR: Controller Troubleshooting**: Investigate why controllers might not be appearing in WebXR; add check for `select` events.

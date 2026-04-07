@@ -4,16 +4,15 @@
 
 ## [2026-04-07 01:30] - Trajectory Analysis & UX Pivot
 ### 📝 Summary
-Latest flight log analysis confirmed the physics engine is stable, but the ship is missing the Moon rendezvous by arriving at the orbital path when the Moon is in a different phase. User feedback highlighted that forceful warp resets are disruptive to the experience.
+Successfully addressed disruptive warp resets by transitioning to a "Suggested Warp" notification system. Improved HUD readability with a unit conversion for gravity and refined the mission lead angle to resolve the "Phase Lag" observed in recent flight logs.
 
 ### 🛠️ Work Done
-- **Trajectory Analysis**:
-    - Confirmed MECO at **10.74 km/s** (Perfect energy for 3-day transit).
-    - Identified "Phase Lag": Ship reached 384k km at T+3.6 days, but the Moon was not at the intercept coordinates.
-    - Result: Ship bypassed Moon with near-zero gravitational influence.
-- **UX Refinement (Planned)**:
-    - **Forceful Resets -> Suggested Alerts**: Removing automatic `updateWarpUI` calls at milestones. Replacing with flashing buttons and `nav-msg` prompts.
-    - **Unit Conversion**: Switching HUD gravity display from km/s² to **m/s²** for better human-scale readability.
+- **UX Refinement**:
+    - **Removed Forced Resets**: Eliminated automatic `updateWarpUI` calls at milestones.
+    - **Implemented Suggested Alerts**: Added flashing UI buttons and `nav-msg` prompts to guide users toward safe warp speeds.
+    - **Unit Conversion**: Switched HUD gravity display from km/s² to **m/s²** (x1000) for better human-scale readability and to reduce the appearance of rounding errors.
+- **Trajectory Optimization**:
+    - **Lead Angle Refinement**: Increased `targetPhaseAngle` offset to **0.91 rad (~52°)** to account for the 3.5-day transit time, ensuring the ship arrives at the intercept point when the Moon is actually present.
 - **Architecture**:
     - Re-confirmed commitment to single-file `index.html` for portability while maintaining internal modularity.
 
