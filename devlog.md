@@ -2,6 +2,24 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 00:45] - Physics Optimization & High-Warp Stability
+### 📝 Summary
+Refined the orbital mechanics engine to allow for 10x faster simulation speeds within the Lunar Sphere of Influence without sacrificing integration precision. Resolved the burn duration discrepancy by implementing proper rocket dynamics.
+
+### 🛠️ Work Done
+- **Physics & Rocketry**:
+    - Implemented the **Tsiolkovsky Rocket Equation** for burn-time estimation, correctly accounting for mass loss due to propellant consumption.
+    - Reverted TLI cutoff to **Energy-Based Sensing** for dynamic trajectory adaptation.
+    - Verified proper gravitational data capture in MECO/MES log events.
+- **Warp & Stability**:
+    - Lifted the "Hard Safety" warp cap within the Lunar SOI from 60x to **600x**, enabling faster mission testing.
+    - Optimized sub-stepping: Uses **0.1s** steps for the general SOI and only drops to **0.01s** ultra-fine precision within **5,000 km** of the Moon.
+    - Doubled the per-frame integration budget to **10,000 steps** to prevent "Spiral of Death" freezes at high time-acceleration.
+- **HUD & UI**:
+    - Verified the new `nav-msg` system for command feedback and warp reset notifications.
+
+---
+
 ## [2026-04-06 12:30] - Discovery: VR Success & Mobile UI Challenges
 ### 📝 Summary
 Empirical testing on Quest 3 (via Link) confirmed a functional and "amazing" VR experience, though native browser support and HUD visibility remain challenges. Mobile testing revealed critical HUD scaling issues in both orientations.
@@ -44,9 +62,14 @@ Successfully addressed high-priority cross-platform issues and improved simulati
 - **Enhanced Telemetry & HUD**:
     - Added **Gravitational Magnitude** displays for Earth and Moon to the HUD (km/s²).
     - Expanded Flight Logs and HUD to include **Velocity Vectors (Vx, Vy, Vz)** for detailed trajectory analysis.
-    - Updated `logEvent` to capture full physics state at every milestone.
+    - Implemented a **Navigation Message Area** (`nav-msg`) for transient user warnings and command feedback.
+- **Controls & Safety**:
+    - Fixed a critical bug in the autopilot where engines would fail to ignite because the burn target time was captured after the firing check.
+    - Implemented a mandatory **Warp Reset to 1x** upon Main Engine Start (MES) to ensure sub-stepping accuracy during the burn.
+    - Restricted **Time Warp** changes during active engine burns to prevent integration errors and improve realism.
+    - Added user-facing warning: "COMMAND DENIED: ENGINES ACTIVE" when warp is attempted during a burn.
 - **UI & Stability**:
-    - Fixed a critical `TypeError` that caused the simulation to freeze when switching warp speeds at mission milestones.
+    - Fixed an `Uncaught TypeError` in the logging system caused by accessing telemetry properties on an empty object placeholder.
     - Implemented `safeSetText` helper function to handle missing DOM elements gracefully.
     - Added a `try...catch` block to the main animation loop to prevent simulation halts on unexpected UI or data errors.
 - **Telemetry Track**:

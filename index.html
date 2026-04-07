@@ -182,6 +182,7 @@
             <div class="panel" title="Ship control systems. Engage the autopilot or control the burn manually.">
                 <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
                 <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite;">[SEQUENCE RUNNING: SHOT 01]</p>
+                <div id="nav-msg" style="color:#ff4444; font-size:0.75rem; height:1.2rem; font-weight:bold; text-align:center;"></div>
                 <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
                 <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn. Target phase angle is opposite the moon.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
                 <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically ignite and cut off engines to perfectly reach the Moon.">Autopilot:</span> <span id="autopilot-status" class="danger">OFF</span></p>
@@ -748,8 +749,8 @@
                 vy: shipVel.y.toFixed(5),
                 vz: shipVel.z.toFixed(5),
                 gforce: currentGForce.toFixed(2),
-                magEarth: telemetry ? telemetry.magEarth.toFixed(8) : "0",
-                magMoon: telemetry ? telemetry.magMoon.toFixed(8) : "0",
+                magEarth: (telemetry && telemetry.magEarth) ? telemetry.magEarth.toFixed(8) : "0",
+                magMoon: (telemetry && telemetry.magMoon) ? telemetry.magMoon.toFixed(8) : "0",
                 warp: timeWarp,
                 x: shipPos.x.toFixed(4),
                 y: shipPos.y.toFixed(4),
@@ -883,9 +884,21 @@
             }
         }
 
+        function showNavMsg(text, duration = 3000) {
+            const msgEl = document.getElementById('nav-msg');
+            if (msgEl) {
+                msgEl.textContent = text;
+                setTimeout(() => { if (msgEl.textContent === text) msgEl.textContent = ""; }, duration);
+            }
+        }
+
         [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
+                if (isBurning) {
+                    showNavMsg("COMMAND DENIED: ENGINES ACTIVE");
+                    return;
+                }
                 cinematicActive = false; // Manual override
                 playbackActive = false; // Manual override
                 document.getElementById('cinematic-status').style.display = 'none';
@@ -933,7 +946,12 @@
             // Calculate remaining $\Delta V$ for UI
             let targetVelAtCurrentAlt = Math.sqrt(2 * (targetEnergy + (muEarth / r) + (muMoon / Math.max(1, distToMoon))));
             let dvRequired = Math.max(0, targetVelAtCurrentAlt - currentVelMag);
-            let estimatedBurnTime = dvRequired / (thrustForce / (shipEmptyMass + fuel));
+            
+            // Rocket Equation for precise burn time: dV = Ve * ln(m0/m1)
+            // m1 = m0 * exp(-dV/Ve) | massLost = m0 - m1 | time = massLost / massFlowRate
+            let m0 = shipEmptyMass + fuel;
+            let m1 = m0 * Math.exp(-dvRequired / exhaustVel);
+            let estimatedBurnTime = (m0 - m1) / massFlowRate;
 
             if (isBurning && initialTargetBurnTime === 0 && dvRequired > 0) {
                 initialTargetBurnTime = estimatedBurnTime;
@@ -952,24 +970,29 @@
             // Latching Autopilot
             let wasBurning = isBurning;
             if (autoPilotEngaged && !isTliCoast) {
-                if (timeToWindow < 5) autoBurnActive = true; 
-            }
-            
-            // EXECUTE BURN (Switch to time-based for higher precision)
-            if (autoBurnActive) {
-                if (actualBurnTime < initialTargetBurnTime) {
-                    isBurning = true;
-                } else {
-                    isBurning = false;
-                    autoBurnActive = false;
-                    autoPilotEngaged = false; // Disengage after complete
+                if (timeToWindow < 5 && !autoBurnActive) {
+                    autoBurnActive = true; 
+                    initialTargetBurnTime = estimatedBurnTime; 
                 }
             }
+            
+            if (autoBurnActive && !isTliCoast) {
+                isBurning = true; 
+            } else if (autoPilotEngaged && isTliCoast && autoBurnActive) {
+                isBurning = false; 
+                autoBurnActive = false;
+            }
 
-            if(isBurning && !wasBurning) logEvent("Main Engine Start (MES). Executing TLI Burn.", {});
+            if(isBurning && !wasBurning) {
+                logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) });
+                if (timeWarp > 1) {
+                    updateWarpUI(1);
+                    showNavMsg("WARP RESET: ENGINES ACTIVE");
+                }
+            }
             if(!isBurning && wasBurning) {
-                logEvent("Main Engine Cutoff (MECO). Burn Time Reached.", {});
-                burnEndTime = metSeconds;
+                logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) });
+                if (isTliCoast) burnEndTime = metSeconds;
             }
 
             if (isBurning) actualBurnTime += dt;
@@ -1017,8 +1040,8 @@
             earth.rotation.y += 0.0000727 * dt;
 
             // Safety: Force warp down if we are deep in SOI and integration is at risk
-            if (distToMoon < 60000 && timeWarp > 60 && !cinematicActive && !playbackActive) {
-                updateWarpUI(60);
+            if (distToMoon < 60000 && timeWarp > 600 && !cinematicActive && !playbackActive) {
+                updateWarpUI(600);
             }
 
             return { 
@@ -1055,16 +1078,14 @@
                 let simSecondsToProcess = dt_real * timeWarp;
 
                 // Sub-stepping for physics stability
-                // High warp (7.2kx) needs much finer sub-stepping to capture gravity gradients
+                // High warp (7.2kx) needs finer sub-stepping to capture gravity gradients
                 let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
                 let stepSize = 0.5; // Default 0.5s step
-                if (distM < 100000) stepSize = 0.1; // Finer near SOI
-                if (distM < 20000) stepSize = 0.01; // Ultra-fine for close flyby
+                if (distM < 60000) stepSize = 0.1; // Standard SOI precision
+                if (distM < 5000) stepSize = 0.01; // Ultra-fine for close flyby only
                 
-                // Cap maximum steps per frame to prevent "spiral of death" (performance freeze)
-                // but allow enough for 7.2kx (7200 / 0.1 = 72,000 steps per second)
-                // If dt_real is 0.016 (60fps), simSeconds is ~115s. 115 / 0.1 = 1150 steps.
-                let steps = Math.max(1, Math.min(5000, Math.ceil(simSecondsToProcess / stepSize)));
+                // Increase step budget to 10,000 to support higher warp speeds
+                let steps = Math.max(1, Math.min(10000, Math.ceil(simSecondsToProcess / stepSize)));
                 let dt_step = simSecondsToProcess / steps;
 
                 let telemetry = null;

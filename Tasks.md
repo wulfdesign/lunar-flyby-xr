@@ -12,6 +12,11 @@
 - [ ] 🔥🔥 **Mission: Elliptical Earth Loop**: Artemis II initial high-eccentricity orbit option.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
+- [ ] 🧪 **Autopilot: Ignition Fix**: Resolved race condition where engines failed to fire due to zeroed `initialTargetBurnTime`.
+- [ ] 🧪 **Controls: Warp Reset at MES**: Engines now automatically force 1x warp at ignition for maximum physics precision.
+- [ ] 🧪 **Bug: Logging TypeError**: Fixed "Cannot read properties of undefined" crash when logging events with partial telemetry.
+- [ ] 🧪 **Controls: Warp Restriction**: Disallow time-warp changes during active burns with user-facing warnings (🏆).
+- [ ] 🧪 **HUD: Navigation Messages**: Added `nav-msg` area for transient warnings and command feedback (🏆).
 - [ ] 🧪 **Physics: Velocity Verlet Integration**: Standardized integration for better energy conservation and lunar capture.
 - [ ] 🧪 **Physics: Ultra-fine Sub-stepping**: Implemented 0.01s steps for close lunar flybys to prevent "drifting past".
 - [ ] 🧪 **Warp: Smooth Gearbox**: Automated gradual ramp-up/down implemented globally for all warp changes.
