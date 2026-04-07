@@ -10,7 +10,7 @@
 ## 🛠️ Current Work
 - [ ] 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial `MISSION_LEAD_ANGLE` moon-moving cheat with realistic TLI parameters (ejection angle, transit time) to calculate leading-edge interception of a naturally orbiting Moon.
 - [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
-- [ ] 🔥🔥🔥 **Physics: Waypoint Accuracy Check**: Implement periodic trajectory/speed validation at key milestones.
+- [ ] 🔥🔥🔥 **Avionics: Waypoint MCC Autopilot**: Implement Mid-Course Correction (MCC) waypoint checks (Geosync, Midpoint, Lunar SOI Approach) with an "Autopilot" maneuver execution system.
 - [ ] 🔥🔥🔥 **HUD: Visual Trajectory Indicator**: Show "On Target" / "Off Course" status based on real-time physics projection.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
@@ -27,6 +27,7 @@
 - [ ] 🔥🔥🔥 **Artemis II: State Vector Interpolation**: Create the linear/cubic spline interpolation engine for 10-minute samples.
 
 ## 🔥🔥 V2.0 Mission Goals & Architecture
+- [ ] 🔥🔥 **Physics: Lunar Orbit Insertion (LOI)**: Transition beyond Free-Return trajectories to calculate decel burns for stable lunar captures.
 - [ ] 🔥🔥 **Avionics: Flight Computer UI**: Build a targeting console to read current state vectors and calculate maneuver nodes (intercepts, rendezvous, MCCs).
 - [ ] 🔥🔥 **Physics: Sun Gravity Integration**: Add solar mass to N-body calculation for v2.1 "Gold Master" accuracy.
 - [ ] 🔥🔥 **Architecture: Modular Source Files**: Prepare project for split into `styles.css`, `physics.js`, and `ui.js` while maintaining single-file build.

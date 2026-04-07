@@ -2,6 +2,16 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 15:28] - Waypoints, MCC Autopilot, & Orbit Planning
+### 📝 Summary
+Shifted focus to implement explicit Waypoints (Geosync, Midpoint, and Lunar Approach) that calculate required Mid-Course Corrections (MCC). To ease user complexity, we will implement an "Autopilot" feature that blinks when a burn is required, executing the MCC vectors automatically when tapped. Full manual vector control will follow later. We also set a V2.0 goal for Lunar Orbit Insertion (LOI) to go beyond simple free-returns.
+
+### 🛠️ Work Done
+- **Tasks Updated:** Upgraded the Waypoint Accuracy task to include the MCC Autopilot execution.
+- **Tasks Updated:** Added Lunar Orbit Insertion (LOI) to the future architecture goals.
+
+---
+
 ## [2026-04-07 15:20] - Realism Check: TLI Targeting vs God-Mode
 ### 📝 Summary
 The user rightly pointed out that in reality, we cannot "move" the Moon (via `MISSION_LEAD_ANGLE` delay) to fix our trajectory timing. To achieve true realism, we must fix the Moon to its natural ephemeris and adjust our **Trans-Lunar Injection (TMI) parameters**: Specifically, the Ejection Angle (orbit phase at burn start) and the Transit Time (burn duration/$\Delta V$). We also planned a Flight Computer module to help calculate these mid-course rendezvous trajectories and corrections on the fly. 
