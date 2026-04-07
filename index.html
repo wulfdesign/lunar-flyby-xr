@@ -227,6 +227,17 @@
          */
         const SIM_VERSION = "1.9.6";
 
+        // --- USER CONFIGURED FLYBY THRESHOLDS ---
+        // Edit these limits to control when the high-warp yellow warnings appear
+        const WARP_LIMITS = {
+            APPROACH_SOI_DIST: 100000, 
+            APPROACH_SOI_WARP: 600,   // Drop to 600x entering cislunar space
+            ENTER_SOI_DIST: 60000,
+            ENTER_SOI_WARP: 300,      // Drop to 300x inside Lunar SOI
+            PROXIMITY_DIST: 5000,
+            PROXIMITY_WARP: 10        // Drop to 10x for ultra-close flyby visualization
+        };
+
         // --- REAL-WORLD PHYSICS CONSTANTS ---
         const MISSION_LEAD_ANGLE = 0.74; // Global Phase Angle offset for Artemis II
         const muEarth = 398600.4418; // km^3/s^2
@@ -1082,7 +1093,7 @@
             earth.rotation.y += 0.0000727 * dt;
 
             // Safety Warning only: Do not force warp down per user feedback
-            if (distToMoon < 60000 && timeWarp > 600 && !cinematicActive && !playbackActive) {
+            if (distToMoon < WARP_LIMITS.ENTER_SOI_DIST && timeWarp > WARP_LIMITS.ENTER_SOI_WARP && !cinematicActive && !playbackActive) {
                 showNavMsg("ADVISORY: REDUCE WARP FOR SOI STABILITY");
             }
 
@@ -1227,39 +1238,39 @@
                     });
                 };
 
-                if (distM < 15000) {
+                if (distM < WARP_LIMITS.PROXIMITY_DIST) {
                     region = "Lunar Proximity";
                     if (!milestoneLatches.lunarProximity) {
                         logEvent("Milestone: Entering Lunar Proximity", telemetry);
                         milestoneLatches.lunarProximity = true;
                         triggerAlertFlash("region-text");
-                        if (!cinematicActive && !playbackActive && timeWarp > 1) {
-                            showNavMsg("SUGGESTED WARP: 1x");
-                            const b = document.getElementById('btn-warp-1'); if(b) b.classList.add('caution-btn');
+                        if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.PROXIMITY_WARP) {
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.PROXIMITY_WARP + "x");
+                            const b = document.getElementById('btn-warp-' + WARP_LIMITS.PROXIMITY_WARP); if(b) b.classList.add('caution-btn');
                         }
                     }
                 }
                 else if (distM < 40000) region = "Final Lunar Approach";
-                else if (distM < 60000) {
+                else if (distM < WARP_LIMITS.ENTER_SOI_DIST) {
                     region = "Lunar Sphere of Influence";
                     if (!milestoneLatches.inSOI) {
                         logEvent("Milestone: Entered Lunar Sphere of Influence", telemetry);
                         milestoneLatches.inSOI = true;
                         triggerAlertFlash("region-text");
-                        if (!cinematicActive && !playbackActive && timeWarp > 10) {
-                            showNavMsg("SUGGESTED WARP: 10x");
-                            const b = document.getElementById('btn-warp-10'); if(b) b.classList.add('caution-btn');
+                        if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.ENTER_SOI_WARP) {
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.ENTER_SOI_WARP + "x");
+                            const b = document.getElementById('btn-warp-' + WARP_LIMITS.ENTER_SOI_WARP); if(b) b.classList.add('caution-btn');
                         }
                     }
                 }
-                else if (distM < 100000) {
+                else if (distM < WARP_LIMITS.APPROACH_SOI_DIST) {
                     region = "Approaching Lunar SOI";
                     if (!milestoneLatches.approachingSOI) {
                         logEvent("Milestone: Approaching Lunar SOI", telemetry);
                         milestoneLatches.approachingSOI = true;
-                        if (!cinematicActive && !playbackActive && timeWarp > 30) {
-                            showNavMsg("SUGGESTED WARP: 30x");
-                            const b = document.getElementById('btn-warp-30'); if(b) b.classList.add('caution-btn');
+                        if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.APPROACH_SOI_WARP) {
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.APPROACH_SOI_WARP + "x");
+                            const b = document.getElementById('btn-warp-' + WARP_LIMITS.APPROACH_SOI_WARP); if(b) b.classList.add('caution-btn');
                         }
                     }
                 }

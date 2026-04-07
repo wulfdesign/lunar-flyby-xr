@@ -11,10 +11,11 @@
 - [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
 - [ ] 🔥🔥🔥 **Physics: Waypoint Accuracy Check**: Implement periodic trajectory/speed validation at key milestones.
 - [ ] 🔥🔥🔥 **HUD: Visual Trajectory Indicator**: Show "On Target" / "Off Course" status based on real-time physics projection.
-- [ ] 🛠️ **UI: Revert Sim Start Time**: Reset initial mission window to ~2 minutes before burn for user adjustment.
-- [ ] 🛠️ **Physics: Object Pooling Refactor**: Zero-allocation math using global vectors in updatePhysics to fix high-warp lag.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
+- [ ] 🧪 **UX: Configurable Warp Limits**: Extracted `WARP_LIMITS` for user-adjustable flyby slowdown testing.
+- [ ] 🧪 **UI: Revert Sim Start Time**: Reset initial mission window using `MISSION_LEAD_ANGLE`.
+- [ ] 🧪 **Physics: Object Pooling Refactor**: Zero-allocation math using global vectors to fix high-warp lag.
 - [ ] 🧪 **UX: Gearbox Responsiveness**: Reduced shift delay to 0.5s and added "Current -> Target" HUD feedback (🏆).
 - [ ] 🧪 **Physics: Refine Lead Angle (V3)**: Adjusted targetPhaseAngle to 0.74 rad to fix Moon impacts (🏆).
 - [ ] 🧪 **Versioning: Alignment**: Reverted/aligned SIM_VERSION to v1.9.6 for baseline consistency.

@@ -2,6 +2,17 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 15:15] - Orbital Mechanics & Trailing-Edge Analysis
+### 📝 Summary
+Investigated the 20km flyby trajectory that failed to result in a "figure-8" free-return loop. Confirmed physics vectors are accurate; the issue stems from passing *behind* the Moon (Trailing-Edge pass) which acts as a gravitational slingshot, rather than passing *in front* (Leading-Edge pass) which cancels velocity and creates the loop. Also exposed time warp auto-slowdown speeds as configurable constants per user request.
+
+### 🛠️ Work Done
+- **Configurable Warp Settings:** Created the `WARP_LIMITS` configuration block in `index.html` to prevent forced warp reduction and allow user tuning for flyby warnings.
+- **Physics Analysis:** Traced the flight log data to confirm the slingshot mechanics (Earth apoapsis reached >448,000km). 
+- **Next Steps Identified:** Need to refine `MISSION_LEAD_ANGLE` to delay the intercept, transitioning the trajectory from a Trailing-Edge slingshot to a Leading-Edge free-return.
+
+---
+
 ## [2026-04-07 14:35] - Object Pooling Refactor & Sim Start Fix Plan
 ### 📝 Summary
 Switching objectives to address garbage collection stutter at high time warps (300x-600x) within the Lunar SOI. Outlined a zero-allocation vector math approach and an initial window timer fix.
