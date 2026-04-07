@@ -2,6 +2,23 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 01:30] - Trajectory Analysis & UX Pivot
+### 📝 Summary
+Latest flight log analysis confirmed the physics engine is stable, but the ship is missing the Moon rendezvous by arriving at the orbital path when the Moon is in a different phase. User feedback highlighted that forceful warp resets are disruptive to the experience.
+
+### 🛠️ Work Done
+- **Trajectory Analysis**:
+    - Confirmed MECO at **10.74 km/s** (Perfect energy for 3-day transit).
+    - Identified "Phase Lag": Ship reached 384k km at T+3.6 days, but the Moon was not at the intercept coordinates.
+    - Result: Ship bypassed Moon with near-zero gravitational influence.
+- **UX Refinement (Planned)**:
+    - **Forceful Resets -> Suggested Alerts**: Removing automatic `updateWarpUI` calls at milestones. Replacing with flashing buttons and `nav-msg` prompts.
+    - **Unit Conversion**: Switching HUD gravity display from km/s² to **m/s²** for better human-scale readability.
+- **Architecture**:
+    - Re-confirmed commitment to single-file `index.html` for portability while maintaining internal modularity.
+
+---
+
 ## [2026-04-07 00:45] - Physics Optimization & High-Warp Stability
 ### 📝 Summary
 Refined the orbital mechanics engine to allow for 10x faster simulation speeds within the Lunar Sphere of Influence without sacrificing integration precision. Resolved the burn duration discrepancy by implementing proper rocket dynamics.

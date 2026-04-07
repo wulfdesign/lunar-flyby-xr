@@ -8,22 +8,15 @@
 ---
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
-- [ ] 🔥🔥 **Mission: Elliptical Earth Loop**: Artemis II initial high-eccentricity orbit option.
+- [ ] 🔥🔥🔥 **Physics: Refine Mission Lead Angle**: Investigate why ship arrives at orbital path but misses Moon phase; update 0.83 rad offset.
+- [ ] 🔥🔥🔥 **UX: Suggested Warp Alerts**: Replace forced resets at milestones with flashing UI buttons and `nav-msg` prompts.
+- [ ] 🔥🔥🔥 **HUD: Gravity Units (m/s²)**: Convert gravity display from km/s² to m/s² for human-scale readability.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
-- [ ] 🧪 **Autopilot: Ignition Fix**: Resolved race condition where engines failed to fire due to zeroed `initialTargetBurnTime`.
+- [ ] 🧪 **Physics: Rocket Equation Burn Estimation**: Uses Tsiolkovsky math for mass-aware target time calculation (🏆).
+- [ ] 🧪 **Physics: Optimized Sub-stepping**: Lifted budget to 10k steps and refined SOI thresholds for high-warp stability (🏆).
 - [ ] 🧪 **Controls: Warp Reset at MES**: Engines now automatically force 1x warp at ignition for maximum physics precision.
 - [ ] 🧪 **Bug: Logging TypeError**: Fixed "Cannot read properties of undefined" crash when logging events with partial telemetry.
-- [ ] 🧪 **Controls: Warp Restriction**: Disallow time-warp changes during active burns with user-facing warnings (🏆).
-- [ ] 🧪 **HUD: Navigation Messages**: Added `nav-msg` area for transient warnings and command feedback (🏆).
-- [ ] 🧪 **Physics: Velocity Verlet Integration**: Standardized integration for better energy conservation and lunar capture.
-- [ ] 🧪 **Physics: Ultra-fine Sub-stepping**: Implemented 0.01s steps for close lunar flybys to prevent "drifting past".
-- [ ] 🧪 **Warp: Smooth Gearbox**: Automated gradual ramp-up/down implemented globally for all warp changes.
-- [ ] 🧪 **Telemetry: Enhanced Vectors & Gravity**: Added Vx, Vy, Vz and Gravity Field magnitudes (Earth/Moon) to logs and HUD.
-- [ ] 🧪 **Mobile: UI Layout (Landscape/Portrait)**: Responsive scaling, scrolling, and orientation-specific layouts (🏆).
-- [ ] 🧪 **Quest 3: VR HUD Visibility**: Updated z-index and panel background for `dom-overlay` visibility.
-- [ ] 🧪 **Quest 3: VR Session Restoration**: User confirmed VR works via Link (🏆).
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **VR: Controller Troubleshooting**: Investigate why controllers might not be appearing in WebXR; add check for `select` events.
