@@ -13,3 +13,6 @@ private/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Screenshots
+screenshots/

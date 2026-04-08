@@ -11,7 +11,7 @@
 ![At the Moon](LunarFlybyXR_Screenshot_AtMoon_2026-03-31.png)
 *Arriving at the Moon after a 3-day cislunar coast.*
 
-> **🚀 Current Status (v1.9.5):** The simulation has reached a stable baseline for public release. Manual Trans-Lunar Injection, 7.2kx time-acceleration, and granular HUD POI milestones are fully functional. **Cinematic Capture** and **Load Flight Log** are temporarily disabled for maintenance. We are currently verifying the "Lunar Keyhole" physics to ensure 100% reliable free-return trajectories after reports of trajectory overshoot at high warp.
+> **🚀 Current Status (v1.9.6):** The simulation has achieved a fully validated Lunar Flyby! The physics engine now utilizes distance-based Waypoints and a Mid-Course Correction (MCC) framework to execute leading-edge intercepts without needing "God-Mode" cheats. Current development is focused on End-of-Mission sequences: Earth return, atmospheric re-entry heating, and parachute splashdown mechanics.
 
 ## **🚀 The Vision**
 

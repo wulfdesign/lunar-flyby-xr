@@ -2,6 +2,38 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 17:29] - Debrief (Part 2): VR QA & Splashdown Geolocation
+### 📝 Summary
+The user tested the simulator on a Quest 3 (via PC Link) and successfully confirmed VR functionality directly from the browser! Standalone Quest capability still needs QA testing but the foundational pipeline is fully intact. The user updated the `README.md` to document this.
+
+The user is also beginning to collate mission screenshots into a dedicated `/screenshots` folder (which has been added to `.gitignore`), with a selection of highlights eventually making their way to the root project for documentation.
+
+### 🌍 Physics Design: Splashdown Geolocation Tracking
+**User Question:** *"Is it possible to track where I splashed down by the saved flight log? I figured that the Earth's rotation and texture map would give a relative location and splashdown feedback to a successful mission."*
+
+**Analysis: YES.** It is absolutely mathematically possible and has been added to the V2.0 roadmap! To achieve this, the simulation must:
+1. Ensure the Earth mesh dynamically rotates at its proper angular velocity ($7.2921 \times 10^{-5}$ rad/s) as Mission Elapsed Time ticks up.
+2. Capture the capsule's final `THREE.Vector3` Cartesian position exactly at the splashdown threshold (altitude = 0km).
+3. Apply a spherical coordinate transformation to generate the geographic coordinate point. 
+4. Calculate the Earth's rotational offset at that specific time to align the mathematical vector with the physical UV texture map, allowing us to output a precise Latitude & Longitude to the debrief UI!
+
+---
+
+## [2026-04-07 17:05] - Debrief: User Testing & The Splashdown Roadmap
+### 📝 Summary
+The user completed a full local run and confirmed the first officially verified successful lunar flyby under the new Waypoint MCC physics engine without artificial tracking tweaks. Feedback on the flyby was phenomenally positive ("utterly amazing").
+
+### 🐛 Identified UX Debt & Feedback
+1. **Warp Gear Shifting:** Hard snaps from high warp to `1x` are jarring. Needs a smooth stepped deceleration.
+2. **Text Overflow UI Bug:** The time warp status text is wrapping incorrectly, pushing lower UI elements off-screen permanently.
+3. **MCC UX:** The autopilot execution needs more staging: calculate -> 2min countdown -> allow `10x` warp during wait -> force `1x` for execution -> display precise vectors.
+4. **Log Confirmation:** Users need explicit visual feedback when the flight log is manually saved (e.g., clicking `1x`).
+
+### 🚀 Entering The End-of-Mission Phase (V2.0 Core)
+The focus going forward shifts to the return journey: adding checklist items for Loss of Signal (LOS) communication blackouts, retro-fire alignment, plasma heating, parachute deployment, and a final Splashdown target UI overlay.
+
+---
+
 ## [2026-04-07 16:35] - MILESTONE: First Successful Local Flyby
 ### 📝 Summary
 The user manually flew the Artemis II simulation using the new Mid-Course Correction (MCC) Autopilot placeholder system! The Waypoints triggered perfectly at range, automatically pausing the simulation warp as designed to allow for the trajectory correction, leading to a successful and highly immersive lunar flyby.
