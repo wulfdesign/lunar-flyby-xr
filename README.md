@@ -77,6 +77,8 @@ If you use this project for your own research, education, or as a base for your 
 
 ## **🗺️ V2.0 Roadmap**
 
+* \[ \] **Orbital Traffic Checkpoints:** Add altitude milestones indicating when the player passes through the orbits of the ISS, Starlink network, GPS satellites, or Geosynchronous orbit. Include ambient visual elements outside the window for scale context.
+
 * \[ \] **Mobile UX Overhaul:** Design a dedicated, touch-friendly UI layout specifically for mobile browsers to prevent misclicks on critical time-warp buttons and fix landscape orientation clipping.
 * \[ \] **Bug Investigation:** Time warp seems to halt/reset repeatedly when deep inside the Lunar Sphere of Influence. Need to refine the SOI trigger latch.  
 * \[ \] **Mid-Course Correction (MCC):** Add an "Off Course Detected" warning and a "Recalculate Destination" button to execute a burn midway to the Moon if alignment drifts.  

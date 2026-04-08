@@ -50,6 +50,7 @@
 - [ ] 🔥🔥🔥 **Artemis II: State Vector Interpolation**: Create the linear/cubic spline interpolation engine for 10-minute samples.
 
 ## 🔥🔥 V2.0 Mission Goals & Architecture
+- [ ] 🔥🔥 **Environment: Orbital Traffic Checkpoints**: Add altitude markers/indicators for passing real-world orbital bands (ISS/LEO, Starlink, GPS, Geostationary Satellites). Include visual "telescope/starboard window" flybys as ambient flavor.
 - [ ] 🔥🔥 **Mechanics: Emergency Flight Computer Override (Auto-Fly)**: If trajectory deviation is critical or checkpoints are missed, flash red, drop warp to 1x, and announce an emergency computer take-over. The system automatically calculates a safe return trajectory unless explicitly cancelled by the user.
 - [ ] 🔥🔥 **UI: Mission Control CAPCOM Feed**: Add a "CAPCOM" side panel to display scrolling text messages for progress, warnings, and checkpoint approaches sequentially as radio comms.
 - [ ] 🔥🔥 **Physics: Lunar Orbit Insertion (LOI)**: Transition beyond Free-Return trajectories to calculate decel burns for stable lunar captures.

@@ -2,6 +2,16 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-08 12:47] - Final Validation Speedrun & Traffic Waypoints
+### 📝 Summary
+Completed a final extreme stress-test speedrun validating the complete mission arc. The flight successfully survived a terrifying 1.4km perilune (moon slingshot altitude) and returned to a safe mid-Pacific splashdown between Hawaii and Australia!
+
+### 🛠️ Work Done
+- **Roadmap Expanded (Orbital Traffic)**: Based on the successful run, added a highly-requested feature to `Tasks.md` and `README.md`: "Orbital Traffic Checkpoints" (HUD warnings and visual models passing the window for ISS, Starlink, GPS, and Geostationary bands).
+- **Final Validation**: Confirmed project is stable for general public and VIP release. Committed all changes for the final push.
+
+---
+
 ## [2026-04-08 12:26] - Pre-Release Polish & Hubble Preview
 ### 📝 Summary
 Completed final UI polishing, including re-centering the WebXR/Reset buttons and increasing the FOV indicator text scale for readability based on recent playtest feedback. Prepared the README and repository for a soft preview with our Hubble VIPs.
