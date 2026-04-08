@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 19:21] - Debrief (Part 3): Mission 3 Success & Advanced UX
+### 📝 Summary
+The user conducted a 3rd mission test targeting the Phase 1 UI fixes. The Warp text overflow fix (wrapping bounds logic) successfully locked the layout spacing and completely eliminated the vertical bouncing. The mission safely concluded with a smooth ocean splashdown south of Hawaii, marking our 3rd major mission success!
+
+### 🐛 Identified UX Issues & Feature Creep
+- **Time Logging:** The user asked if the real-time logging timestamp should be standardized to UTC. *System Analysis: Yes, it is! Our JavaScript `new Date().toISOString()` explicitly outputs universal Zulu (Z) time by default. No code changes needed here.*
+- **MCC Autopilot "Suddenness":** Waypoints currently trigger the EXECUTE button too abruptly. The flow needs refinement: Approach -> Auto-Warp down incrementally to 1x -> Click button to "Calculate" -> Run a Countdown Timer -> Auto-Execute sequence.
+- **Warp Safety Indicators on Buttons:** The UI Top Warning banner is too subtle. Instead, the warp buttons *themselves* should illuminate Green for safe speeds, or Flash if recommended. Pushing speeds too high should trigger Red buttons, and forcefully override it by requiring the user to click the dangerous button *twice* ("Double check"). 
+- **Return Trip Void:** There are currently no checkpoints on the way back home. Symmetrical waypoints (Midpoint, LEO Return) need to be plotted to force automatic warp slowdowns before the capsule smashes into Earth at 300x.
+
+---
+
 ## [2026-04-07 17:29] - Debrief (Part 2): VR QA & Splashdown Geolocation
 ### 📝 Summary
 The user tested the simulator on a Quest 3 (via PC Link) and successfully confirmed VR functionality directly from the browser! Standalone Quest capability still needs QA testing but the foundational pipeline is fully intact. The user updated the `README.md` to document this.

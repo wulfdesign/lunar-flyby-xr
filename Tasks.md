@@ -3,7 +3,7 @@
 > **Legend:**
 > 🔥🔥🔥 (Critical) | 🔥🔥 (High) | 🔥 (Medium) | 🧊 (Cold/Icebox)
 > ❄️ (Frozen) | ❄️❄️ (Deep Freeze) | ❄️❄️❄️ (Cryogenic)
-> 🛠️ (In Progress) | 🧪 (Ready for QA) | 🩹 (Tech Debt/Good Enough) | 🏆 (Verified/Done)
+> 🛠️ (In Progress) | 🧪 (Ready for QA) | 🐛 (UX Bugs & Polish) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 
 ---
 
@@ -17,12 +17,14 @@
 - [ ] 🐛 **UX: MCC Countdown & Execution UI**: Display required delta-V, time remaining to burn (2 mins), and allow <10x warp during countdown, enforcing 1x for execution.
 - [ ] 🐛 **UI/UX: Warp Text Overflow**: Fix bug where text pushes the UI off-screen. Need responsive layout or CSS constraint.
 - [ ] 🐛 **UX: Explicit Log Entry Feedback**: Add visual confirmation/HUD toast when a user manually clicks the 1x button to trigger a flight log save.
+- [ ] 🐛 **UX: Dynamic Safe-Warp Button Colors**: Illuminate Warp buttons Green (safe) or Red (unsafe bounds) dynamically based on distance limits. Add a double-click hard confirmation for clicking into Red warp limits.
 
 ## 🔥🔥 End-of-Mission Flow (Re-Entry & Splashdown)
 - [ ] 🔥🔥 **UI/HUD: Phase Checklist Updates**: Add "Loss of Signal (LOS) Warning", "Cislunar Return", "Re-entry Prep". 
 - [ ] 🔥🔥 **UX: Comms Radio UI**: Add a dedicated scrolling log box for CAPCOM radio instructions and ground-control readouts, logging them to the json output.
 - [ ] 🔥🔥 **Simulation: Re-Entry Heating & Plasma Blackout**: Implement visual indicators and a comms blackout period as altitude drops below 120km.
 - [ ] 🔥🔥 **Mechanics: Splashdown Sequence**: Add retro-fire targeting, heat shield orientation requirement, drogue chute deployment, and main chute splashdown.
+- [ ] 🔥🔥 **Mechanics: Earth-Return Waypoints**: Add symmetrical checkpoints on the way back to Earth to catch the spacecraft out of warp before hitting the atmosphere.
 - [ ] 🔥🔥 **Simulation: Splashdown Geolocation Tracking**: Calculate geographic latitude/longitude impact coordinates by syncing the final Cartesian position vector with a rotating Earth texture base based on Mission Elapsed Time.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)

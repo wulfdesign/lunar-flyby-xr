@@ -198,7 +198,7 @@
                 <p><span class="tooltip" title="How long the engines have actually been firing.">Actual Burn:</span> <span id="burn-actual" class="nominal">0.0 s</span></p>
                 <p><span class="tooltip" title="Gravitational force currently felt by the crew. 0.00 G is weightless freefall. Engine thrust creates positive G-force.">G-Force:</span> <span id="g-force" class="nominal">0.00 G</span></p>
 
-                <p style="margin-top: 10px;"><span class="tooltip" title="Current simulation speed. Use carefully to traverse the 3-day gap to the Moon!">Time Warp:</span> <span id="warp-text" class="nominal">1x (Realtime)</span></p>
+                <p style="margin-top: 10px; white-space: nowrap;"><span class="tooltip" title="Current simulation speed. Use carefully to traverse the 3-day gap to the Moon!">Time Warp:</span> <span id="warp-text" class="nominal">1x (Realtime)</span></p>
                 <p><span class="tooltip" title="Propulsion system state.">Engines:</span> <span id="engine-status" class="nominal">STANDBY</span></p>
 
                 <div class="controls">
@@ -756,6 +756,7 @@
             let v = shipVel.length();
             flightLog.push({ 
                 version: SIM_VERSION,
+                timestamp_real: new Date().toISOString(),
                 met: metSeconds, 
                 met_formatted: formatTime(metSeconds),
                 event: eventMsg, 
@@ -905,7 +906,7 @@
                 
                 // Show transition in HUD
                 if (timeWarp !== targetWarp) {
-                    warpTextEl.textContent = `${speedLabel} (Shifting to ${targetWarp}x...)`;
+                    warpTextEl.textContent = `${speedLabel} [>> ${targetWarp}x]`;
                 } else {
                     warpTextEl.textContent = speedLabel;
                 }
@@ -1430,7 +1431,13 @@
                 } else if (distM <= 60000) {
                     safeSetText('phase-text', "LUNAR ENCOUNTER", "caution");
                     safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");
-                    if (itinCoast) itinCoast.className = "complete";
+                    if (itinCoast) {
+                        itinCoast.className = "complete";
+                        if (!itinCoast.dataset.done) {
+                            itinCoast.innerHTML = "[X] Trans-Lunar Coast Complete";
+                            itinCoast.dataset.done = "true";
+                        }
+                    }
                     const itinFlyby = document.getElementById('itin-flyby');
                     if (itinFlyby) itinFlyby.className = "active";
                     if (!milestoneLatches.inSOI) {
@@ -1439,7 +1446,19 @@
                     }
                 } else if (telemetry.isTliCoast) {
                     safeSetText('phase-text', "TRANS-LUNAR COAST", "nominal");
-                    safeSetText('nav-status', "EN ROUTE TO MOON", "nominal");
+                    if (milestoneLatches.inSOI && distM > 60000) {
+                        safeSetText('nav-status', "EARTH RETURN EN ROUTE", "nominal");
+                        const itinFlyby = document.getElementById('itin-flyby');
+                        if (itinFlyby) {
+                            itinFlyby.className = "complete";
+                            if (!itinFlyby.dataset.done) {
+                                itinFlyby.innerHTML = "[X] Lunar Flyby Complete";
+                                itinFlyby.dataset.done = "true";
+                            }
+                        }
+                    } else {
+                        safeSetText('nav-status', "EN ROUTE TO MOON", "nominal");
+                    }
                 } else {
                     safeSetText('phase-text', altE > 100000 ? "DEEP SPACE" : "LOW EARTH ORBIT", "nominal");
                     if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) {
