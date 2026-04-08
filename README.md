@@ -6,11 +6,17 @@
 
 *(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
 
-![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_LEO-Orbit-TMI-BurnStart_2026-03-31.png)
+![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-BurnStart.png)
 *Initial Burn toward the Moon from Low Earth Orbit.*
 
-![At the Moon](LunarFlybyXR_Screenshot_AtMoon_2026-03-31.png)
+![At the Moon](LunarFlybyXR_Screenshot_2026-03-31_002_AtMoon.png)
 *Arriving at the Moon after a 3-day cislunar coast.*
+
+![Earth, Sun, and Moon](LunarFlybyXR_Screenshot_2026-04-07_001_EarthSunMoon.png)
+*Aligning the Earth, Sun, and Moon during the flyby.*
+
+![Earth Return](LunarFlybyXR_Screenshot_2026-04-07_002_EarthReturn.png)
+*Approaching Earth on the return trajectory.*
 
 > **🚀 Current Status (v1.9.7):** The simulation has achieved a fully validated Lunar Flyby and Earth Return capability! The physics engine now utilizes distance-based Waypoints and a Mid-Course Correction (MCC) framework to execute leading-edge intercepts without needing "God-Mode" cheats. Current development is focused on End-of-Mission sequences: Earth return, atmospheric re-entry heating, and parachute splashdown mechanics.
 
