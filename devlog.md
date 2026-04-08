@@ -2,6 +2,39 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-08 12:26] - Pre-Release Polish & Hubble Preview
+### 📝 Summary
+Completed final UI polishing, including re-centering the WebXR/Reset buttons and increasing the FOV indicator text scale for readability based on recent playtest feedback. Prepared the README and repository for a soft preview with our Hubble VIPs.
+
+### 🛠️ Work Done
+- **UI Tweaks**: Fine-tuned the `translateX` positioning of the VR/Reset buttons so they sit perfectly side-by-side. 
+- **Typography Check**: Scaled the FOV overlay text by 120% to help users track zoom levels more comfortably on high-res displays.
+- **Documentation**: Handled bulk renaming of all screenshot assets for consistency, and updated the README with a new visual grid showcasing the successful mobile portrait-mode lunar flyby. 
+
+---
+
+## [2026-04-08 11:50] - Mobile UX Playtest & UI Centering
+### 📝 Summary
+Recorded a successful mobile portrait-orientation test flight that reached geosync return, but ended in a high-warp crash due to UI button spacing. Adjusted the "ENTER VR FLYBY" and "RESET VIEW" buttons to return to the bottom-center of the screen with a lowered z-index to stay behind primary HUD panels on small screens.
+
+### 🛠️ Work Done
+- **UI Positioning**: Moved `btnVR` and `btnResetView` to `left: 50%; transform: translateX(-50%);` and verified `z-index: 0` keeps them safely behind the mission-critical panels on mobile displays.
+- **Mobile Roadmap**: Acknowledged the need for a dedicated, simplified Mobile UX strategy (or entirely separate mobile UI mode), while keeping the desktop UI untouched for now.
+- **Playtest Debrief**: Documented that mobile portrait mode works well for navigating the full sequence (lunar flyby to geosync), but the proximity of the time warp buttons on a touch screen is a critical risk factor (accidentally activating 7.2kx warp during final course correction causes immediate Earth collision).
+
+---
+
+## [2026-04-08 11:35] - System Recovery & Git Permissions Fix
+### 📝 Summary
+Successfully recovered the local workspace and v1.9.7 codebase after an Antigravity background updater failure, and resolved a Git directory ownership warning to restore source control.
+
+### 🛠️ Work Done
+- **System Recovery**: Re-ran the Antigravity installer after a botched background update deleted the main executable. All local files, Git history, and `%AppData%` workspace states survived 100% intact from yesterday's 13-hour sprint.
+- **Git Permissions**: Resolved an "Unsafe Repository" warning that was blocking source control. The issue was triggered by the `/private` folder's ownership permissions and was fixed by marking the directory as safe.
+- **Status**: The v1.9.7 physics refactor and successful free-return trajectory are completely secure. The environment is now stable and ready for final UX polish before sending to Hubble VIPs.
+
+---
+
 ## [2026-04-07 21:46] - Debrief (Part 6): Mission 6 & Release v1.9.7
 ### 📝 Summary
 Testing confirmed the `isReturningHome` latch successfully prevented the memory leak. Mobile layout in portrait mode works effectively on startup; however, rotating to landscape dynamically breaks the bounding boxes and forces HUD overlap. The simulation has reached a stable milestone checkpoint, designated **v1.9.7**, keeping the mobile landscape limitation explicitly documented.

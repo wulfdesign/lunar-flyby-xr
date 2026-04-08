@@ -6,16 +6,16 @@
 
 *(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
 
-![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-BurnStart.png)
+![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png)
 *Initial Burn toward the Moon from Low Earth Orbit.*
 
-![At the Moon](LunarFlybyXR_Screenshot_2026-03-31_002_AtMoon.png)
+![At the Moon](Lunar-Flyby-XR_Screenshot_2026-03-31_002_At-Moon.png)
 *Arriving at the Moon after a 3-day cislunar coast.*
 
-![Earth, Sun, and Moon](LunarFlybyXR_Screenshot_2026-04-07_001_EarthSunMoon.png)
+![Earth, Sun, and Moon](Lunar-Flyby-XR_Screenshot_2026-04-07_001_Earth-Sun-Moon.png)
 *Aligning the Earth, Sun, and Moon during the flyby.*
 
-![Earth Return](LunarFlybyXR_Screenshot_2026-04-07_002_EarthReturn.png)
+![Earth Return](Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
 *Approaching Earth on the return trajectory.*
 
 > **🚀 Current Status (v1.9.7):** The simulation has achieved a fully validated Lunar Flyby and Earth Return capability! The physics engine now utilizes distance-based Waypoints and a Mid-Course Correction (MCC) framework to execute leading-edge intercepts without needing "God-Mode" cheats. Current development is focused on End-of-Mission sequences: Earth return, atmospheric re-entry heating, and parachute splashdown mechanics.
@@ -56,7 +56,14 @@ This project is currently completely self-contained in a single file for maximum
 1. Clone or download this repository.  
 2. Double-click index.html to open it in any modern web browser.  
 3. (Optional) Put on a WebXR-compatible headset (like the Meta Quest) and click "ENTER VR FLYBY".
-4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap. Avoid extremely high warp multipliers on mobile to prevent CPU locking. Currenly only tested on Quest 3 link from a VR ready pc.
+4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! However, be very careful with the high-warp buttons (like 7.2kx) during critical course corrections, as the touch UI layout currently places them close together. Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
+
+<p align="center">
+  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg" width="23%" title="At the Moon" alt="Mobile View at the Moon"/>
+  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_002_Sun-Earth-Moon.jpg" width="23%" title="Sun Earth Moon Alignment" alt="Mobile Sun Earth Moon"/>
+  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_003_Moon-Com-Blackout.jpg" width="23%" title="Lunar Comms Blackout" alt="Mobile Lunar Comms Blackout"/>
+  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_004_Sun-Moon-Earth.jpg" width="23%" title="Sun Moon Earth Return" alt="Mobile Earth Return"/>
+</p>
 
 ## **⭐ Attribution & Giving Credit**
 
@@ -70,6 +77,7 @@ If you use this project for your own research, education, or as a base for your 
 
 ## **🗺️ V2.0 Roadmap**
 
+* \[ \] **Mobile UX Overhaul:** Design a dedicated, touch-friendly UI layout specifically for mobile browsers to prevent misclicks on critical time-warp buttons and fix landscape orientation clipping.
 * \[ \] **Bug Investigation:** Time warp seems to halt/reset repeatedly when deep inside the Lunar Sphere of Influence. Need to refine the SOI trigger latch.  
 * \[ \] **Mid-Course Correction (MCC):** Add an "Off Course Detected" warning and a "Recalculate Destination" button to execute a burn midway to the Moon if alignment drifts.  
 * \[ \] **Trajectory Trails:** Render the actual path flown (white line) vs projected path (blue dotted line).  

@@ -24,7 +24,8 @@
 - [ ] 🐛 **UX: Early Checkpoint Warnings (Pre-Arrival)**: Trigger checkpoint warnings *earlier* in the approach trajectory to give the user time to execute MCC maneuvers safely.
 - [ ] 🐛 **UX: Warp-Adjusted ETA Countdown**: Implement a HUD countdown timer that displays the ETA to the next node in real-time seconds dynamically adjusted by the current warp gear.
 - [ ] 🐛 **UI: Help Popup Toggle**: Add a hotkey/button to toggle the visibility of the informational help popups on screen.
-- [ ] 🐛 **UI: WebXR Button Z-Index**: Fix the default WebXR "Enter VR" button rendering behind other HUD panels. Move it back to the center-bottom layer.
+- [x] 🏆 **UI: WebXR Button Z-Index & Centering**: Fixed the default WebXR "Enter VR" and "Reset View" buttons rendering order and restored them to the bottom center, properly adjusting their widths safely behind panels on mobile.
+- [x] 🏆 **UI: FOV Indicator Size**: Increased the FOV tracking text size by 120% per A/B playtest feedback.
 
 ## 🔥🔥 End-of-Mission Flow (Re-Entry & Splashdown)
 - [ ] 🔥🔥 **UI/HUD: Phase Checklist Updates**: Add "Loss of Signal (LOS) Warning", "Cislunar Return", "Re-entry Prep". 

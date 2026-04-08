@@ -94,7 +94,7 @@
 
         #zoom-indicator {
             position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-            color: #00ffff; font-size: 0.9rem; font-weight: bold; text-shadow: 0 0 5px #000;
+            color: #00ffff; font-size: 1.08rem; font-weight: bold; text-shadow: 0 0 5px #000;
             pointer-events: auto; cursor: help;
         }
 
@@ -110,7 +110,7 @@
             p { font-size: 0.7rem; margin: 2px 0; }
             .controls { gap: 4px; margin-top: 8px; }
             button { padding: 5px 8px; font-size: 0.65rem; min-width: 45px; }
-            #zoom-indicator { bottom: 60px; font-size: 0.75rem; }
+            #zoom-indicator { bottom: 60px; font-size: 0.9rem; }
             ul.checklist li { font-size: 0.7rem; margin-bottom: 3px; }
         }
 
@@ -527,7 +527,7 @@
 
         // Buttons for VR and View Reset (Moved to bottom behind UI panels)
         const btnVR = document.createElement('button');
-        btnVR.style.cssText = 'position:absolute; bottom:20px; right:20px; width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
+        btnVR.style.cssText = 'position:absolute; bottom:20px; left:50%; transform:translateX(5px); width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
         btnVR.textContent = 'ENTER VR FLYBY';
         btnVR.title = "Jump into an immersive WebXR headset view if supported.";
         document.body.appendChild(btnVR);
@@ -579,7 +579,7 @@
         });
 
         const btnResetView = document.createElement('button');
-        btnResetView.style.cssText = 'position:absolute; bottom:80px; right:20px; width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
+        btnResetView.style.cssText = 'position:absolute; bottom:20px; left:50%; transform:translateX(calc(-100% - 5px)); width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
         btnResetView.textContent = 'RESET VIEW';
         btnResetView.title = "Re-centers the camera to face exactly along the Prograde travel vector.";
         document.body.appendChild(btnResetView);
