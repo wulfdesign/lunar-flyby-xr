@@ -17,6 +17,21 @@ The user verified the Camera inversion fix and pushed the simulation to completi
 
 ---
 
+## [2026-04-07 23:00] - QA Debrief: Partner iPad & Laptop Playtest
+### 📝 Summary
+The user's partner conducted an independent QA test on an iPad Mini and a Laptop. This surface-level testing highlighted several critical UX bottlenecks, specifically regarding mobile orientation scaling, emergency trajectory recovery, and atmospheric immersion (CAPCOM comms). All feedback has been logged directly to the Task tracking system for the `v2.0` architecture goals.
+
+### 🐛 Identified UX Issues & Feature Requests
+- **Mobile Orientation Lock-Out:** Rotating the iPad from Portrait to Landscape pushed the controls off the bottom of the screen. Rotating back to Portrait failed to restore them, permanently locking the user out of TMI controls and resulting in a deep-space fly-past.
+- **Emergency Flight Computer Override:** If a user misses a burn or gets severely off-course, the ship should flash red, drop to 1x warp, and initiate an "Emergency Auto-Fly" sequence to calculate a safe return trajectory unless explicitly cancelled by the user.
+- **Early Checkpoint Warnings:** Users need earlier warnings (both visual and in the radio feed) *before* arriving at a checkpoint to allow for trajectory adjustments before speeding back up.
+- **CAPCOM Radio Feed Integration:** Progress, warnings, and checkpoint arrivals need to be printed sequentially in a text/message box as if coming over the radio from Mission Control.
+- **VR Button Positioning:** The "Enter VR" WebXR button is currently rendering behind other HUD elements instead of the center-bottom of the screen.
+- **Warp-Adjusted ETA Timer:** The mission itinerary should include a real-time countdown timer (in seconds) dynamically calculated based on the current Time Warp setting.
+- **Help Popup Toggle:** Add a button/hotkey to toggle the visibility of the informational help popups/tooltips.
+
+---
+
 ## [2026-04-07 20:59] - Debrief (Part 5): Mission 5 & Mechanics Fixes
 ### 📝 Summary
 The user pushed the simulation boundaries on Mission 5 (landing off the coast of Eastern Africa / Madagascar). The newly introduced `isReturningHome` checkpoint effectively caught the inbound trajectories, however, a missing State-Latch on the boundary check caused a massive telemetry logging loop. Additionally, Re-Entry physics revealed that while the UI accurately threw Atmospheric Warnings, the mathematical Engine doesn't have an aerodynamic drag profile, meaning the spacecraft didn't biologically slow down. 

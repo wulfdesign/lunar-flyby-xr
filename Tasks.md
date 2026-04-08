@@ -21,6 +21,10 @@
 - [ ] 🐛 **UX: Flashing Buttons on Slowdown**: The notification buttons during forced deceleration or checkpoint arrivals should visually flash to grab user attention.
 - [ ] 🐛 **UX: Mobile Landscape/Portrait Scaling**: Overhaul CSS to dynamically scale `zoom` or Transform percentages to keep HUD proportional on orientation flips. Move VR buttons back to bottom but with a negative z-index offset.
 - [ ] 🐛 **UX/3D: Disappearing Crosshairs**: Fix the bug where the 3D Prograde vector ring disappears/clips into the Earth when altitude drops below 100km due to its -15 Z-depth rendering scale.
+- [ ] 🐛 **UX: Early Checkpoint Warnings (Pre-Arrival)**: Trigger checkpoint warnings *earlier* in the approach trajectory to give the user time to execute MCC maneuvers safely.
+- [ ] 🐛 **UX: Warp-Adjusted ETA Countdown**: Implement a HUD countdown timer that displays the ETA to the next node in real-time seconds dynamically adjusted by the current warp gear.
+- [ ] 🐛 **UI: Help Popup Toggle**: Add a hotkey/button to toggle the visibility of the informational help popups on screen.
+- [ ] 🐛 **UI: WebXR Button Z-Index**: Fix the default WebXR "Enter VR" button rendering behind other HUD panels. Move it back to the center-bottom layer.
 
 ## 🔥🔥 End-of-Mission Flow (Re-Entry & Splashdown)
 - [ ] 🔥🔥 **UI/HUD: Phase Checklist Updates**: Add "Loss of Signal (LOS) Warning", "Cislunar Return", "Re-entry Prep". 
@@ -45,7 +49,8 @@
 - [ ] 🔥🔥🔥 **Artemis II: State Vector Interpolation**: Create the linear/cubic spline interpolation engine for 10-minute samples.
 
 ## 🔥🔥 V2.0 Mission Goals & Architecture
-- [ ] 🔥🔥 **UI: Mission Control Radio Feed**: Add a "CAPCOM" text box to display authentic radio readouts and telemetry instructions (e.g. "Houston, we are go for TMI").
+- [ ] 🔥🔥 **Mechanics: Emergency Flight Computer Override (Auto-Fly)**: If trajectory deviation is critical or checkpoints are missed, flash red, drop warp to 1x, and announce an emergency computer take-over. The system automatically calculates a safe return trajectory unless explicitly cancelled by the user.
+- [ ] 🔥🔥 **UI: Mission Control CAPCOM Feed**: Add a "CAPCOM" side panel to display scrolling text messages for progress, warnings, and checkpoint approaches sequentially as radio comms.
 - [ ] 🔥🔥 **Physics: Lunar Orbit Insertion (LOI)**: Transition beyond Free-Return trajectories to calculate decel burns for stable lunar captures.
 - [ ] 🔥🔥 **Avionics: Flight Computer UI**: Build a targeting console to read current state vectors and calculate maneuver nodes (intercepts, rendezvous, MCCs).
 - [ ] 🔥🔥 **Physics: Sun Gravity Integration**: Add solar mass to N-body calculation for v2.1 "Gold Master" accuracy.
