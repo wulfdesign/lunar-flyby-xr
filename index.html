@@ -68,8 +68,11 @@
         button:active { transform: scale(0.95); }
         button.btn-danger { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.1); }
         button.btn-danger:hover { background: #ff4444; color: #000; box-shadow: 0 0 10px #ff4444;}
-        button.active { background: #00ffff; color: #000; }
+        button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; }
         button.caution-btn { animation: flash-btn 1s infinite; }
+        button.safe-btn { border-color: #44ff44; color: #44ff44; }
+        button.safe-btn.active { background: #44ff44 !important; box-shadow: 0 0 10px #44ff44; }
+        button.danger-btn { border-color: #ff4444; color: #ff4444; }
         
         /* Viewing Center Crosshair */
         #crosshair-view {
@@ -78,9 +81,10 @@
             transform: translate(-50%, -50%); pointer-events: none; z-index: 5;
             box-shadow: 0 0 5px #000;
         }
-        #crosshair-view::after { content: ''; position: absolute; top: 6px; left: 6px; width: 4px; height: 4px; background: rgba(255,255,255,1); border-radius: 50%; }
-
-        /* Target Info Popup */
+        #crosshair-view::after { 
+            content: '+'; position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); color: #ffffff; font-size: 12px; font-weight: bold;
+        }
         #target-popup {
             position: absolute; top: 52%; left: 52%; background: rgba(0, 40, 20, 0.9);
             border: 1px solid #44ff44; padding: 10px; border-radius: 4px;
@@ -96,7 +100,11 @@
 
         /* Responsive UI for Mobile */
         @media (max-width: 600px) {
-            #ui-layer { padding: 10px; overflow-y: auto; pointer-events: auto; }
+            #ui-layer { 
+                padding: 10px; overflow-y: auto; pointer-events: none; 
+                transform: scale(0.85); transform-origin: top left;
+                width: 117.6%; height: 117.6%;
+            }
             .panel { padding: 8px; width: 100%; box-sizing: border-box; }
             h1 { font-size: 0.85rem; margin-bottom: 5px; }
             p { font-size: 0.7rem; margin: 2px 0; }
@@ -264,12 +272,22 @@
         let globalMaxAlt = 0;
         
         // --- WAYPOINTS ---
-        const MISSION_WAYPOINTS = [
+        const MISSION_WAYPOINTS_OUTBOUND = [
             { name: "Geosynchronous Orbit Check", distance_km: 42164, passed: false, type: "MCC" },
-            { name: "Trans-Lunar Midpoint", distance_km: 192200, passed: false, type: "MCC" },
+            { name: "Trans-Lunar Midpoint (Equidistant)", distance_km: 192200, passed: false, type: "MCC" },
             { name: "Lunar SOI Approach", distance_km: 320000, passed: false, type: "MCC" }
         ];
+        const MISSION_WAYPOINTS_RETURN = [
+            { name: "Cislunar Return Interface (Midpoint)", distance_km: 192200, passed: false, type: "MCC" },
+            { name: "Return Geosync Interface", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Re-Entry Interface", distance_km: 5000, passed: false, type: "MCC" }
+        ];
+        
         let activeMCCWaypoint = null;
+        let isReturningHome = false;
+        let autoDecelerateTarget = -1;
+        let lastDecelTime = 0;
+        let currentMaxSafeWarp = -1;
 
         // --- BURN DIAGNOSTICS & STATE LATCHES ---
         let actualBurnTime = 0;
@@ -507,9 +525,9 @@
         renderer.xr.enabled = true;
         document.body.appendChild(renderer.domElement);
 
-        // Buttons for VR and View Reset
+        // Buttons for VR and View Reset (Moved to bottom behind UI panels)
         const btnVR = document.createElement('button');
-        btnVR.style.cssText = 'position:absolute; bottom:20px; left:calc(50% + 10px); width:150px; z-index:999; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
+        btnVR.style.cssText = 'position:absolute; bottom:20px; right:20px; width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
         btnVR.textContent = 'ENTER VR FLYBY';
         btnVR.title = "Jump into an immersive WebXR headset view if supported.";
         document.body.appendChild(btnVR);
@@ -561,7 +579,7 @@
         });
 
         const btnResetView = document.createElement('button');
-        btnResetView.style.cssText = 'position:absolute; bottom:20px; left:calc(50% - 160px); width:150px; z-index:999; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
+        btnResetView.style.cssText = 'position:absolute; bottom:80px; right:20px; width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
         btnResetView.textContent = 'RESET VIEW';
         btnResetView.title = "Re-centers the camera to face exactly along the Prograde travel vector.";
         document.body.appendChild(btnResetView);
@@ -570,6 +588,13 @@
             lookLon = 0; lookLat = 0;
             baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix();
             document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
+        });
+
+        // --- RESIZE EVENT LISTENER ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
         // --- ZOOM CONTROLS (Scroll Wheel) ---
@@ -649,6 +674,7 @@
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts3), pgLineMat));
         
         shipGroup.add(progradeMesh);
+
         shipGroup.add(camera);
         scene.add(shipGroup);
 
@@ -926,6 +952,17 @@
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.classList.add('caution-btn');
         }
+        
+        let pendingDangerWarp = null;
+        let maxSafeWarp = 7200;
+
+        function resetWarpButtonTexts() {
+            const labels = {1: "1x", 10: "10x", 30: "30x", 60: "60x", 300: "300x", 600: "600x", 1800: "1.8kx", 3600: "3.6kx", 7200: "7.2kx"};
+            [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+                const btn = document.getElementById(`btn-warp-${w}`);
+                if (btn && btn.textContent === "CONFIRM") btn.textContent = labels[w];
+            });
+        }
 
         [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
             const btn = document.getElementById(`btn-warp-${w}`);
@@ -934,6 +971,22 @@
                     showNavMsg("COMMAND DENIED: ENGINES ACTIVE");
                     return;
                 }
+                
+                // Double Click Latch Logic for Dangerous Warps
+                if (w > maxSafeWarp) {
+                    if (pendingDangerWarp !== w) {
+                        resetWarpButtonTexts();
+                        pendingDangerWarp = w;
+                        btn.textContent = "CONFIRM";
+                        showNavMsg(`ADVISORY: DANGEROUS WARP LEVEL. CLICK AGAIN TO CONFIRM.`, 4000);
+                        return; // Halt shift
+                    }
+                }
+                
+                // Authorized Shift
+                pendingDangerWarp = null;
+                resetWarpButtonTexts();
+                
                 cinematicActive = false; // Manual override
                 playbackActive = false; // Manual override
                 document.getElementById('cinematic-status').style.display = 'none';
@@ -1002,11 +1055,13 @@
             let distToMoon = shipPos.distanceTo(_moonPos);
 
             // Waypoint Checks
-            for (let wp of MISSION_WAYPOINTS) {
-                if (r >= wp.distance_km && !wp.passed) {
+            let activeWaypoints = isReturningHome ? MISSION_WAYPOINTS_RETURN : MISSION_WAYPOINTS_OUTBOUND;
+            for (let wp of activeWaypoints) {
+                let conditionMet = isReturningHome ? (r <= wp.distance_km) : (r >= wp.distance_km);
+                if (conditionMet && !wp.passed) {
                     wp.passed = true;
                     logEvent(`WAYPOINT REACHED: ${wp.name}`);
-                    if (timeWarp > 1) updateWarpUI(1);
+                    autoDecelerateTarget = 1; // Trigger Sequential Auto-Braking
                     evaluateMCC(wp);
                 }
             }
@@ -1105,7 +1160,7 @@
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
             _tempVec1.copy(shipVel).normalize();
-            _lookTarget.copy(shipGroup.position).add(_tempVec1);
+            _lookTarget.copy(shipGroup.position).sub(_tempVec1);
             shipGroup.lookAt(_lookTarget); 
             
             camera.rotation.order = 'YXZ';
@@ -1174,6 +1229,24 @@
                 // Update cinematic sequence
                 if (cinematicActive) updateCinematic(dt_real, telemetry);
                 updatePlayback(dt_real);
+
+                // Auto-Warp Decelerator Sequence (MCC Stage Braking)
+                if (typeof targetWarp !== 'undefined' && autoDecelerateTarget > 0 && targetWarp > autoDecelerateTarget) {
+                    let now = performance.now();
+                    if (now - lastDecelTime > 1200) { // step down every 1.2 seconds for dramatic effect
+                        lastDecelTime = now;
+                        const gears = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200];
+                        let currentIndex = gears.indexOf(targetWarp);
+                        if (currentIndex > 0) {
+                            let nextWarp = gears[currentIndex - 1];
+                            shiftWarp(nextWarp);
+                            updateWarpUI(timeWarp); // UI refresh
+                            triggerAlertFlash(`btn-warp-${nextWarp}`); // Yellow blink directly onto the button
+                        }
+                    }
+                } else if (typeof targetWarp !== 'undefined' && targetWarp <= autoDecelerateTarget) {
+                    autoDecelerateTarget = -1; // Braking complete
+                }
 
                 // --- AUTO TRACKING LOGIC ---
                 if (isTrackingTarget && currentTargetObj) {
@@ -1344,6 +1417,28 @@
                 else if (altE > 2000) region = "Medium Earth Orbit";
                 safeSetText('region-text', region);
 
+                // Safe Warp UI Indicator Logic (State Cached for Performance)
+                maxSafeWarp = 7200;
+                if (altE <= 150) maxSafeWarp = 1;         // Atmosphere
+                else if (altE <= 2000) maxSafeWarp = 10;  // LEO Warning
+                else if (distM < WARP_LIMITS.PROXIMITY_DIST) maxSafeWarp = WARP_LIMITS.PROXIMITY_WARP; // Proximity
+                else if (distM < WARP_LIMITS.ENTER_SOI_DIST) maxSafeWarp = WARP_LIMITS.ENTER_SOI_WARP; // In SOI
+                else if (distM < WARP_LIMITS.APPROACH_SOI_DIST) maxSafeWarp = WARP_LIMITS.APPROACH_SOI_WARP; // Approaching Moon
+
+                if (maxSafeWarp !== currentMaxSafeWarp) {
+                    currentMaxSafeWarp = maxSafeWarp;
+                    [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+                        const btn = document.getElementById(`btn-warp-${w}`);
+                        if (btn) {
+                            if (w <= maxSafeWarp) {
+                                btn.classList.add('safe-btn'); btn.classList.remove('danger-btn');
+                            } else {
+                                btn.classList.add('danger-btn'); btn.classList.remove('safe-btn');
+                            }
+                        }
+                    });
+                }
+
                 function triggerAlertFlash(elementId) {
                     const el = document.getElementById(elementId);
                     if (el) {
@@ -1442,7 +1537,16 @@
                     if (itinFlyby) itinFlyby.className = "active";
                     if (!milestoneLatches.inSOI) {
                         milestoneLatches.inSOI = true;
-                        logEvent("Alert: Entered Lunar Sphere of Influence");
+                        logEvent("LUNAR SOI ENCOUNTER: Entered Lunar Sphere of Influence", telemetry);
+                    }
+                } else if (distM > 60000 && milestoneLatches.inSOI) {
+                    isReturningHome = true;
+                    safeSetText('phase-text', "EARTH RETURN TRANSIT", "nominal");
+                    safeSetText('nav-status', "EXITING LUNAR SOI", "nominal");
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (!milestoneLatches.exitedSOI) {
+                        milestoneLatches.exitedSOI = true;
+                        logEvent("LUNAR SOI BOUNDARY: Exited Lunar Sphere of Influence", telemetry);
                     }
                 } else if (telemetry.isTliCoast) {
                     safeSetText('phase-text', "TRANS-LUNAR COAST", "nominal");

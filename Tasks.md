@@ -14,17 +14,21 @@
 
 ## 🐛 UX & Polish (Debrief Feedback)
 - [ ] 🐛 **UX: Smooth Warp Deceleration**: Transition warp down to 1x incrementally with visual feedback instead of a hard snap.
-- [ ] 🐛 **UX: MCC Countdown & Execution UI**: Display required delta-V, time remaining to burn (2 mins), and allow <10x warp during countdown, enforcing 1x for execution.
+- [ ] 🐛 **UX: MCC Countdown & Execution UI**: Approach waypoints should auto-trigger sequential warp gear-downs to 1x before flashing the Execute calculate prompt.
 - [ ] 🐛 **UI/UX: Warp Text Overflow**: Fix bug where text pushes the UI off-screen. Need responsive layout or CSS constraint.
 - [ ] 🐛 **UX: Explicit Log Entry Feedback**: Add visual confirmation/HUD toast when a user manually clicks the 1x button to trigger a flight log save.
-- [ ] 🐛 **UX: Dynamic Safe-Warp Button Colors**: Illuminate Warp buttons Green (safe) or Red (unsafe bounds) dynamically based on distance limits. Add a double-click hard confirmation for clicking into Red warp limits.
+- [ ] 🐛 **UX: Dynamic Safe-Warp Button Colors**: Illuminate Warp buttons Green (safe) or Red (unsafe bounds) dynamically based on distance limits. Fix Red-Active button text contrast.
+- [ ] 🐛 **UX: Flashing Buttons on Slowdown**: The notification buttons during forced deceleration or checkpoint arrivals should visually flash to grab user attention.
+- [ ] 🐛 **UX: Mobile Landscape/Portrait Scaling**: Overhaul CSS to dynamically scale `zoom` or Transform percentages to keep HUD proportional on orientation flips. Move VR buttons back to bottom but with a negative z-index offset.
+- [ ] 🐛 **UX/3D: Disappearing Crosshairs**: Fix the bug where the 3D Prograde vector ring disappears/clips into the Earth when altitude drops below 100km due to its -15 Z-depth rendering scale.
 
 ## 🔥🔥 End-of-Mission Flow (Re-Entry & Splashdown)
 - [ ] 🔥🔥 **UI/HUD: Phase Checklist Updates**: Add "Loss of Signal (LOS) Warning", "Cislunar Return", "Re-entry Prep". 
 - [ ] 🔥🔥 **UX: Comms Radio UI**: Add a dedicated scrolling log box for CAPCOM radio instructions and ground-control readouts, logging them to the json output.
 - [ ] 🔥🔥 **Simulation: Re-Entry Heating & Plasma Blackout**: Implement visual indicators and a comms blackout period as altitude drops below 120km.
-- [ ] 🔥🔥 **Mechanics: Splashdown Sequence**: Add retro-fire targeting, heat shield orientation requirement, drogue chute deployment, and main chute splashdown.
-- [ ] 🔥🔥 **Mechanics: Earth-Return Waypoints**: Add symmetrical checkpoints on the way back to Earth to catch the spacecraft out of warp before hitting the atmosphere.
+- [ ] 🔥🔥 **Mechanics: Atmospheric Drag**: Program velocity bleed-off (`F_drag`) interacting with `updatePhysics` once `altE < 100km`, allowing the ship to aerodynamically slow down before impact.
+- [ ] 🔥🔥 **Mechanics: Splashdown Sequence**: Add retro-fire targeting, heat shield orientation requirement, drogue chute deployment, and main chute splashdown restrictions interacting with the aerodynamic load.
+- [ ] 🔥🔥 **Mechanics: Earth-Return Waypoints**: Duplicate the Mission Waypoint script to track distance *decreasing* for inbound flights, triggering the same auto-warp slowdowns and MCC checks.
 - [ ] 🔥🔥 **Simulation: Splashdown Geolocation Tracking**: Calculate geographic latitude/longitude impact coordinates by syncing the final Cartesian position vector with a rotating Earth texture base based on Mission Elapsed Time.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
@@ -61,3 +65,4 @@
 - [x] 🏆 **Track Target Working**: Verified manual and auto tracking. (Verified 2026-04-01)
 - [x] 🏆 **Detailed Log Naming**: Log files now save with full ISO timestamp. (Verified 2026-04-01)
 - [x] 🏆 **Warp Button Upgrades**: Added **30x** and **7.2kx** buttons. (Verified 2026-04-01)
+- [x] 🏆 **Camera Inversion Bug:** Fixed `shipGroup.lookAt` vector subtraction to properly align the camera facing forward along the velocity path instead of backwards.

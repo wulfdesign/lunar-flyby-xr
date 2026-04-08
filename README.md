@@ -3,6 +3,7 @@
 **A browser-based, educational gravity and orbital dynamics simulator built with Three.js and WebXR.**
 
 ### **🚀 [Launch Live Experience](https://wulfdesign.github.io/lunar-flyby-xr/)**
+
 *(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
 
 ![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_LEO-Orbit-TMI-BurnStart_2026-03-31.png)
@@ -11,7 +12,7 @@
 ![At the Moon](LunarFlybyXR_Screenshot_AtMoon_2026-03-31.png)
 *Arriving at the Moon after a 3-day cislunar coast.*
 
-> **🚀 Current Status (v1.9.6):** The simulation has achieved a fully validated Lunar Flyby! The physics engine now utilizes distance-based Waypoints and a Mid-Course Correction (MCC) framework to execute leading-edge intercepts without needing "God-Mode" cheats. Current development is focused on End-of-Mission sequences: Earth return, atmospheric re-entry heating, and parachute splashdown mechanics.
+> **🚀 Current Status (v1.9.7):** The simulation has achieved a fully validated Lunar Flyby and Earth Return capability! The physics engine now utilizes distance-based Waypoints and a Mid-Course Correction (MCC) framework to execute leading-edge intercepts without needing "God-Mode" cheats. Current development is focused on End-of-Mission sequences: Earth return, atmospheric re-entry heating, and parachute splashdown mechanics.
 
 ## **🚀 The Vision**
 
@@ -27,18 +28,19 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 * **Orbital Energy Targeting:** The flight computer calculates Trans-Lunar Injection (TLI) burns using the Vis-viva equation and orbital energy, not just preset timers.  
 * **Dynamic Telemetry HUD:** Real-time G-Force, relative velocity, altitude, and fuel mass-flow calculations.  
 * **Time Warp System:** Accelerate time up to 3,600x to cross the 3-day cislunar gap.  
-* **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser.  
+* **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser (Still needs testing & QA on stand alone quest standalone headsets, however it did work on the Quest 3 link when lauched from browser on vr ready pc. STILL NEEDS QA & TESTING).  
 * **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis.
 
 ## **🛠️ Tech Stack & Credits**
 
-*   **Engine:** Three.js (r128)
-*   **Physics:** Custom Velocity Verlet Integration
-*   **Frontend:** Vanilla HTML5/CSS3 (No Tailwind/Bootstrap)
-*   **Immersion:** WebXR API (VR Support)
-*   **Full Attribution:** See the detailed [🎖️ Credits & Resources](docs/credits.md) for a list of all scientific data sources, texture origins, and technical influences.
+* **Engine:** Three.js (r128)
+* **Physics:** Custom Velocity Verlet Integration
+* **Frontend:** Vanilla HTML5/CSS3 (No Tailwind/Bootstrap)
+* **Immersion:** WebXR API (VR Support)
+* **Full Attribution:** See the detailed [🎖️ Credits & Resources](docs/credits.md) for a list of all scientific data sources, texture origins, and technical influences.
 
 ## **📜 History**
+
 This project began as an AI-assisted rapid prototype session on March 30-31, 2026. After a successful iteration process, the source code was rescued from a browser canvas glitch and reconstructed into this repository to serve as a foundation for further development of educational space simulations.
 
 ## **💻 How to Run**
@@ -48,16 +50,17 @@ This project is currently completely self-contained in a single file for maximum
 1. Clone or download this repository.  
 2. Double-click index.html to open it in any modern web browser.  
 3. (Optional) Put on a WebXR-compatible headset (like the Meta Quest) and click "ENTER VR FLYBY".
+4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap. Avoid extremely high warp multipliers on mobile to prevent CPU locking. Currenly only tested on Quest 3 link from a VR ready pc.
 
 ## **⭐ Attribution & Giving Credit**
 
-If you use this project for your own research, education, or as a base for your own work, we'd love to see it! 
+If you use this project for your own research, education, or as a base for your own work, we'd love to see it!
 
-*   **Credit:** Please credit **Larry James (Wulf Design Studios / UpLiftVR Studios)** in any public-facing descriptions or presentations.
-*   **Tag Us:** Tag us on social media so we can share your progress with the community!
-    *   **LinkedIn:** [WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
-    *   **YouTube:** [UpLiftVR Studios](https://www.youtube.com/@UpLiftVR)
-*   **Clone & Fork:** If you fork or clone this repository, please keep the attribution and license files intact.
+* **Credit:** Please credit **Larry James (Wulf Design Studios / UpLiftVR Studios)** in any public-facing descriptions or presentations.
+* **Tag Us:** Tag us on social media so we can share your progress with the community!
+  * **LinkedIn:** [WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
+  * **YouTube:** [UpLiftVR Studios](https://www.youtube.com/@UpLiftVR)
+* **Clone & Fork:** If you fork or clone this repository, please keep the attribution and license files intact.
 
 ## **🗺️ V2.0 Roadmap**
 
@@ -68,6 +71,8 @@ If you use this project for your own research, education, or as a base for your 
 * \[ \] **Post-Flight Report:** After flyby/crash, generate a UI report showing Max Gs, flight time, and fuel remaining.  
 * \[ \] **Lagrangian Points (L1-L4):** Add invisible targets/markers to the raycaster for L1 (between Earth/Moon), L2 (behind Moon), etc.  
 * \[ \] **Lunar Orbit Insertion (LOI):** Add capability to do a retrograde burn at perilune to establish Lunar Orbit instead of a Free Return.  
+* \[ \] **Target Waypoint HUD Overlay:** Add a floating marker in 3D space that physically points at the Moon or Earth (DESTINATION VECTOR) so users can easily visually locate targets when they are perpendicular to travel velocity.
+* \[ \] **RCS Attitude Control:** Allow the user to uncouple the hull from the Prograde vector and use Reaction Control Thrusters to manually rotate the spacecraft (Yaw, Pitch, Roll) to execute burns in any direction.
 * \[ \] **Asset Upgrades:** Replace procedural geometry with high-res NASA .glb models for the Orion capsule and SLS.
 
 ## **🏆 Completed Ready to Archive**
@@ -77,18 +82,20 @@ If you use this project for your own research, education, or as a base for your 
 **Larry James (WulfDesignStudios / UpLiftVR Studios)** is an indie VR developer, filmmaker, and space enthusiast with a passion for using immersive technology to make complex science accessible and awe-inspiring.
 
 ### **🌑 Featured Project: High Desert Eclipse**
-One of Larry's most impactful works is **"High Desert Eclipse,"** a 360-degree VR documentary capturing the majestic 2017 total solar eclipse from a remote hilltop in the Oregon high desert. 
 
-*   **For Educators & Schools:** This experience is a powerful tool for Earth and Space science. It captures the eerie transition from day to twilight, the 360-degree "sunrise" on the horizon, and the breathtaking solar corona.
-*   **Watch for Free:** The 4K 360-degree timelapse is available on YouTube. **Tip:** For the best quality, especially in a VR headset, set the playback speed to **0.25x**. This allows the 4K stream to buffer smoothly and lets you soak in the subtle environmental changes.
-    *   [📺 Watch: High Desert Eclipse (YouTube)](https://youtu.be/fzcFw_33iC8)
-*   **Immersive Edition:** A full-length version is available for the **Meta Quest** (via App Lab) and on [upliftvr.itch.io](https://upliftvr.itch.io/). It's a perfect addition to classroom VR kits to bring a "once-in-a-lifetime" celestial event to students anywhere.
+One of Larry's most impactful works is **"High Desert Eclipse,"** a 360-degree VR documentary capturing the majestic 2017 total solar eclipse from a remote hilltop in the Oregon high desert.
+
+* **For Educators & Schools:** This experience is a powerful tool for Earth and Space science. It captures the eerie transition from day to twilight, the 360-degree "sunrise" on the horizon, and the breathtaking solar corona.
+* **Watch for Free:** The 4K 360-degree timelapse is available on YouTube. **Tip:** For the best quality, especially in a VR headset, set the playback speed to **0.25x**. This allows the 4K stream to buffer smoothly and lets you soak in the subtle environmental changes.
+  * [📺 Watch: High Desert Eclipse (YouTube)](https://youtu.be/fzcFw_33iC8)
+* **Immersive Edition:** A full-length version is available for the **Meta Quest** (via App Lab) and on [upliftvr.itch.io](https://upliftvr.itch.io/). It's a perfect addition to classroom VR kits to bring a "once-in-a-lifetime" celestial event to students anywhere.
 
 ### **🚀 The Vision Behind Artemis: The Free Return**
-This project represents a "lifetime vision finally fulfilled." Inspired by a proposal for the (now canceled) *dearMoon* project, it leverages the latest in WebXR and AI-assisted development to create a prototype that is "quicker and more accessible than ever before in history." 
+
+This project represents a "lifetime vision finally fulfilled." Inspired by a proposal for the (now canceled) *dearMoon* project, it leverages the latest in WebXR and AI-assisted development to create a prototype that is "quicker and more accessible than ever before in history."
 
 Larry's goal is to inspire the next generation of space explorers and to remind those who have seen a total eclipse of the magic—and for those who haven't, to provide the impetus to get into the path of the next one.
 
-*   [🎥 Evening Magazine Feature (UpLiftVR)](https://www.youtube.com/watch?v=Xh0l8hA9y0c)
-*   [🎬 FilmFreeway: Larry James](https://filmfreeway.com/LarryJames)
-*   [🔗 LinkedIn: WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
+* [🎥 Evening Magazine Feature (UpLiftVR)](https://www.youtube.com/watch?v=Xh0l8hA9y0c)
+* [🎬 FilmFreeway: Larry James](https://filmfreeway.com/LarryJames)
+* [🔗 LinkedIn: WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)

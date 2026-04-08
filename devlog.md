@@ -2,6 +2,45 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-07 21:46] - Debrief (Part 6): Mission 6 & Release v1.9.7
+### 📝 Summary
+Testing confirmed the `isReturningHome` latch successfully prevented the memory leak. Mobile layout in portrait mode works effectively on startup; however, rotating to landscape dynamically breaks the bounding boxes and forces HUD overlap. The simulation has reached a stable milestone checkpoint, designated **v1.9.7**, keeping the mobile landscape limitation explicitly documented.
+
+### 🐛 Identified Bugs & Feature Requests
+- **Autopilot Highlight Legibility:** The "Autopilot On" button becomes black text on default translucent cyan, rendering it completely unreadable. Needs solid background fill override.
+- **Forward Vector Crosshair:** The HUD lacks a dedicated "Forward/Heading" indicator on the viewport center. The central crosshair needs a distinctive Green mapping to clarify the ship's nose heading versus the prograde velocity mesh.
+- **Milestone Mechanics Pending:** With the UI stabilized, the next priority is Earth Atmosphere Entry Corridors (Angle-of-Attack logic to prevent bounce-out or burn-up), Aerodynamic Drag velocity bleeding, Parachute automation, and Splashdown tracking.
+- **Camera Inversion Bug:** Realized the camera was mounted mathematically backwards due to ThreeJS `lookAt` assigning the +Z axis towards the velocity vector. Swapped vector `.add` to `.sub` to invert the matrix, placing the camera rightfully facing the forward velocity path so the exhaust isn't the primary view during burns!
+
+### 🛑 Session Wrap-up
+The user verified the Camera inversion fix and pushed the simulation to completion. The MCC Flight Computer successfully guided the ship to a safe splashdown in the Indian Ocean despite high warp stress-testing! We officially concluded the session by staging final UX tweaks (Flashing warning buttons, Depth clipping on 3D UI geometry during crashes) to the backlog for tomorrow. Prepared Hand-Off instructions for the next context window.
+
+---
+
+## [2026-04-07 20:59] - Debrief (Part 5): Mission 5 & Mechanics Fixes
+### 📝 Summary
+The user pushed the simulation boundaries on Mission 5 (landing off the coast of Eastern Africa / Madagascar). The newly introduced `isReturningHome` checkpoint effectively caught the inbound trajectories, however, a missing State-Latch on the boundary check caused a massive telemetry logging loop. Additionally, Re-Entry physics revealed that while the UI accurately threw Atmospheric Warnings, the mathematical Engine doesn't have an aerodynamic drag profile, meaning the spacecraft didn't biologically slow down. 
+
+### 🐛 Identified Bugs & Feature Requests
+- **Telemetry Explosion:** The `flightLog` hit 35MB (150,000+ lines). *Analysis: I forgot to properly latch the `isReturningHome` condition in `updatePhysics`, meaning it spammed the JSON array every single calculation frame. Fatal memory leak, needs immediate hotfix.*
+- **Button Contrast:** Active buttons mapped inverted. Red button + white text is hard to read. The request is: Active state buttons maintain their context color filling (Solid blue/red/green background) but the text shifts to absolute `#000000` black for perfect contrast readability.
+- **Return Midpoint Labelling:** The temporal/spatial distance of 192,200km on the return outbound doesn't feel like a proper "Midpoint" due to accumulated velocity. Needs to be renamed to something like `Return Coast Phase Check` or visually rescaled.
+- **Atmospheric Drag & Parachutes:** Currently hitting the `100km` mark fires a UI warning but does zero physical deceleration. The engine requires: Atmospheric Drag integration (Bleeding velocity into heat/G-force tracking) -> Drogue chute deployment -> Main chute splashdown limits.
+
+---
+
+## [2026-04-07 20:14] - Debrief (Part 4): Mission 4 & Return Trajectory
+### 📝 Summary
+The user conducted a 4th mission test (successful splashdown in the central Amazon basin at 10.25 km/s) to evaluate the new Warp Constraints and Mobile responsiveness. The warning indicators and safety locks were highly praised, but structural layout and Return-trip logic require immediate attention.
+
+### 🐛 Identified UX Issues & Mechanics Deficits
+- **Mobile Responsive Layout:** CSS scaling is broken. Switching landscape/portrait crunches all UI elements into the top-left rather than scaling down/zooming to fit the viewport. The VR buttons should be returned to the bottom, but strictly on a lower `z-index` so they sit *behind* the main HUD panels and don't block interaction.
+- **Warp Contrast:** Text on active red error buttons is unreadable. Needs inverse text mapping for contrast.
+- **Auto-Slowdown Waypoints:** The game currently hard-stops warp instantly at a waypoint or ignores it. The flow should be: Approach -> Auto-decrease warp gear gradually down to 1x with flashing warnings -> Stop -> Wait for MCC procedure.
+- **Return Trip Missing Logic:** Because the system evaluates Waypoints by checking if Earth altitude is *greater* than an outbound threshold, the capsule blasts completely through the returning Midpoint and Geosync thresholds without triggering checks or warnings, resulting in ultra high-speed collision approaches into Earth's atmosphere.
+
+---
+
 ## [2026-04-07 19:21] - Debrief (Part 3): Mission 3 Success & Advanced UX
 ### 📝 Summary
 The user conducted a 3rd mission test targeting the Phase 1 UI fixes. The Warp text overflow fix (wrapping bounds logic) successfully locked the layout spacing and completely eliminated the vertical bouncing. The mission safely concluded with a smooth ocean splashdown south of Hawaii, marking our 3rd major mission success!
