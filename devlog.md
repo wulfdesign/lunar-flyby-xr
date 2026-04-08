@@ -2,6 +2,16 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-08 13:21] - System Memory Hardcoding & End of Session
+### 📝 Summary
+Successfully consolidated all critical architectural rules and privacy boundaries discovered during today's sprint into the permanent session handoff instructions.
+
+### 🛠️ Work Done
+- **Agent Memory Protocols Applied**: Hard-tracked the 5 core development rules into `NewChatInst.md` (Privacy Boundaries, Mobile Portrait lock, Three.js Camera math, 3D Scaling/Clipping physics, and Single-File Architecture validation) to prevent future context loss during agent turnover.
+- **Session Complete**: Performed the final local commit, wrapping up an incredibly productive sprint for the `v1.9.7` milestone.
+
+---
+
 ## [2026-04-08 12:47] - Final Validation Speedrun & Traffic Waypoints
 ### 📝 Summary
 Completed a final extreme stress-test speedrun validating the complete mission arc. The flight successfully survived a terrifying 1.4km perilune (moon slingshot altitude) and returned to a safe mid-Pacific splashdown between Hawaii and Australia!
