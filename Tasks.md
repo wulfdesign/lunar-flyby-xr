@@ -60,9 +60,11 @@
 - [ ] 🔥🔥 **Physics: Sun Gravity Integration**: Add solar mass to N-body calculation for v2.1 "Gold Master" accuracy.
 - [ ] 🔥🔥 **Architecture: Modular Source Files**: Prepare project for split into `styles.css`, `physics.js`, and `ui.js` while maintaining single-file build.
 - [ ] 🔥🔥 **Artemis II Real-Time Replay**: Load and play back the actual mission state-vectors from NASA data.
+- [ ] 🔥🔥 **Mechanic**: Service Module Jettison (Release ESM mass at 2000km to stabilize heatshield before Entry Interface).
 
 
 ## 🧊 Icebox (Cold)
+- [ ] 🧊 **Mechanic**: Dragon-style Powered Landing (Fire retros, discard chutes, zero-velocity touchdown).
 - [ ] 🧊 **Restore Load Flight Log**: Re-enable log playback once stability issues are resolved.
 - [ ] 🧊 **Refine Auto Camera Tracking**: Automated pans currently disabled.
 

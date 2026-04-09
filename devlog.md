@@ -2,6 +2,18 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-09 14:50] - V1.9.8 Sprint: Atmospheric Drag & Auto MCC
+### 📝 Summary
+Kicked off the sprint to implement full aerodynamic reentry physics and the automated Midcourse Correction (MCC) keyhole threading. 
+
+### 🛠️ Work Done
+- **Planning & Architecture Reviewed**: Drafted and approved the implementation plan to build out proper barometric density vectors and zero-allocation acceleration calculations for the 122km Entry Interface.
+- **Service Module Feasibility Studied**: Concluded that the massive European Service Module (ESM) must be jettisoned before reentry to prevent uncontrolled tumble and plasma incineration. Added it to V2.0 tasks.
+- **Future Landing Systems**: Logged the possibility of a "Dragon-style" powered landing (firing retros, ditching chutes) to the Icebox for later exploration.
+- **Status**: The math is set up, implementation into `index.html` `updatePhysics` is underway.
+
+---
+
 ## [2026-04-08 13:21] - System Memory Hardcoding & End of Session
 ### 📝 Summary
 Successfully consolidated all critical architectural rules and privacy boundaries discovered during today's sprint into the permanent session handoff instructions.
