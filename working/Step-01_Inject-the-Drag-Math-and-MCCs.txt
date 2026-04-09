@@ -1,0 +1,94 @@
+Step 1: Inject the Drag Math & MCCs
+
+Open your index.html and find the updatePhysics function. Scroll down inside it until you see the // --- ZERO-ALLOCATION VELOCITY VERLET INTEGRATION --- section.
+
+Replace that whole integration block (from let currentMass down to shipVel.add(...)) with this updated code that includes the MCC logic and Atmospheric Drag:
+
+
+// code begin JavaScript
+
+// --- ZERO-ALLOCATION VELOCITY VERLET INTEGRATION ---
+            let currentMass = shipEmptyMass + fuel;
+            let altE = shipPos.length() - radEarth;
+            let accelData = getAcceleration(shipPos);
+            _accel.copy(accelData.total); 
+            let magEarth = accelData.magEarth;
+            let magMoon = accelData.magMoon;
+            
+            // 1. Inbound Midcourse Correction (MCC) Logic
+            let isReturning = shipVel.dot(shipPos) < 0; // Negative dot product means falling toward Earth
+            if (autoPilotEngaged && isReturning) {
+                if (altE < 192200 && !milestoneLatches.mcc1) {
+                    milestoneLatches.mcc1 = true;
+                    logEvent('AUTO: Inbound Midcourse Correction (MCC) Executed', telemetry);
+                    // Instantaneous impulse to ensure we thread the 122km keyhole
+                    let currentTangent = shipVel.clone().projectOnPlane(shipPos).normalize();
+                    let correctionMagnitude = 0.005; // 5 m/s nudge
+                    shipVel.add(currentTangent.multiplyScalar(correctionMagnitude));
+                }
+            }
+
+            // 2. Atmospheric Drag Equation
+            let dragAccMag = 0;
+            let isReentry = false;
+            if (altE < 122 && altE > 0) { // Entry Interface
+                isReentry = true;
+                let dragCd = 1.5; // Capsule blunt body
+                if (altE < 7.3) dragCd = 50.0;  // Drogue Chutes
+                if (altE < 3.0) dragCd = 150.0; // Main Chutes
+
+                let density = 1.225 * Math.exp(-altE / 8.5); // Barometric density (kg/m^3)
+                let v_ms = currentVelMag * 1000; // km/s to m/s
+                let dragForce = 0.5 * density * v_ms * v_ms * dragCd * 10.5; // Newtons
+                dragAccMag = (dragForce / 8000) / 1000; // Force / Mass (8000kg capsule) in km/s^2
+            }
+
+            currentGForce = 0; 
+            _thrustAcc.set(0,0,0);
+            
+            if (isBurning && fuel > 0) {
+                let thrustAccMag = (thrustForce / currentMass); 
+                _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
+                fuel -= (massFlowRate * dt); 
+                if(fuel < 0) fuel = 0;
+                currentGForce = thrustAccMag / 0.00980665; 
+            }
+            
+            // Add Reentry G-Forces to the dial
+            if (isReentry) {
+                currentGForce += dragAccMag / 0.00980665;
+            }
+
+            // 1. pos(t + dt)
+            _totalAccel.addVectors(_accel, _thrustAcc);
+            if (isReentry && currentVelMag > 0) {
+                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); // Drag opposes velocity
+                _totalAccel.add(_tempVec1);
+            }
+
+            _tempVec1.copy(shipVel).multiplyScalar(dt);
+            _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt);
+            shipPos.add(_tempVec1).add(_tempVec2);
+            
+            // 2. a(t + dt)
+            let nextAccelData = getAcceleration(shipPos);
+            _nextAccel.copy(nextAccelData.total);
+            _nextThrustAcc.set(0,0,0);
+            
+            if (isBurning && fuel > 0) {
+                let thrustAccMag = (thrustForce / currentMass);
+                _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
+            }
+            _nextTotalAccel.addVectors(_nextAccel, _nextThrustAcc);
+            
+            if (isReentry && shipVel.length() > 0) {
+                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag);
+                _nextTotalAccel.add(_tempVec1);
+            }
+
+            // 3. v(t + dt)
+            _tempVec1.addVectors(_totalAccel, _nextTotalAccel).multiplyScalar(0.5 * dt);
+            shipVel.add(_tempVec1);
+
+
+// code end JavaScript

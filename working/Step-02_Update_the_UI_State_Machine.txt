@@ -1,0 +1,57 @@
+Step 2: Update the UI State Machine
+
+Scroll down to the // State-based Phase/Status UI section inside the renderer.setAnimationLoop.
+Replace the old crash logic (if (altE < 0)...) with our new Parachute and Splashdown state machine:
+
+// code begin JavaScript
+
+// State-based Phase/Status UI
+                if (altE <= 0) {
+                    let impactVel = shipVel.length() * 1000; // m/s
+                    if (impactVel < 15) {
+                        safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal");
+                        safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s)`, "nominal");
+                        progradeMat.color.setHex(0x00ff00);
+                    } else {
+                        safeSetText('phase-text', "LITHOBRAKING (FATAL IMPACT)", "danger");
+                        safeSetText('nav-status', `MISSION FAILED (Impact: ${impactVel.toFixed(1)} m/s)`, "danger");
+                        progradeMat.color.setHex(0xff0000); 
+                    }
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (altE < 3.0) {
+                    safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal");
+                    safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal");
+                    if (timeWarp > 1) updateWarpUI(1); // Force 1x for splashdown viewing
+                } else if (altE < 7.3) {
+                    safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution");
+                    safeSetText('nav-status', "AERODYNAMIC DECELERATION", "caution");
+                } else if (altE < 122) {
+                    safeSetText('phase-text', "ENTRY INTERFACE", "danger");
+                    safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "danger");
+                    // Auto-rotate heatshield forward (retrograde) for visuals
+                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-1);
+                    _lookTarget.copy(shipGroup.position).add(_tempVec1);
+                    shipGroup.lookAt(_lookTarget);
+                } else if (distM <= 60000) {
+                    safeSetText('phase-text', "LUNAR ENCOUNTER", "caution");
+                    safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");
+                    if (itinCoast) itinCoast.className = "complete";
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (itinFlyby) itinFlyby.className = "active";
+                    if (!milestoneLatches.inSOI) {
+                        milestoneLatches.inSOI = true;
+                        logEvent("Alert: Entered Lunar Sphere of Influence");
+                    }
+                } else if (telemetry.isTliCoast) {
+                    safeSetText('phase-text', "TRANS-LUNAR COAST", "nominal");
+                    safeSetText('nav-status', "EN ROUTE TO MOON", "nominal");
+                } else {
+                    safeSetText('phase-text', altE > 100000 ? "DEEP SPACE" : "LOW EARTH ORBIT", "nominal");
+                    if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) {
+                        safeSetText('nav-status', "ACTION REQ: ENABLE AUTOPILOT", "caution");
+                    } else {
+                        safeSetText('nav-status', "ORBIT STABLE", "nominal");
+                    }
+                }
+
+// code begin JavaScript
