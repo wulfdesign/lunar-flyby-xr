@@ -1,0 +1,144 @@
+System Initialization: Please act as a Sr. Developer performing a surgical update on index.html.
+Context: We are updating the simulation to v1.9.8.1. I need you to implement the Post-Flight Debrief UX fixes (Entry Angle math, Max G tracking, m/s formatting, and Parachute targets) without breaking the existing zero-allocation Velocity Verlet physics loop.
+Please read index.html and apply the following 5 surgical replacements:
+1. Version Bump & Variable Declaration
+Find const SIM_VERSION and change it to "1.9.8.1".
+Find let currentGForce = 0; (around the State Latches area) and immediately below it, add: let maxGForce = 0;
+2. HUD HTML Update (Prevent Misclicks & Add Entry Angle)
+Find the <!-- BOTTOM RIGHT: Navigation --> section. Replace from that comment down to the <hr style="border-color: #00ffff; line with this:
+code
+Html
+<!-- BOTTOM RIGHT: Navigation -->
+            <div class="panel" title="Ship control systems. Engage the autopilot or control the burn manually.">
+                <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
+                <div style="min-height: 3.5rem; display: flex; flex-direction: column; justify-content: center;">
+                    <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite; margin: 0; text-align: center;">[SEQUENCE RUNNING: SHOT 01]</p>
+                    <div id="nav-msg" style="color:#ff4444; font-size:0.75rem; height:1.2rem; font-weight:bold; text-align:center;"></div>
+                </div>
+                <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
+                <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn. Target phase angle is opposite the moon.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
+                <p><span class="tooltip" title="Flight Path Angle. Target -6.5° for safe reentry.">Entry Angle:</span> <span id="entry-angle" class="nominal">0.00&deg;</span></p>
+                <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically ignite and cut off engines to perfectly reach the Moon.">Autopilot:</span> <span id="autopilot-status" class="danger">OFF</span></p>
+                <div class="controls">
+                    <button id="btn-toggle-auto" title="Click to arm the flight computer. It will wait for the Next Action timer to hit zero, then fire.">ENABLE AUTO TMI</button>
+                    <button id="btn-skip-window" title="Warps time forward to exactly 60 seconds before the next burn window.">SKIP TO ACTION</button>
+                    <button id="btn-track-target" title="Automatically keep the current target centered in view. Click a target to select it first!">TRACK TARGET: OFF</button>
+                </div>
+                <hr style="border-color: #00ffff; opacity: 0.3; margin-top: 15px;">
+3. Entry Angle Math & Max G Tracking
+Inside updatePhysics(dt), right after let isReturning = shipVel.dot(shipPos) < 0; and the if (autoPilotEngaged && isReturning) block, add this math to calculate Flight Path Angle:
+code
+JavaScript
+// Calculate Flight Path Angle (Entry Angle) - Zero Allocation
+            _tempVec1.copy(shipVel).normalize();
+            _tempVec2.copy(shipPos).normalize();
+            let fpaRad = Math.asin(_tempVec1.dot(_tempVec2));
+            let flightPathAngle = THREE.MathUtils.radToDeg(fpaRad);
+Next, find where currentGForce is updated inside updatePhysics (specifically the if (isReentry) block) and add the Max G tracker:
+code
+JavaScript
+if (isReentry) {
+                currentGForce += dragAccMag / 0.00980665;
+            }
+            if (currentGForce > maxGForce) maxGForce = currentGForce;
+Finally, at the end of updatePhysics, add _telemetry.flightPathAngle = flightPathAngle; right before return _telemetry;.
+4. Low-Altitude Formatting & Parachute UI
+Inside renderer.setAnimationLoop, find the UI UPDATE LOGIC section. Replace the safeSetText('alt-earth', ...) and safeSetText('velocity', ...) calls with this block:
+code
+JavaScript
+// Task 4: Aviation Mode (High Precision below 10km)
+                if (altE < 10 && altE > 0) {
+                    safeSetText('alt-earth', altE.toFixed(3) + " km");
+                    safeSetText('velocity', (shipVel.length() * 1000).toFixed(1) + " m/s");
+                } else {
+                    safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                    safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
+                }
+                
+                // Task 3: Entry Angle UI Formatting
+                let fpaColor = "danger"; 
+                if (telemetry.flightPathAngle < -5.5 && telemetry.flightPathAngle > -7.5) fpaColor = "nominal"; 
+                else if (telemetry.flightPathAngle <= -4.5 && telemetry.flightPathAngle >= -8.5) fpaColor = "caution"; 
+                safeSetText('entry-angle', telemetry.flightPathAngle.toFixed(2) + "°", fpaColor);
+Next, replace the entire if (altE <= 0) { ... } else if (...) state-machine block at the bottom of the render loop with this:
+code
+JavaScript
+// State-based Phase/Status UI
+                if (altE <= 0) {
+                    let impactVel = shipVel.length() * 1000; // m/s
+                    if (impactVel < 15) {
+                        safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal");
+                        safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "nominal");
+                        progradeMat.color.setHex(0x00ff00);
+                    } else {
+                        safeSetText('phase-text', "LITHOBRAKING (FATAL IMPACT)", "danger");
+                        safeSetText('nav-status', `MISSION FAILED (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "danger");
+                        progradeMat.color.setHex(0xff0000); 
+                    }
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (altE < 3.0) {
+                    safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal");
+                    safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal");
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (altE < 7.3) {
+                    safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution");
+                    safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution");
+                } else if (altE < 122) {
+                    safeSetText('phase-text', "ENTRY INTERFACE", "danger");
+                    safeSetText('nav-status', "TARGET DROGUES: 7.300 km", "danger");
+                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-1);
+                    _lookTarget.copy(shipGroup.position).add(_tempVec1);
+                    shipGroup.lookAt(_lookTarget);
+                } else if (distM < 0) {
+                    safeSetText('phase-text', "LITHOBRAKING (IMPACT)", "danger");
+                    safeSetText('nav-status', "MISSION FAILURE", "danger");
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (distM <= 60000) {
+                    safeSetText('phase-text', "LUNAR ENCOUNTER", "caution");
+                    safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");
+                    if (itinCoast) {
+                        itinCoast.className = "complete";
+                        if (!itinCoast.dataset.done) {
+                            itinCoast.innerHTML = "[X] Trans-Lunar Coast Complete";
+                            itinCoast.dataset.done = "true";
+                        }
+                    }
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (itinFlyby) itinFlyby.className = "active";
+                    if (!milestoneLatches.inSOI) {
+                        milestoneLatches.inSOI = true;
+                        logEvent("LUNAR SOI ENCOUNTER: Entered Lunar Sphere of Influence", telemetry);
+                    }
+                } else if (distM > 60000 && milestoneLatches.inSOI) {
+                    isReturningHome = true;
+                    safeSetText('phase-text', "EARTH RETURN TRANSIT", "nominal");
+                    safeSetText('nav-status', "EXITING LUNAR SOI", "nominal");
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (!milestoneLatches.exitedSOI) {
+                        milestoneLatches.exitedSOI = true;
+                        logEvent("LUNAR SOI BOUNDARY: Exited Lunar Sphere of Influence", telemetry);
+                    }
+                } else if (telemetry.isTliCoast) {
+                    safeSetText('phase-text', "TRANS-LUNAR COAST", "nominal");
+                    if (milestoneLatches.inSOI && distM > 60000) {
+                        safeSetText('nav-status', "EARTH RETURN EN ROUTE", "nominal");
+                        const itinFlyby = document.getElementById('itin-flyby');
+                        if (itinFlyby) {
+                            itinFlyby.className = "complete";
+                            if (!itinFlyby.dataset.done) {
+                                itinFlyby.innerHTML = "[X] Lunar Flyby Complete";
+                                itinFlyby.dataset.done = "true";
+                            }
+                        }
+                    } else {
+                        safeSetText('nav-status', "EN ROUTE TO MOON", "nominal");
+                    }
+                } else {
+                    safeSetText('phase-text', altE > 100000 ? "DEEP SPACE" : "LOW EARTH ORBIT", "nominal");
+                    if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) {
+                        safeSetText('nav-status', "ACTION REQ: ENABLE AUTOPILOT", "caution");
+                    } else {
+                        safeSetText('nav-status', "ORBIT STABLE", "nominal");
+                    }
+                }
+Apply these exact replacements and confirm completion.

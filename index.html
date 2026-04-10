@@ -211,18 +211,19 @@
             <!-- BOTTOM RIGHT: Navigation -->
             <div class="panel" title="Ship control systems. Engage the autopilot or control the burn manually.">
                 <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
-                <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite;">[SEQUENCE RUNNING: SHOT 01]</p>
-                <div id="nav-msg" style="color:#ff4444; font-size:0.75rem; height:1.2rem; font-weight:bold; text-align:center;"></div>
+                <div style="min-height: 3.5rem; display: flex; flex-direction: column; justify-content: center;">
+                    <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite; margin: 0; text-align: center;">[SEQUENCE RUNNING: SHOT 01]</p>
+                    <div id="nav-msg" style="color:#ff4444; font-size:0.75rem; height:1.2rem; font-weight:bold; text-align:center;"></div>
+                </div>
                 <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
                 <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn. Target phase angle is opposite the moon.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
+                <p><span class="tooltip" title="Flight Path Angle. Target -6.5° for safe reentry.">Entry Angle:</span> <span id="entry-angle" class="nominal">0.00&deg;</span></p>
                 <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically ignite and cut off engines to perfectly reach the Moon.">Autopilot:</span> <span id="autopilot-status" class="danger">OFF</span></p>
-                
                 <div class="controls">
                     <button id="btn-toggle-auto" title="Click to arm the flight computer. It will wait for the Next Action timer to hit zero, then fire.">ENABLE AUTO TMI</button>
                     <button id="btn-skip-window" title="Warps time forward to exactly 60 seconds before the next burn window.">SKIP TO ACTION</button>
                     <button id="btn-track-target" title="Automatically keep the current target centered in view. Click a target to select it first!">TRACK TARGET: OFF</button>
                 </div>
-                
                 <hr style="border-color: #00ffff; opacity: 0.3; margin-top: 15px;">
                 <p><span class="tooltip" title="Estimated time the engines need to fire to achieve the required orbital energy.">Target Burn:</span> <span id="burn-target" class="nominal">145.0 s</span></p>
                 <p><span class="tooltip" title="How long the engines have actually been firing.">Actual Burn:</span> <span id="burn-actual" class="nominal">0.0 s</span></p>
@@ -258,7 +259,7 @@
          * Features: Velocity Verlet Integration, Real-world units, Orbital Energy Targeting, 
          * Latching Autopilot, Target Scanning, Burn Diagnostics, G-Force, Milestone Tracking.
          */
-        const SIM_VERSION = "2.0.0";
+        const SIM_VERSION = "1.9.8.1";
 
         // --- USER CONFIGURED FLYBY THRESHOLDS ---
         // Edit these limits to control when the high-warp yellow warnings appear
@@ -323,6 +324,7 @@
         let autoBurnActive = false;
         let burnEndTime = -999;
         let currentGForce = 0; 
+        let maxGForce = 0;
         
         let milestoneLatches = {
             approachingGeosync: false,
@@ -774,7 +776,7 @@
             shipVel = new THREE.Vector3(vOrbit * -Math.sin(startShipAngle), 0, vOrbit * Math.cos(startShipAngle));
 
             fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0;
-            actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; globalMaxAlt = 0;
+            actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0;
             
             // Reset State Latches
             milestoneLatches = {
@@ -1193,6 +1195,12 @@
                 }
             }
 
+            // Calculate Flight Path Angle (Entry Angle) - Zero Allocation
+            _tempVec1.copy(shipVel).normalize();
+            _tempVec2.copy(shipPos).normalize();
+            let fpaRad = Math.asin(_tempVec1.dot(_tempVec2));
+            let flightPathAngle = THREE.MathUtils.radToDeg(fpaRad);
+
             // 2. Atmospheric Drag Equation
             let dragAccMag = 0;
             let isReentry = false;
@@ -1223,6 +1231,7 @@
             if (isReentry) {
                 currentGForce += dragAccMag / 0.00980665;
             }
+            if (currentGForce > maxGForce) maxGForce = currentGForce;
 
             // 1. pos(t + dt) = pos(t) + v(t)dt + 0.5 * a(t)dt^2
             _totalAccel.addVectors(_accel, _thrustAcc);
@@ -1275,7 +1284,8 @@
                 isTliCoast, 
                 estimatedBurnTime,
                 magEarth: accelData.magEarth,
-                magMoon: accelData.magMoon
+                magMoon: accelData.magMoon,
+                flightPathAngle: flightPathAngle
             };
         }
         function formatTime(totalSeconds) {
@@ -1399,10 +1409,24 @@
                 if (altE > globalMaxAlt) globalMaxAlt = altE;
 
                 safeSetText('met-time', formatTime(metSeconds));
-                safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                
+                // Task 4: Aviation Mode (High Precision below 10km)
+                if (altE < 10 && altE > 0) {
+                    safeSetText('alt-earth', altE.toFixed(3) + " km");
+                    safeSetText('velocity', (shipVel.length() * 1000).toFixed(1) + " m/s");
+                } else {
+                    safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                    safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
+                }
+                
+                // Task 3: Entry Angle UI Formatting
+                let fpaColor = "danger"; 
+                if (telemetry.flightPathAngle < -5.5 && telemetry.flightPathAngle > -7.5) fpaColor = "nominal"; 
+                else if (telemetry.flightPathAngle <= -4.5 && telemetry.flightPathAngle >= -8.5) fpaColor = "caution"; 
+                safeSetText('entry-angle', telemetry.flightPathAngle.toFixed(2) + "°", fpaColor);
+
                 safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
 
-                safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
                 safeSetText('vx', shipVel.x.toFixed(3));
                 safeSetText('vy', shipVel.y.toFixed(3));
                 safeSetText('vz', shipVel.z.toFixed(3));
@@ -1628,25 +1652,24 @@
                     let impactVel = shipVel.length() * 1000; // m/s
                     if (impactVel < 15) {
                         safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal");
-                        safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s)`, "nominal");
+                        safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "nominal");
                         progradeMat.color.setHex(0x00ff00);
                     } else {
                         safeSetText('phase-text', "LITHOBRAKING (FATAL IMPACT)", "danger");
-                        safeSetText('nav-status', `MISSION FAILED (Impact: ${impactVel.toFixed(1)} m/s)`, "danger");
+                        safeSetText('nav-status', `MISSION FAILED (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "danger");
                         progradeMat.color.setHex(0xff0000); 
                     }
                     if (timeWarp > 1) updateWarpUI(1);
                 } else if (altE < 3.0) {
                     safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal");
                     safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal");
-                    if (timeWarp > 1) updateWarpUI(1); // Force 1x for splashdown viewing
+                    if (timeWarp > 1) updateWarpUI(1);
                 } else if (altE < 7.3) {
                     safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution");
-                    safeSetText('nav-status', "AERODYNAMIC DECELERATION", "caution");
+                    safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution");
                 } else if (altE < 122) {
                     safeSetText('phase-text', "ENTRY INTERFACE", "danger");
-                    safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "danger");
-                    // Auto-rotate heatshield forward (retrograde) for visuals
+                    safeSetText('nav-status', "TARGET DROGUES: 7.300 km", "danger");
                     _tempVec1.copy(shipVel).normalize().multiplyScalar(-1);
                     _lookTarget.copy(shipGroup.position).add(_tempVec1);
                     shipGroup.lookAt(_lookTarget);
