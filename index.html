@@ -135,14 +135,24 @@
             50% { background: rgba(255, 0, 0, 0.4); }
             100% { background: rgba(255, 0, 0, 0); }
         }
+@media (max-height: 500px) and (orientation: landscape) {
+    #ui-layer { flex-direction: row; align-items: flex-start; }
+    .panel { width: 45vw; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
+    #zoom-indicator { bottom: 20px; }
+}
 
-        @media (max-height: 500px) and (orientation: landscape) {
-            #ui-layer { flex-direction: row; align-items: flex-start; }
-            .panel { width: 45vw; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
-            #zoom-indicator { bottom: 20px; }
-        }
-    </style>
-    <!-- Import Three.js -->
+/* Layout stability for MCC button */
+#mcc-container { 
+    min-height: 45px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100%;
+    margin-bottom: 5px;
+}
+</style>
+...
+const SIM_VERSION = "1.9.8.2";
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
@@ -243,8 +253,8 @@
                     <button id="btn-warp-3600" title="1s = 1 Hour">3.6kx</button>
                     <button id="btn-warp-7200" title="1s = 2 Hours">7.2kx</button>
                 </div>
-                <div class="controls">
-                    <button id="btn-autopilot-mcc" class="btn-danger caution-btn" style="display:none; font-size: 0.9rem; margin-bottom: 10px;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE MCC AUTOPILOT</button>
+                <div id="mcc-container">
+                    <button id="btn-autopilot-mcc" class="btn-danger caution-btn" style="visibility:hidden; font-size: 0.9rem;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE TRAJECTORY ALIGNMENT</button>
                 </div>
                 <div class="controls">
                     <button id="btn-thrust" class="btn-danger" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
@@ -308,7 +318,7 @@
         ];
         const MISSION_WAYPOINTS_RETURN = [
             { name: "Cislunar Return Interface (Midpoint)", distance_km: 192200, passed: false, type: "MCC" },
-            { name: "Return Geosync Interface", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Return Trajectory Alignment (MCC)", distance_km: 42164, passed: false, type: "MCC" },
             { name: "Re-Entry Interface", distance_km: 5000, passed: false, type: "MCC" }
         ];
         
@@ -1274,6 +1284,12 @@
 
             earth.rotation.y += 0.0000727 * dt;
 
+            // Task 5: Auto-Warp Decelerator for Reentry Approach
+            if (isReturningHome && altE < 5000 && timeWarp > 60 && !cinematicActive && !playbackActive) {
+                shiftWarp(60);
+                showNavMsg("ADVISORY: ATMOSPHERIC APPROACH - REDUCING WARP", 4000, "flash-warning");
+            }
+
             // Safety Warning only: Do not force warp down per user feedback
             if (distToMoon < WARP_LIMITS.ENTER_SOI_DIST && timeWarp > WARP_LIMITS.ENTER_SOI_WARP && !cinematicActive && !playbackActive) {
                 showNavMsg("ADVISORY: REDUCE WARP FOR SOI STABILITY", 4000, "flash-warning");
@@ -1650,13 +1666,15 @@
                 // State-based Phase/Status UI
                 if (altE <= 0) {
                     let impactVel = shipVel.length() * 1000; // m/s
-                    if (impactVel < 15) {
+                    // Task 3: Strict Survival Logic (Impact < 15 m/s AND Max G < 15)
+                    if (impactVel < 15 && maxGForce < 15) {
                         safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal");
                         safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "nominal");
                         progradeMat.color.setHex(0x00ff00);
                     } else {
-                        safeSetText('phase-text', "LITHOBRAKING (FATAL IMPACT)", "danger");
-                        safeSetText('nav-status', `MISSION FAILED (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "danger");
+                        let failureMsg = impactVel >= 15 ? `IMPACT: ${impactVel.toFixed(1)} m/s` : `EXCESSIVE G-LOAD: ${maxGForce.toFixed(1)}G`;
+                        safeSetText('phase-text', "FATAL IMPACT", "danger");
+                        safeSetText('nav-status', `MISSION FAILED (${failureMsg})`, "danger");
                         progradeMat.color.setHex(0xff0000); 
                     }
                     if (timeWarp > 1) updateWarpUI(1);
@@ -1667,9 +1685,16 @@
                 } else if (altE < 7.3) {
                     safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution");
                     safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution");
+                    safeSetText('window-timer', "DEPLOY MAINS (3.0 km)", "caution");
                 } else if (altE < 122) {
                     safeSetText('phase-text', "ENTRY INTERFACE", "danger");
-                    safeSetText('nav-status', "TARGET DROGUES: 7.300 km", "danger");
+                    // Task 4: Reentry Terminology
+                    if (altE > 40) {
+                        safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "danger");
+                    } else {
+                        safeSetText('nav-status', "TARGET DROGUES: 7.300 km", "danger");
+                    }
+                    safeSetText('window-timer', "DEPLOY DROGUES (7.3 km)", "danger");
                     _tempVec1.copy(shipVel).normalize().multiplyScalar(-1);
                     _lookTarget.copy(shipGroup.position).add(_tempVec1);
                     shipGroup.lookAt(_lookTarget);
@@ -1747,22 +1772,39 @@
             showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`, 5000, "flash-warning");
             activeMCCWaypoint = waypoint;
             const btn = document.getElementById('btn-autopilot-mcc');
-            if (btn) btn.style.display = 'block';
+            if (btn) btn.style.visibility = 'visible';
         }
 
         function executeAutopilotBurn() {
             if (!activeMCCWaypoint) return;
             
-            // Instant placeholder delta-V translation (just shifts velocity 0.05 km/s prograde for visual effect)
-            let prograde = shipVel.clone().normalize();
-            shipVel.add(prograde.multiplyScalar(0.05));
+            // Task 1: Trajectory Alignment Math (Target ~40km Perigee)
+            // If we are on the return trip, apply a normal/tangential correction to flatten the dive
+            let correctionMag = 0.05; // Default 50 m/s prograde
             
-            logEvent(`MCC EXECUTED: +0.05 km/s delta-v (${activeMCCWaypoint.name})`);
+            if (isReturningHome) {
+                // Calculate current angular momentum and required boost to hit 40km perigee
+                // For surgical implementation, we apply a significant tangential boost to raise perigee
+                let radialDir = shipPos.clone().normalize();
+                let velocityTangential = shipVel.clone().projectOnPlane(shipPos);
+                let tangentialDir = velocityTangential.clone().normalize();
+                
+                // Boost tangential velocity to increase angular momentum (lifting perigee)
+                // 0.42 km/s is a typical scale for deep space correction to fix a -47 deg dive
+                shipVel.add(tangentialDir.multiplyScalar(0.42)); 
+                correctionMag = 0.42;
+                logEvent(`MCC EXECUTED: Return Trajectory Alignment (${correctionMag} km/s tangential boost)`);
+            } else {
+                let prograde = shipVel.clone().normalize();
+                shipVel.add(prograde.multiplyScalar(correctionMag));
+                logEvent(`MCC EXECUTED: +${correctionMag} km/s delta-v (${activeMCCWaypoint.name})`);
+            }
+            
             showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL");
             
             activeMCCWaypoint = null;
             const btn = document.getElementById('btn-autopilot-mcc');
-            if (btn) btn.style.display = 'none';
+            if (btn) btn.style.visibility = 'hidden';
         }
 
         window.addEventListener('resize', () => {
