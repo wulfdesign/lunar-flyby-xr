@@ -2,6 +2,30 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-09 15:55] - HOTFIX: Black Screen & RenderScale Calibration
+### 📝 Summary
+Resolved the "black screen" issue reported after the V1.9.8 integration and optimized the `renderScale` to better support re-entry visualization.
+
+### 🛠️ Work Done
+- **RenderScale Optimization**: Increased `renderScale` from 0.02 to **0.1** (1 unit = 10km). This ensures that at the 122km re-entry interface, the ship is 12.2 units from the Earth's center, allowing the `progradeMesh` (at Z: -3) to stay safely and visibly above the Earth's crust (which is 2.2 units away from the camera).
+- **Cockpit Visibility Fix**: Discovered that the increased `renderScale` pushed the cockpit box geometry (which uses `BackSide` rendering) outside of the camera's near-plane (`0.01`). This caused the camera to see the solid interior walls of the cockpit, creating a "black box" effect. Fixed by scaling the `cockpit` mesh down to a fixed **0.005 units**, forcing it back inside the near-plane to restore the intended "invisible frame" behavior.
+- **Verification**: HUD and Universe visibility restored. 3D Crosshairs correctly positioned for re-entry.
+
+---
+
+## [2026-04-09 15:30] - V1.9.8 Sprint: Atmospheric Drag, Mobile UX & Polish Complete
+### 📝 Summary
+Completed the targeted code replacements for `index.html` to implement the 4 queued tasks, including full aerodynamic reentry physics, mobile portrait enforcement, and orbital traffic checkpoints.
+
+### 🛠️ Work Done
+- **Mobile UX Overhaul**: Enforced Portrait mode via CSS, increased touch target sizes, and physically spaced out dangerous 1.8kx+ warp buttons to prevent accidental "fat-finger" crashes.
+- **UX Polish**: Integrated "Orbital Traffic Checkpoints" for ISS (400km), Starlink (550km), and GPS (20,200km) altitude markers with HUD alerts. Enhanced `nav-msg` with a prominent `flash-warning` red-pulse animation for critical system alerts.
+- **Atmospheric Drag & Splashdown**: Injected zero-allocation aerodynamic drag math into the physics loop using exponential barometric density. Implemented a multi-stage parachute state machine (Drogues at 7.3km, Mains at 3km) and mission success/failure logic based on a 15m/s splashdown velocity threshold.
+- **3D Geometry Fix**: Repositioned the `progradeMesh` from Z: -15 to Z: -3 and scaled it down by 80% to prevent the vector ring from clipping into the Earth's crust during low-altitude re-entry.
+- **Inbound MCC Logic**: Added automated Midcourse Correction (MCC) keyhole threading logic to ensure the spacecraft accurately targets the 122km Entry Interface upon return.
+
+---
+
 ## [2026-04-09 14:50] - V1.9.8 Sprint: Atmospheric Drag & Auto MCC
 ### 📝 Summary
 Kicked off the sprint to implement full aerodynamic reentry physics and the automated Midcourse Correction (MCC) keyhole threading. 

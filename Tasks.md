@@ -38,12 +38,8 @@
 - [ ] 🔥🔥 **Simulation: Splashdown Geolocation Tracking**: Calculate geographic latitude/longitude impact coordinates by syncing the final Cartesian position vector with a rotating Earth texture base based on Mission Elapsed Time.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
-- [ ] 🧪 **UX: Configurable Warp Limits**: Extracted `WARP_LIMITS` for user-adjustable flyby slowdown testing.
-- [ ] 🧪 **UI: Revert Sim Start Time**: Reset initial mission window using `MISSION_LEAD_ANGLE`.
-- [ ] 🧪 **Physics: Object Pooling Refactor**: Zero-allocation math using global vectors to fix high-warp lag.
-- [ ] 🧪 **UX: Gearbox Responsiveness**: Reduced shift delay to 0.5s and added "Current -> Target" HUD feedback (🏆).
-- [ ] 🧪 **Physics: Refine Lead Angle (V3)**: Adjusted targetPhaseAngle to 0.74 rad to fix Moon impacts (🏆).
-- [ ] 🧪 **Versioning: Alignment**: Reverted/aligned SIM_VERSION to v1.9.6 for baseline consistency.
+- [ ] 🧪 **UX/3D: Prograde Crosshair Clipping**: Optimized `renderScale` to 0.1 and pulled `progradeMesh` to Z: -3, ensuring it stays 9.2 units above the Earth's surface even at 122km re-entry interface.
+- [ ] 🧪 **UI/3D: Fix Black Screen Bug**: Scaled down the ship's interior `cockpit` mesh to 0.005 units (inside the camera near-plane) to restore the "invisible frame" behavior and fix the blank screen issue reported during V1.9.8 integration.
 
 ## 🔥🔥🔥 High Priority (Ready to Forge)
 - [ ] 🔥🔥🔥 **Controls: Manual Thrust Vectoring**: Allow user to adjust burn direction (currently locked to prograde) for mid-course corrections.

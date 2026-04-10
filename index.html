@@ -104,14 +104,36 @@
                 padding: 10px; overflow-y: auto; pointer-events: none; 
                 transform: scale(0.85); transform-origin: top left;
                 width: 117.6%; height: 117.6%;
+                /* Enforce Portrait Layout */
+                flex-direction: column !important;
             }
             .panel { padding: 8px; width: 100%; box-sizing: border-box; }
             h1 { font-size: 0.85rem; margin-bottom: 5px; }
             p { font-size: 0.7rem; margin: 2px 0; }
-            .controls { gap: 4px; margin-top: 8px; }
-            button { padding: 5px 8px; font-size: 0.65rem; min-width: 45px; }
+            .controls { gap: 8px; margin-top: 12px; } /* Increased gap for touch */
+            button { padding: 10px 8px; font-size: 0.65rem; min-width: 55px; } /* Larger touch targets */
+            
+            /* Physically space out dangerous high-warp buttons on mobile */
+            #btn-warp-1800, #btn-warp-3600, #btn-warp-7200 {
+                margin-top: 10px;
+                border-width: 2px;
+            }
+
             #zoom-indicator { bottom: 60px; font-size: 0.9rem; }
             ul.checklist li { font-size: 0.7rem; margin-bottom: 3px; }
+        }
+
+        /* Nav-msg warning animation */
+        .flash-warning {
+            animation: flash-red-bg 0.5s infinite;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        @keyframes flash-red-bg {
+            0% { background: rgba(255, 0, 0, 0); }
+            50% { background: rgba(255, 0, 0, 0.4); }
+            100% { background: rgba(255, 0, 0, 0); }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
@@ -232,11 +254,11 @@
 
     <script>
         /**
-         * Artemis: Lunar Flyby VR - Educational Orbital Dynamics Engine
+         * Artemis: Lunar Flyby XR - Educational Orbital Dynamics Engine
          * Features: Velocity Verlet Integration, Real-world units, Orbital Energy Targeting, 
          * Latching Autopilot, Target Scanning, Burn Diagnostics, G-Force, Milestone Tracking.
          */
-        const SIM_VERSION = "1.9.6";
+        const SIM_VERSION = "2.0.0";
 
         // --- USER CONFIGURED FLYBY THRESHOLDS ---
         // Edit these limits to control when the high-warp yellow warnings appear
@@ -256,7 +278,7 @@
         const radEarth = 6371;       // km
         const radMoon = 1737;        // km
         const distMoon = 384400;     // km (Average distance)
-        const renderScale = 0.001;   // Scale down for WebGL rendering
+        const renderScale = 0.1;    // 1 unit = 10km
 
         // --- SHIP STATE & TELEMETRY ---
         let shipPos, shipVel, fuel, isBurning, timeWarp, autoPilotEngaged, autoFastForward, metSeconds;
@@ -270,6 +292,12 @@
         let flightLog = []; // Stores {met, event, alt, vel, gforce}
         let lastLogTime = 0;
         let globalMaxAlt = 0;
+        
+        // --- RE-ENTRY & DRAG CONSTANTS ---
+        let parachuteState = 'NONE'; // NONE, ENTRY, DROGUES, MAINS, SPLASHDOWN
+        const DRAG_AREA = 0.011; // 11 m^2 (Orion Capsule base)
+        const RHO_0 = 1.225;     // kg/m^3 (Surface density)
+        const SCALE_HEIGHT = 8.5; // km
         
         // --- WAYPOINTS ---
         const MISSION_WAYPOINTS_OUTBOUND = [
@@ -305,7 +333,11 @@
             pastMidpoint: false,
             approachingSOI: false,
             inSOI: false,
-            lunarProximity: false
+            lunarProximity: false,
+            mcc1: false,
+            passedISS: false,
+            passedStarlink: false,
+            passedGPS: false
         };
 
         // --- CINEMATIC SCRIPT ENGINE ---
@@ -519,8 +551,12 @@
         
         // Base FOV is 70. Will be adjusted by scroll wheel.
         let baseFov = 70;
-        const camera = new THREE.PerspectiveCamera(baseFov, window.innerWidth / window.innerHeight, 0.01, 2000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        const camera = new THREE.PerspectiveCamera(baseFov, window.innerWidth / window.innerHeight, 0.01, 100000000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            powerPreference: "high-performance",
+            logarithmicDepthBuffer: true 
+        });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.xr.enabled = true;
         document.body.appendChild(renderer.domElement);
@@ -626,7 +662,7 @@
         const starGeo = new THREE.BufferGeometry();
         const starVerts = new Float32Array(5000 * 3);
         for(let i=0; i < 5000 * 3; i+=3) {
-            let r = 800 + Math.random() * 500;
+            let r = 50000000; // 500 Million km away
             let theta = Math.random() * 2 * Math.PI;
             let phi = Math.acos((Math.random() * 2) - 1);
             starVerts[i] = r * Math.sin(phi) * Math.cos(theta);
@@ -634,16 +670,16 @@
             starVerts[i+2] = r * Math.cos(phi);
         }
         starGeo.setAttribute('position', new THREE.BufferAttribute(starVerts, 3));
-        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 1.0, sizeAttenuation: false}));
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 1.5, sizeAttenuation: false}));
         scene.add(stars);
 
         // Lighting & The Sun
         const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
-        const sunPosition = new THREE.Vector3(-1000, 200, 0).normalize().multiplyScalar(1500); 
+        const sunPosition = new THREE.Vector3(-1000, 200, 0).normalize().multiplyScalar(15000000); // 150 Million km
         sunLight.position.copy(sunPosition); 
         scene.add(sunLight);
         
-        const sunMeshGeo = new THREE.SphereGeometry(30, 32, 32);
+        const sunMeshGeo = new THREE.SphereGeometry(70000, 32, 32); // Scaled up for distance
         const sunMeshMat = new THREE.MeshBasicMaterial({color: 0xffffee}); 
         const sunMesh = new THREE.Mesh(sunMeshGeo, sunMeshMat);
         sunMesh.position.copy(sunPosition);
@@ -654,21 +690,21 @@
 
         // Ship Cockpit & Prograde Marker
         const shipGroup = new THREE.Group();
-        const frameGeo = new THREE.BoxGeometry(4 * renderScale, 3 * renderScale, 4 * renderScale);
+        const frameGeo = new THREE.BoxGeometry(0.005, 0.005, 0.005);
         const frameMat = new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide});
         const cockpit = new THREE.Mesh(frameGeo, frameMat);
         shipGroup.add(cockpit);
         
         // 3D Prograde Marker (Forward Velocity Vector)
-        const progradeGeo = new THREE.RingGeometry(0.2, 0.25, 16);
+        const progradeGeo = new THREE.RingGeometry(0.04, 0.05, 16);
         const progradeMat = new THREE.MeshBasicMaterial({color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.8});
         const progradeMesh = new THREE.Mesh(progradeGeo, progradeMat);
         progradeMesh.name = "PROGRADE VECTOR"; // Name added for Raycaster
-        progradeMesh.position.set(0, 0, -15); 
+        progradeMesh.position.set(0, 0, -3); 
         const pgLineMat = new THREE.LineBasicMaterial({color: 0x00ff00});
-        const pgPts1 = [new THREE.Vector3(-0.4, 0, 0), new THREE.Vector3(-0.2, 0, 0)];
-        const pgPts2 = [new THREE.Vector3(0.4, 0, 0), new THREE.Vector3(0.2, 0, 0)];
-        const pgPts3 = [new THREE.Vector3(0, 0.4, 0), new THREE.Vector3(0, 0.2, 0)];
+        const pgPts1 = [new THREE.Vector3(-0.08, 0, 0), new THREE.Vector3(-0.04, 0, 0)];
+        const pgPts2 = [new THREE.Vector3(0.08, 0, 0), new THREE.Vector3(0.04, 0, 0)];
+        const pgPts3 = [new THREE.Vector3(0, 0.08, 0), new THREE.Vector3(0, 0.04, 0)];
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts1), pgLineMat));
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts2), pgLineMat));
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts3), pgLineMat));
@@ -750,7 +786,11 @@
                 pastMidpoint: false,
                 approachingSOI: false,
                 inSOI: false,
-                lunarProximity: false
+                lunarProximity: false,
+                mcc1: false,
+                passedISS: false,
+                passedStarlink: false,
+                passedGPS: false
             };
 
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix();
@@ -870,11 +910,13 @@
         });
         document.getElementById('btn-warp-1').addEventListener('click', () => { shiftWarp(1); autoFastForward = false; });
         document.getElementById('btn-warp-10').addEventListener('click', () => { shiftWarp(10); autoFastForward = false; });
+        document.getElementById('btn-warp-30').addEventListener('click', () => { shiftWarp(30); autoFastForward = false; });
         document.getElementById('btn-warp-60').addEventListener('click', () => { shiftWarp(60); autoFastForward = false; });
         document.getElementById('btn-warp-300').addEventListener('click', () => { shiftWarp(300); autoFastForward = false; });
         document.getElementById('btn-warp-600').addEventListener('click', () => { shiftWarp(600); autoFastForward = false; });
         document.getElementById('btn-warp-1800').addEventListener('click', () => { shiftWarp(1800); autoFastForward = false; });
         document.getElementById('btn-warp-3600').addEventListener('click', () => { shiftWarp(3600); autoFastForward = false; });
+        document.getElementById('btn-warp-7200').addEventListener('click', () => { shiftWarp(7200); autoFastForward = false; });
         
         document.getElementById('btn-toggle-auto').addEventListener('click', (e) => {
             cinematicActive = false; // Manual override
@@ -940,11 +982,17 @@
             }
         }
 
-        function showNavMsg(text, duration = 3000) {
+        function showNavMsg(text, duration = 3000, className = "") {
             const msgEl = document.getElementById('nav-msg');
             if (msgEl) {
                 msgEl.textContent = text;
-                setTimeout(() => { if (msgEl.textContent === text) msgEl.textContent = ""; }, duration);
+                msgEl.className = className;
+                setTimeout(() => { 
+                    if (msgEl.textContent === text) {
+                        msgEl.textContent = ""; 
+                        msgEl.className = "";
+                    }
+                }, duration);
             }
         }
 
@@ -968,7 +1016,7 @@
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
                 if (isBurning) {
-                    showNavMsg("COMMAND DENIED: ENGINES ACTIVE");
+                    showNavMsg("COMMAND DENIED: ENGINES ACTIVE", 3000, "flash-warning");
                     return;
                 }
                 
@@ -978,7 +1026,7 @@
                         resetWarpButtonTexts();
                         pendingDangerWarp = w;
                         btn.textContent = "CONFIRM";
-                        showNavMsg(`ADVISORY: DANGEROUS WARP LEVEL. CLICK AGAIN TO CONFIRM.`, 4000);
+                        showNavMsg(`ADVISORY: DANGEROUS WARP LEVEL. CLICK AGAIN TO CONFIRM.`, 4000, "flash-warning");
                         return; // Halt shift
                     }
                 }
@@ -1072,7 +1120,7 @@
             let targetEnergy = -muEarth / (2 * a_transfer);
             let isTliCoast = currentEnergy >= targetEnergy; 
             
-            // Calculate remaining $\Delta V$ for UI
+            // Calculate remaining ΔV for UI
             let targetVelAtCurrentAlt = Math.sqrt(2 * (targetEnergy + (muEarth / r) + (muMoon / Math.max(1, distToMoon))));
             let dvRequired = Math.max(0, targetVelAtCurrentAlt - currentVelMag);
             
@@ -1115,7 +1163,7 @@
                 logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) });
                 if (timeWarp > 1) {
                     updateWarpUI(1);
-                    showNavMsg("WARP RESET: ENGINES ACTIVE");
+                    showNavMsg("WARP RESET: ENGINES ACTIVE", 3000, "flash-warning");
                 }
             }
             if(!isBurning && wasBurning) {
@@ -1127,10 +1175,42 @@
 
             // --- Standard Velocity Verlet Integration (Zero-Allocation) ---
             let currentMass = shipEmptyMass + fuel;
+            let altE = shipPos.length() - radEarth;
             let accelData = getAcceleration(shipPos, _accel);
+            let magEarth = accelData.magEarth;
+            let magMoon = accelData.magMoon;
             
+            // 1. Inbound Midcourse Correction (MCC) Logic
+            let isReturning = shipVel.dot(shipPos) < 0; // Negative dot product means falling toward Earth
+            if (autoPilotEngaged && isReturning) {
+                if (altE < 192200 && !milestoneLatches.mcc1) {
+                    milestoneLatches.mcc1 = true;
+                    logEvent('AUTO: Inbound Midcourse Correction (MCC) Executed', { magEarth, magMoon });
+                    // Instantaneous impulse to ensure we thread the 122km keyhole
+                    let currentTangent = shipVel.clone().projectOnPlane(shipPos).normalize();
+                    let correctionMagnitude = 0.005; // 5 m/s nudge
+                    shipVel.add(currentTangent.multiplyScalar(correctionMagnitude));
+                }
+            }
+
+            // 2. Atmospheric Drag Equation
+            let dragAccMag = 0;
+            let isReentry = false;
+            if (altE < 122 && altE > 0) { // Entry Interface
+                isReentry = true;
+                let dragCd = 1.5; // Capsule blunt body
+                if (altE < 7.3) dragCd = 50.0;  // Drogue Chutes
+                if (altE < 3.0) dragCd = 150.0; // Main Chutes
+
+                let density = 1.225 * Math.exp(-altE / 8.5); // Barometric density (kg/m^3)
+                let v_ms = currentVelMag * 1000; // km/s to m/s
+                let dragForce = 0.5 * density * v_ms * v_ms * dragCd * 10.5; // Newtons (Area = 10.5)
+                dragAccMag = (dragForce / 8000) / 1000; // Force / Mass (8000kg capsule) in km/s^2
+            }
+
             currentGForce = 0; 
             _thrustAcc.set(0,0,0);
+            
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass); 
                 _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
@@ -1138,24 +1218,40 @@
                 if(fuel < 0) fuel = 0;
                 currentGForce = thrustAccMag / 0.00980665; 
             }
+            
+            // Add Reentry G-Forces to the dial
+            if (isReentry) {
+                currentGForce += dragAccMag / 0.00980665;
+            }
 
             // 1. pos(t + dt) = pos(t) + v(t)dt + 0.5 * a(t)dt^2
-            _totalAccel.copy(_accel).add(_thrustAcc);
+            _totalAccel.addVectors(_accel, _thrustAcc);
+            if (isReentry && currentVelMag > 0) {
+                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); // Drag opposes velocity
+                _totalAccel.add(_tempVec1);
+            }
+
             _tempVec1.copy(shipVel).multiplyScalar(dt);
             _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt);
             shipPos.add(_tempVec1).add(_tempVec2);
             
             // 2. a(t + dt)
-            getAcceleration(shipPos, _nextAccel);
+            let nextAccelData = getAcceleration(shipPos, _nextAccel);
             _nextThrustAcc.set(0,0,0);
+            
             if (isBurning && fuel > 0) {
                 let thrustAccMag = (thrustForce / currentMass);
                 _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
             }
-            _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
+            _nextTotalAccel.addVectors(_nextAccel, _nextThrustAcc);
+            
+            if (isReentry && shipVel.length() > 0) {
+                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag);
+                _nextTotalAccel.add(_tempVec1);
+            }
 
             // 3. v(t + dt) = v(t) + 0.5 * (a(t) + a(t + dt))dt
-            _tempVec1.copy(_totalAccel).add(_nextTotalAccel).multiplyScalar(0.5 * dt);
+            _tempVec1.addVectors(_totalAccel, _nextTotalAccel).multiplyScalar(0.5 * dt);
             shipVel.add(_tempVec1);
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
@@ -1171,7 +1267,7 @@
 
             // Safety Warning only: Do not force warp down per user feedback
             if (distToMoon < WARP_LIMITS.ENTER_SOI_DIST && timeWarp > WARP_LIMITS.ENTER_SOI_WARP && !cinematicActive && !playbackActive) {
-                showNavMsg("ADVISORY: REDUCE WARP FOR SOI STABILITY");
+                showNavMsg("ADVISORY: REDUCE WARP FOR SOI STABILITY", 4000, "flash-warning");
             }
 
             return { 
@@ -1340,7 +1436,7 @@
                         milestoneLatches.lunarProximity = true;
                         triggerAlertFlash("region-text");
                         if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.PROXIMITY_WARP) {
-                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.PROXIMITY_WARP + "x");
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.PROXIMITY_WARP + "x", 3000, "flash-warning");
                             const b = document.getElementById('btn-warp-' + WARP_LIMITS.PROXIMITY_WARP); if(b) b.classList.add('caution-btn');
                         }
                     }
@@ -1353,7 +1449,7 @@
                         milestoneLatches.inSOI = true;
                         triggerAlertFlash("region-text");
                         if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.ENTER_SOI_WARP) {
-                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.ENTER_SOI_WARP + "x");
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.ENTER_SOI_WARP + "x", 3000, "flash-warning");
                             const b = document.getElementById('btn-warp-' + WARP_LIMITS.ENTER_SOI_WARP); if(b) b.classList.add('caution-btn');
                         }
                     }
@@ -1364,7 +1460,7 @@
                         logEvent("Milestone: Approaching Lunar SOI", telemetry);
                         milestoneLatches.approachingSOI = true;
                         if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.APPROACH_SOI_WARP) {
-                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.APPROACH_SOI_WARP + "x");
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.APPROACH_SOI_WARP + "x", 3000, "flash-warning");
                             const b = document.getElementById('btn-warp-' + WARP_LIMITS.APPROACH_SOI_WARP); if(b) b.classList.add('caution-btn');
                         }
                     }
@@ -1510,15 +1606,50 @@
                     safeSetText('engine-status', "STANDBY", "nominal");
                 }
 
+                // Orbital Traffic Checkpoints
+                if (altE > 380 && altE < 420 && !milestoneLatches.passedISS) {
+                    milestoneLatches.passedISS = true;
+                    showNavMsg("CHECKPOINT: ISS ORBITAL PLANE (400km)", 5000, "flash-warning");
+                    logEvent("CHECKPOINT: Passed ISS Orbital Plane");
+                }
+                if (altE > 530 && altE < 570 && !milestoneLatches.passedStarlink) {
+                    milestoneLatches.passedStarlink = true;
+                    showNavMsg("CHECKPOINT: STARLINK CONSTELLATION (550km)", 5000, "flash-warning");
+                    logEvent("CHECKPOINT: Passed Starlink Constellation");
+                }
+                if (altE > 19000 && altE < 21000 && !milestoneLatches.passedGPS) {
+                    milestoneLatches.passedGPS = true;
+                    showNavMsg("CHECKPOINT: GPS SATELLITE BELT (20,200km)", 5000, "flash-warning");
+                    logEvent("CHECKPOINT: Passed GPS Satellite Belt");
+                }
+
                 // State-based Phase/Status UI
-                if (altE < 0) {
-                    safeSetText('phase-text', "HULL BREACH: CRASHED", "danger");
-                    safeSetText('nav-status', "MISSION FAILURE", "danger");
-                    progradeMat.color.setHex(0xff0000); 
+                if (altE <= 0) {
+                    let impactVel = shipVel.length() * 1000; // m/s
+                    if (impactVel < 15) {
+                        safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal");
+                        safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s)`, "nominal");
+                        progradeMat.color.setHex(0x00ff00);
+                    } else {
+                        safeSetText('phase-text', "LITHOBRAKING (FATAL IMPACT)", "danger");
+                        safeSetText('nav-status', `MISSION FAILED (Impact: ${impactVel.toFixed(1)} m/s)`, "danger");
+                        progradeMat.color.setHex(0xff0000); 
+                    }
                     if (timeWarp > 1) updateWarpUI(1);
-                } else if (altE < 100) {
-                    safeSetText('phase-text', "ATMOSPHERIC DRAG", "danger");
-                    safeSetText('nav-status', "WARNING: ORBIT DECAYING", "danger");
+                } else if (altE < 3.0) {
+                    safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal");
+                    safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal");
+                    if (timeWarp > 1) updateWarpUI(1); // Force 1x for splashdown viewing
+                } else if (altE < 7.3) {
+                    safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution");
+                    safeSetText('nav-status', "AERODYNAMIC DECELERATION", "caution");
+                } else if (altE < 122) {
+                    safeSetText('phase-text', "ENTRY INTERFACE", "danger");
+                    safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "danger");
+                    // Auto-rotate heatshield forward (retrograde) for visuals
+                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-1);
+                    _lookTarget.copy(shipGroup.position).add(_tempVec1);
+                    shipGroup.lookAt(_lookTarget);
                 } else if (distM < 0) {
                     safeSetText('phase-text', "LITHOBRAKING (IMPACT)", "danger");
                     safeSetText('nav-status', "MISSION FAILURE", "danger");
@@ -1590,7 +1721,7 @@
 
         // --- AVIONICS: WAYPOINT & MCC EXECUTION ---
         function evaluateMCC(waypoint) {
-            showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`);
+            showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`, 5000, "flash-warning");
             activeMCCWaypoint = waypoint;
             const btn = document.getElementById('btn-autopilot-mcc');
             if (btn) btn.style.display = 'block';
