@@ -14,12 +14,6 @@
             padding: 20px; box-sizing: border-box; z-index: 10;
         }
 
-        #plasma-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,100,0,0) 30%, rgba(255,50,0,0.85) 100%);
-            opacity: 0; pointer-events: none; z-index: 5; transition: opacity 0.2s linear;
-        }
-
         .panel {
             background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.4);
             padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);
@@ -41,6 +35,7 @@
         .flash-yellow { color: #ffff44; font-weight: bold; animation: flash 1.5s infinite; text-shadow: 0 0 8px rgba(255, 255, 68, 0.8); }
         .flash-green { color: #44ff44; font-weight: bold; animation: flash 1.5s infinite; text-shadow: 0 0 8px rgba(68, 255, 68, 0.8); }
         
+        /* Solid state colors for projection UI to prevent annoying blinking over 3 days */
         .solid-green { color: #44ff44; font-weight: bold; text-shadow: 0 0 5px rgba(68, 255, 68, 0.5); }
         .solid-yellow { color: #ffff44; font-weight: bold; text-shadow: 0 0 5px rgba(255, 255, 68, 0.5); }
         .solid-red { color: #ff4444; font-weight: bold; text-shadow: 0 0 5px rgba(255, 68, 68, 0.5); }
@@ -68,10 +63,12 @@
         button:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555 !important; color: #555 !important; background: rgba(0,0,0,0.5) !important; }
         button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; border-color: #00ffff !important; box-shadow: 0 0 10px #00ffff !important; animation: none !important;}
         
+        /* Unified Danger Button CSS */
         button.danger-btn { border-color: #ff4444 !important; color: #ff4444 !important; background: rgba(255, 68, 68, 0.1) !important; }
         button.danger-btn:hover:not(:disabled) { background: #ff4444 !important; color: #000 !important; box-shadow: 0 0 10px #ff4444 !important;}
         button.danger-btn.active { background: #aa0000 !important; color: #fff !important; border-color: #ff4444 !important; box-shadow: inset 0 0 10px #000 !important; animation: none !important; }
 
+        /* Strict Yellow Flash Override */
         button.caution-btn { animation: flash-btn-yellow 1s infinite !important; border-color: #ffff44 !important; color: #ffff44 !important; }
         
         button.safe-btn { border-color: #44ff44 !important; color: #44ff44 !important; background: rgba(68, 255, 68, 0.1) !important; }
@@ -120,7 +117,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <div id="plasma-overlay"></div>
     <div id="ui-layer">
         <div style="display: flex; justify-content: space-between; width: 100%;">
             <div class="panel" title="Real-time flight data. All units are accurate to real-world physics.">
@@ -130,8 +126,8 @@
                 <p><span class="tooltip" title="Mission Elapsed Time: Total duration since the simulation began.">MET:</span> <span id="met-time">00:00:00:00</span></p>
                 <hr style="border-color: #00ffff; opacity: 0.3;">
                 <p><span class="tooltip" title="Altitude above Earth's sea level.">Alt (Earth):</span> <span id="alt-earth">400 km</span></p>
+                <p><span class="tooltip" title="Maximum distance achieved from Earth during this flight">Max Alt:</span> <span id="max-alt" class="nominal">400 km</span></p>
                 <p><span class="tooltip" title="Distance from the Moon's surface.">Dist (Moon):</span> <span id="dist-moon">380,000 km</span></p>
-                <p><span class="tooltip" title="The closest distance achieved to the Moon during this flight.">Min Lunar Approach:</span> <span id="min-moon-dist" class="nominal">N/A</span></p>
                 <p><span class="tooltip" title="Angle between the center of your view and the Moon.">Moon Heading:</span> <span id="moon-heading" class="caution">0&deg;</span></p>
                 <p><span class="tooltip" title="Absolute velocity relative to Earth.">Velocity:</span> <span id="velocity">7.67 km/s</span></p>
                 <div id="velocity-vector-info" style="font-size: 0.7rem; color: #888; display: flex; justify-content: space-between;">
@@ -207,21 +203,17 @@
                 <div id="mcc-container">
                     <button id="btn-autopilot-mcc" style="visibility:hidden; font-size: 0.9rem;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE TRAJECTORY ALIGNMENT</button>
                 </div>
-                
-                <div id="standard-controls" class="controls">
+                <div class="controls">
                     <button id="btn-thrust" class="danger-btn" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
-                </div>
-                <div id="reentry-controls" class="controls" style="display:none;">
-                    <button id="btn-lift-up" class="safe-btn" onmousedown="liftUp=true" onmouseup="liftUp=false" ontouchstart="liftUp=true" ontouchend="liftUp=false" title="Roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (REDUCE Gs)</button>
-                    <button id="btn-lift-down" class="danger-btn" onmousedown="liftDown=true" onmouseup="liftDown=false" ontouchstart="liftDown=true" ontouchend="liftDown=false" title="Roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (STEEPEN)</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const SIM_VERSION = "1.9.8.10";
+        const SIM_VERSION = "1.9.8.9";
 
+        // --- USER SETTINGS ---
         const ALLOW_7200X_IN_SYSTEM = false; 
 
         const WARP_LIMITS = {
@@ -249,12 +241,8 @@
         let flightLog = []; 
         let lastLogTime = 0;
         let globalMaxAlt = 0;
-        let globalMinMoonDist = Infinity;
         
-        // Active Reentry Controls
-        let liftUp = false;
-        let liftDown = false;
-        
+        // --- WAYPOINTS ---
         const MISSION_WAYPOINTS_OUTBOUND = [
             { name: "Geosynchronous Orbit Check", distance_km: 42164, passed: false, type: "MCC" },
             { name: "Trans-Lunar Midpoint", distance_km: 192200, passed: false, type: "MCC" },
@@ -262,7 +250,8 @@
         ];
         const MISSION_WAYPOINTS_RETURN = [
             { name: "Cislunar Return Interface", distance_km: 192200, passed: false, type: "MCC" },
-            { name: "Return Trajectory Alignment", distance_km: 42164, passed: false, type: "MCC" }
+            { name: "Return Trajectory Alignment", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Re-Entry Interface", distance_km: 5000, passed: false, type: "MCC" }
         ];
         
         let activeMCCWaypoint = null;
@@ -422,13 +411,12 @@
             const startShipAngle = targetPhaseAngle - offsetAngle; 
             shipPos = new THREE.Vector3(startRadius * Math.cos(startShipAngle), 0, startRadius * Math.sin(startShipAngle));
             shipVel = new THREE.Vector3(vOrbit * -Math.sin(startShipAngle), 0, vOrbit * Math.cos(startShipAngle));
-            fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0; actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0; globalMinMoonDist = Infinity;
-            liftUp = false; liftDown = false;
-            
+            fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0; actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0;
             for (let key in milestoneLatches) milestoneLatches[key] = false;
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix(); document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
             updateWarpUI(1); flightLog = []; logEvent("Mission Started - System initialized in LEO.", { magEarth: muEarth/Math.pow(radEarth+400, 2), magMoon: 0 });
             
+            // Ensure Auto TMI button starts flashing Yellow explicitly
             const autoBtn = document.getElementById('btn-toggle-auto'); 
             autoBtn.className = "caution-btn"; 
             autoBtn.textContent = "ENABLE AUTO TMI"; 
@@ -436,10 +424,6 @@
             document.getElementById('autopilot-status').className = "danger";
             
             document.getElementById('itin-tli').className = "active"; document.getElementById('itin-coast').className = ""; document.getElementById('itin-flyby').className = "";
-            document.getElementById('standard-controls').style.display = 'flex';
-            document.getElementById('reentry-controls').style.display = 'none';
-            document.getElementById('plasma-overlay').style.opacity = 0;
-            
             isReturningHome = false;
         }
         resetMission();
@@ -448,6 +432,7 @@
 
         function logEvent(eventMsg, telemetry) {
             let r = shipPos.length() - radEarth; let v = shipVel.length();
+            
             let projectedGammaLog = "N/A";
             if (isReturningHome && r > 122) {
                 let h_mag = new THREE.Vector3().crossVectors(shipPos, shipVel).length();
@@ -464,7 +449,7 @@
                 version: SIM_VERSION, timestamp_real: new Date().toISOString(), met: metSeconds, met_formatted: formatTime(metSeconds),
                 event: eventMsg, altitude_km: r.toFixed(2), velocity_kms: v.toFixed(3),
                 vx: shipVel.x.toFixed(5), vy: shipVel.y.toFixed(5), vz: shipVel.z.toFixed(5),
-                gforce: currentGForce.toFixed(2), max_gforce: maxGForce.toFixed(2), min_moon_dist_km: globalMinMoonDist === Infinity ? "N/A" : globalMinMoonDist.toFixed(2),
+                gforce: currentGForce.toFixed(2), max_gforce: maxGForce.toFixed(2),
                 magEarth: (telemetry && telemetry.magEarth) ? telemetry.magEarth.toFixed(8) : "0", magMoon: (telemetry && telemetry.magMoon) ? telemetry.magMoon.toFixed(8) : "0",
                 warp: timeWarp, target_burn_s: initialTargetBurnTime.toFixed(1), actual_burn_s: actualBurnTime.toFixed(1),
                 projected_entry_angle: projectedGammaLog
@@ -472,6 +457,7 @@
         }
 
         document.getElementById('btn-save-log').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(flightLog, null, 2)], {type: "application/json"})); a.download = `Artemis_FlightLog_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.json`; a.click(); });
+        
         document.getElementById('btn-abort').addEventListener('click', () => { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; resetMission(); });
         
         document.getElementById('btn-toggle-auto').addEventListener('click', (e) => { 
@@ -483,7 +469,7 @@
                 document.getElementById('autopilot-status').textContent = "ENGAGED"; 
                 document.getElementById('autopilot-status').className = "nominal"; 
             } else { 
-                e.target.className = 'caution-btn';
+                e.target.className = 'caution-btn'; // Return to blinking yellow if turned off
                 document.getElementById('autopilot-status').textContent = "OFF"; 
                 document.getElementById('autopilot-status').className = "danger"; 
             } 
@@ -560,42 +546,39 @@
             _tempVec1.copy(shipVel).normalize(); _tempVec2.copy(shipPos).normalize(); let dot = _tempVec1.dot(_tempVec2);
             let flightPathAngle = THREE.MathUtils.radToDeg(Math.asin(Math.max(-1, Math.min(1, dot))));
 
-            let dragAccMag = 0; let isReentry = false; let liftAccMag = 0;
+            let dragAccMag = 0; let isReentry = false;
             
+            // --- PARACHUTE REEFING PHYSICS ---
+            // Gradual deployment of parachutes eliminates the massive G-Force spikes that crush the crew
             if (altE < 122 && altE > 0) {
                 isReentry = true; 
                 let dragCd = 1.5; 
                 
-                if (altE < 7.3 && altE >= 5.0) { let factor = (7.3 - altE) / 2.3; dragCd = 1.5 + (factor * 48.5); } 
-                else if (altE < 5.0 && altE >= 3.0) { dragCd = 50.0; } 
-                else if (altE < 3.0 && altE >= 2.0) { let factor = (3.0 - altE) / 1.0; dragCd = 50.0 + (factor * 100.0); } 
-                else if (altE < 2.0) { dragCd = 150.0; }
+                if (altE < 7.3 && altE >= 5.0) {
+                    // Drogues reefing out from 1.5 to 50
+                    let factor = (7.3 - altE) / 2.3; // 0.0 at 7.3, 1.0 at 5.0
+                    dragCd = 1.5 + (factor * 48.5); 
+                } else if (altE < 5.0 && altE >= 3.0) {
+                    dragCd = 50.0;
+                } else if (altE < 3.0 && altE >= 2.0) {
+                    // Mains reefing out from 50 to 150
+                    let factor = (3.0 - altE) / 1.0; 
+                    dragCd = 50.0 + (factor * 100.0);
+                } else if (altE < 2.0) {
+                    dragCd = 150.0;
+                }
 
                 let density = 1.225 * Math.exp(-altE / 8.5); let v_ms = currentVelMag * 1000;
                 dragAccMag = ((0.5 * density * v_ms * v_ms * dragCd * 10.5) / 8000) / 1000; 
-                
-                // AERODYNAMIC LIFT CALCULATION (L/D Ratio ~ 0.25)
-                if (liftUp || liftDown) { liftAccMag = dragAccMag * 0.25; }
             }
 
             currentGForce = 0; _thrustAcc.set(0,0,0);
             if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); fuel -= (massFlowRate * dt); if(fuel < 0) fuel = 0; currentGForce = thrustAccMag / 0.00980665; }
-            
-            if (isReentry) {
-                // Vector summation for Drag and Lift G-forces
-                let totalReentryAcc = Math.sqrt((dragAccMag * dragAccMag) + (liftAccMag * liftAccMag));
-                currentGForce += totalReentryAcc / 0.00980665;
-            }
+            if (isReentry) currentGForce += dragAccMag / 0.00980665;
             if (currentGForce > maxGForce) maxGForce = currentGForce;
 
             _totalAccel.copy(_accel).add(_thrustAcc);
-            if (isReentry && currentVelMag > 0) { 
-                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _totalAccel.add(_tempVec1); 
-                if (liftUp || liftDown) {
-                    _tempVec2.copy(shipPos).normalize().multiplyScalar(liftUp ? liftAccMag : -liftAccMag);
-                    _totalAccel.add(_tempVec2);
-                }
-            }
+            if (isReentry && currentVelMag > 0) { _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _totalAccel.add(_tempVec1); }
             _tempVec1.copy(shipVel).multiplyScalar(dt); _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt); shipPos.add(_tempVec1).add(_tempVec2);
             
             if (shipPos.length() - radEarth <= 0) {
@@ -605,19 +588,13 @@
                     milestoneLatches.splashdown = true;
                     let impactV = currentVelMag * 1000;
                     let isSafe = impactV < 15 && maxGForce < 15;
-                    logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G)`, { magEarth: accelData.magEarth, magMoon: accelData.magMoon });
+                    logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G)`, telemetry);
                 }
             } else {
                 let nextAccelData = getAcceleration(shipPos, _nextAccel); _nextThrustAcc.set(0,0,0);
                 if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); }
                 _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
-                if (isReentry && shipVel.length() > 0) { 
-                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _nextTotalAccel.add(_tempVec1); 
-                    if (liftUp || liftDown) {
-                        _tempVec2.copy(shipPos).normalize().multiplyScalar(liftUp ? liftAccMag : -liftAccMag);
-                        _nextTotalAccel.add(_tempVec2);
-                    }
-                }
+                if (isReentry && shipVel.length() > 0) { _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _nextTotalAccel.add(_tempVec1); }
                 _tempVec1.addVectors(_totalAccel, _nextTotalAccel).multiplyScalar(0.5 * dt); shipVel.add(_tempVec1);
             }
 
@@ -647,8 +624,6 @@
                 let telemetry = null;
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
                 metSeconds += simSecondsToProcess;
-                
-                if (distM < globalMinMoonDist && distM > 0) globalMinMoonDist = distM;
                 
                 updateWarpStepping(dt_real, telemetry);
                 
@@ -694,7 +669,6 @@
                 else { safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km"); safeSetText('velocity', shipVel.length().toFixed(2) + " km/s"); }
                 
                 safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
-                safeSetText('min-moon-dist', globalMinMoonDist === Infinity ? "N/A" : globalMinMoonDist.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
                 safeSetText('vx', shipVel.x.toFixed(3)); safeSetText('vy', shipVel.y.toFixed(3)); safeSetText('vz', shipVel.z.toFixed(3));
                 safeSetText('grav-earth', (telemetry.magEarth * 1000).toFixed(4) + " m/s²"); safeSetText('grav-moon', (telemetry.magMoon * 1000).toFixed(4) + " m/s²");
                 safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%"); safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
@@ -720,27 +694,19 @@
                             let gamma = -Math.acos(cos_gamma) * (180 / Math.PI); 
                             projEntryText = gamma.toFixed(2) + "°";
                             if (gamma <= -5.5 && gamma >= -7.5) { projEntryColor = "nominal solid-green"; corridorStatus = "NOMINAL (GREEN)"; corridorColor = "nominal solid-green"; }
-                            else if (gamma < -4.5 && gamma > -8.5) { projEntryColor = "caution solid-yellow"; corridorStatus = "FINE-TUNE AVAILABLE"; corridorColor = "caution solid-yellow"; }
+                            else if (gamma < -4.5 && gamma > -8.5) { projEntryColor = "caution solid-yellow"; corridorStatus = "ADJUSTMENT REQ"; corridorColor = "caution solid-yellow"; }
                             else { projEntryColor = "danger solid-red"; corridorStatus = "DANGER: EXTREME G-LOAD"; corridorColor = "danger solid-red"; }
                         }
                     }
                 } else if (altE <= 122 && altE > 0) {
                     projEntryText = telemetry.flightPathAngle.toFixed(2) + "°";
                     if (telemetry.flightPathAngle <= -5.5 && telemetry.flightPathAngle >= -7.5) { projEntryColor = "nominal"; corridorStatus = "LOCKED IN CORRIDOR"; corridorColor = "nominal"; } 
-                    else if (telemetry.flightPathAngle < -4.5 && telemetry.flightPathAngle > -8.5) { projEntryColor = "caution"; corridorStatus = "UNSAFE ANGLE (USE LIFT)"; corridorColor = "caution"; } 
-                    else { projEntryColor = "danger"; corridorStatus = "LETHAL DESCENT (USE LIFT)"; corridorColor = "danger"; }
+                    else if (telemetry.flightPathAngle < -4.5 && telemetry.flightPathAngle > -8.5) { projEntryColor = "caution"; corridorStatus = "UNSAFE ANGLE"; corridorColor = "caution"; } 
+                    else { projEntryColor = "danger"; corridorStatus = "LETHAL DESCENT ANGLE"; corridorColor = "danger"; }
                 } else if (!isReturningHome && telemetry.isTliCoast) { corridorStatus = "EN ROUTE TO MOON"; corridorColor = "nominal"; }
 
                 safeSetText('entry-angle', projEntryText, projEntryColor);
                 safeSetText('corridor-status', corridorStatus, corridorColor);
-                
-                // --- PLASMA VISUALS ---
-                if (altE < 120 && altE > 30 && shipVel.length() > 3.0) {
-                    let op = Math.min(0.85, ((shipVel.length() - 3.0) / 8.0));
-                    document.getElementById('plasma-overlay').style.opacity = op;
-                } else {
-                    document.getElementById('plasma-overlay').style.opacity = 0;
-                }
 
                 if (altE < 122 && altE > 0) {
                     if (!milestoneLatches.entryInterface) { milestoneLatches.entryInterface = true; logEvent("ATMOSPHERE: Entry Interface Reached (122km)", telemetry); }
@@ -748,9 +714,6 @@
                     if (altE <= 40 && milestoneLatches.plasmaStart && !milestoneLatches.plasmaEnd) { milestoneLatches.plasmaEnd = true; logEvent("ATMOSPHERE: Plasma Blackout Ended. Comm signal restored.", telemetry); }
                     if (altE <= 7.3 && !milestoneLatches.drogues) { milestoneLatches.drogues = true; logEvent("PARACHUTES: Drogue Chutes Deployed", telemetry); }
                     if (altE <= 3.0 && !milestoneLatches.mains) { milestoneLatches.mains = true; logEvent("PARACHUTES: Main Chutes Deployed", telemetry); }
-                    
-                    document.getElementById('standard-controls').style.display = 'none';
-                    document.getElementById('reentry-controls').style.display = 'flex';
                 }
 
                 let region = "Low Earth Orbit";
@@ -793,10 +756,7 @@
                 if(telemetry.isTliCoast) { if (itinTli) { itinTli.className = "complete"; if (!itinTli.dataset.done) { itinTli.innerHTML = `[X] TLI Burn Complete`; itinTli.dataset.done = "true"; } } if (itinCoast) itinCoast.className = "active"; if (tliEtaEl) { let etaSeconds = distM / Math.max(0.1, shipVel.length()); tliEtaEl.textContent = formatTime(etaSeconds); } progradeMat.color.setHex(0x00ff00); } 
                 else { if (itinTli) { itinTli.className = "active"; if (itinTli.dataset.done) { itinTli.innerHTML = `[ ] TLI Burn (Target: <span id="tli-est-time">${Math.ceil(telemetry.estimatedBurnTime)}</span>s)`; delete itinTli.dataset.done; } } if (tliEstEl) tliEstEl.textContent = Math.ceil(telemetry.estimatedBurnTime); progradeMat.color.setHex(isBurning ? 0xffff00 : 0x00ffff); }
 
-                if (telemetry.isTliCoast && !isReturningHome) { safeSetText('window-timer', "N/A (EN ROUTE)", "nominal"); } 
-                else if (isReturningHome && altE > 122) { safeSetText('window-timer', `ATMO ENTRY IN: ${(altE - 122).toFixed(0)} km`, "nominal"); }
-                else if (!isReturningHome) { const winClass = telemetry.timeToWindow < 60 ? "danger" : (telemetry.timeToWindow < 300 ? "caution" : "nominal"); safeSetText('window-timer', "T- " + formatTime(telemetry.timeToWindow).substring(3), winClass); }
-                
+                if (telemetry.isTliCoast) { safeSetText('window-timer', "N/A (EN ROUTE)", "nominal"); } else { const winClass = telemetry.timeToWindow < 60 ? "danger" : (telemetry.timeToWindow < 300 ? "caution" : "nominal"); safeSetText('window-timer', "T- " + formatTime(telemetry.timeToWindow).substring(3), winClass); }
                 if (isBurning) { safeSetText('engine-status', autoPilotEngaged ? "AUTO TLI FIRING" : "MANUAL FIRING", "danger"); } else { safeSetText('engine-status', "STANDBY", "nominal"); }
 
                 if (altE > 380 && altE < 420 && !milestoneLatches.passedISS) { milestoneLatches.passedISS = true; showNavMsg("CHECKPOINT: ISS ORBITAL PLANE (400km)", 5000, "flash-warning"); logEvent("CHECKPOINT: Passed ISS Orbital Plane"); }
@@ -822,6 +782,7 @@
                     safeSetText('phase-text', "ENTRY INTERFACE", "danger");
                     if (altE > 40 && shipVel.length() > 5.0) { safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "flash-red"); safeSetText('window-timer', `DROGUES IN: ${(altE - 7.3).toFixed(1)} km`, "danger"); } 
                     else { safeSetText('nav-status', "ATMOSPHERIC DESCENT", "caution"); safeSetText('window-timer', `DROGUES IN: ${(altE - 7.3).toFixed(1)} km`, "caution"); }
+                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-1); _lookTarget.copy(shipGroup.position).add(_tempVec1); shipGroup.lookAt(_lookTarget);
                 } else if (distM < 0) { safeSetText('phase-text', "LITHOBRAKING (IMPACT)", "danger"); safeSetText('nav-status', "MISSION FAILURE", "danger"); if (timeWarp > 1) updateWarpUI(1); } 
                 else if (distM <= 60000) {
                     safeSetText('phase-text', "LUNAR ENCOUNTER", "caution"); safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");

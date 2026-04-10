@@ -11,6 +11,7 @@
 - [ ] 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial `MISSION_LEAD_ANGLE` moon-moving cheat with realistic TLI parameters (ejection angle, transit time) to calculate leading-edge interception of a naturally orbiting Moon.
 - [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
 - [ ] 🔥🔥🔥 **HUD: Visual Trajectory Indicator**: Show "On Target" / "Off Course" status based on real-time physics projection.
+- [ ] 🛠️ **UI: Mission Settings Panel**: Build a panel to toggle "Auto-MCC", "Auto-Warp Deceleration", and sensitivity settings.
 
 ## 🐛 UX & Polish (Debrief Feedback)
 - [ ] 🐛 **UX: Smooth Warp Deceleration**: Transition warp down to 1x incrementally with visual feedback instead of a hard snap.
@@ -38,6 +39,16 @@
 - [ ] 🔥🔥 **Simulation: Splashdown Geolocation Tracking**: Calculate geographic latitude/longitude impact coordinates by syncing the final Cartesian position vector with a rotating Earth texture base based on Mission Elapsed Time.
 
 ## 🧪 Ready for QA (Waiting for User Confirmation)
+- [ ] 🧪 **Physics: Vector Corruption Hotfix (v1.9.8.5)**: Fixed integration bug where `_totalAccel` was overwriting base gravity instead of copying it, causing the "crazy numbers" and black screen failures.
+- [ ] 🧪 **Physics: Trajectory Keyhole Restoration**: Reverted `MISSION_LEAD_ANGLE` to 0.74 to restore the proven Free-Return slingshot timing.
+- [ ] 🧪 **Physics: NaN Crash Hotfix (v1.9.8.4)**: Clamped dot-product inputs for `Math.asin` to prevent physics explosions and "black screen" rendering failures.
+- [ ] 🧪 **Avionics: Advanced MCC Logging**: Course corrections now log specific heading, velocity, altitude, and fuel-mass-lost data to the flight log.
+- [ ] 🧪 **Avionics: Auto-MCC self-correction**: Ship now displays a 45s countdown and automatically executes alignment if at 1x speed; button text dynamically updates with timer.
+- [ ] 🧪 **UX: Enhanced Button States**: Implemented specific hover states for Safe (Green) and Danger (Red) buttons with black text contrast.
+- [ ] 🧪 **Avionics: Radial MCC Calibration (v1.9.8.3)**: Replaced overpowering tangential boost with a 0.02 km/s radial impulse to accurately target 40km perigee.
+- [ ] 🧪 **Mechanics: Fuel-Consuming MCC**: Integrated rocket equation math into mid-course corrections; MCC burns now physically deplete the fuel tank.
+- [ ] 🧪 **UX: Dangerous Warp Pulse**: Added aggressive red-flashing animation for `.active.danger-btn` states to warn users of high-speed risks.
+- [ ] 🧪 **UI: HUD Stability Hotfix**: Fixed Navigation button jitter by wrapping MCC controls in a fixed-height container with `visibility` toggling.
 - [ ] 🧪 **UX/3D: Prograde Crosshair Clipping**: Optimized `renderScale` to 0.1 and pulled `progradeMesh` to Z: -3, ensuring it stays 9.2 units above the Earth's surface even at 122km re-entry interface.
 - [ ] 🧪 **UI/3D: Fix Black Screen Bug**: Scaled down the ship's interior `cockpit` mesh to 0.005 units (inside the camera near-plane) to restore the "invisible frame" behavior and fix the blank screen issue reported during V1.9.8 integration.
 

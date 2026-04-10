@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Artemis: Lunar Flyby VR - Educational Edition</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; }
+        
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+            padding: 20px; box-sizing: border-box; z-index: 10;
+        }
+
+        /* Tooltip hover effect for entire panels */
+        .panel {
+            background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.4);
+            padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);
+            pointer-events: auto; width: 360px; max-width: 90vw; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            margin-bottom: 10px; transition: border-color 0.3s;
+            z-index: 20; /* Ensure visibility in VR dom-overlay */
+        }
+        .panel:hover { border-color: rgba(0, 255, 255, 0.8); }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.1rem; color: #00ffff; text-transform: uppercase; letter-spacing: 2px;}
+        p { margin: 5px 0; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;}
+        
+        .tooltip { border-bottom: 1px dotted #888; cursor: help; pointer-events: auto; }
+        
+        /* Dynamic Status Colors */
+        .nominal { color: #44ff44; font-weight: bold; text-shadow: 0 0 5px rgba(68, 255, 68, 0.5); }
+        .caution { color: #ffff44; font-weight: bold; text-shadow: 0 0 5px rgba(255, 255, 68, 0.5); }
+        .danger { color: #ff4444; font-weight: bold; text-shadow: 0 0 5px rgba(255, 68, 68, 0.5); }
+        
+        /* Burn Indicator Flashing States */
+        .flash-red { color: #ff4444; font-weight: bold; animation: flash 0.5s infinite; text-shadow: 0 0 8px rgba(255, 68, 68, 0.8); }
+        .flash-yellow { color: #ffff44; font-weight: bold; animation: flash 0.5s infinite; text-shadow: 0 0 8px rgba(255, 255, 68, 0.8); }
+        .flash-green { color: #44ff44; font-weight: bold; animation: flash 0.5s infinite; text-shadow: 0 0 8px rgba(68, 255, 68, 0.8); }
+        .solid-green { color: #44ff44; font-weight: bold; text-shadow: 0 0 5px rgba(68, 255, 68, 0.5); }
+        
+        ul.checklist { list-style-type: none; padding: 0; margin: 10px 0; font-size: 0.85rem;}
+        ul.checklist li { margin-bottom: 8px; color: #aaa; transition: color 0.3s; cursor: help; pointer-events: auto; }
+        ul.checklist li.active { color: #ffff44; font-weight: bold; text-shadow: 0 0 5px rgba(255, 255, 68, 0.5); }
+        ul.checklist li.complete { color: #44ff44; text-decoration: line-through; }
+        
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes flash-btn {
+            0% { background: rgba(255, 255, 68, 0.2); color: #ffff44; border-color: #ffff44; box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); }
+            50% { background: rgba(255, 255, 68, 0.8); color: #000; border-color: #ffff44; box-shadow: 0 0 20px rgba(255, 255, 68, 1); }
+            100% { background: rgba(255, 255, 68, 0.2); color: #ffff44; border-color: #ffff44; box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); }
+        }
+
+        .controls { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; justify-content: flex-start;}
+        button {
+            background: rgba(0, 255, 255, 0.1); color: #00ffff; border: 1px solid #00ffff;
+            padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;
+            flex-grow: 1; transition: all 0.2s; font-size: 0.8rem; pointer-events: auto;
+            min-width: 60px; /* Prevent shrinking too small */
+        }
+        button:hover { background: #00ffff; color: #000; box-shadow: 0 0 10px #00ffff;}
+        button:active { transform: scale(0.95); }
+        button.btn-danger { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+        button.btn-danger:hover { background: #ff4444; color: #000; box-shadow: 0 0 10px #ff4444;}
+        button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; }
+        button.caution-btn { animation: flash-btn 1s infinite; }
+        button.safe-btn { border-color: #44ff44; color: #44ff44; }
+        button.safe-btn.active { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44; }
+        button.safe-btn:hover { background: #44ff44 !important; color: #000 !important; }
+        button.danger-btn { border-color: #ff4444; color: #ff4444; }
+        button.danger-btn:hover { background: #ff4444 !important; color: #000 !important; }
+        
+        /* Viewing Center Crosshair */
+        #crosshair-view {
+            position: absolute; top: 50%; left: 50%; width: 16px; height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 5;
+            box-shadow: 0 0 5px #000;
+        }
+        #crosshair-view::after { 
+            content: '+'; position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); color: #ffffff; font-size: 12px; font-weight: bold;
+        }
+        #target-popup {
+            position: absolute; top: 52%; left: 52%; background: rgba(0, 40, 20, 0.9);
+            border: 1px solid #44ff44; padding: 10px; border-radius: 4px;
+            color: #44ff44; font-size: 0.8rem; pointer-events: none; display: none; z-index: 5;
+            box-shadow: 0 0 10px rgba(68, 255, 68, 0.3); backdrop-filter: blur(2px);
+        }
+
+        #zoom-indicator {
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+            color: #00ffff; font-size: 1.08rem; font-weight: bold; text-shadow: 0 0 5px #000;
+            pointer-events: auto; cursor: help;
+        }
+
+        /* Responsive UI for Mobile */
+        @media (max-width: 600px) {
+            #ui-layer { 
+                padding: 10px; overflow-y: auto; pointer-events: none; 
+                transform: scale(0.85); transform-origin: top left;
+                width: 117.6%; height: 117.6%;
+                /* Enforce Portrait Layout */
+                flex-direction: column !important;
+            }
+            .panel { padding: 8px; width: 100%; box-sizing: border-box; }
+            h1 { font-size: 0.85rem; margin-bottom: 5px; }
+            p { font-size: 0.7rem; margin: 2px 0; }
+            .controls { gap: 8px; margin-top: 12px; } /* Increased gap for touch */
+            button { padding: 10px 8px; font-size: 0.65rem; min-width: 55px; } /* Larger touch targets */
+            
+            /* Physically space out dangerous high-warp buttons on mobile */
+            #btn-warp-1800, #btn-warp-3600, #btn-warp-7200 {
+                margin-top: 10px;
+                border-width: 2px;
+            }
+
+            #zoom-indicator { bottom: 60px; font-size: 0.9rem; }
+            ul.checklist li { font-size: 0.7rem; margin-bottom: 3px; }
+        }
+
+        /* Nav-msg warning animation */
+        .flash-warning {
+            animation: flash-red-bg 0.5s infinite;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        @keyframes flash-red-bg {
+            0% { background: rgba(255, 0, 0, 0); }
+            50% { background: rgba(255, 0, 0, 0.4); }
+            100% { background: rgba(255, 0, 0, 0); }
+        }
+@media (max-height: 500px) and (orientation: landscape) {
+    #ui-layer { flex-direction: row; align-items: flex-start; }
+    .panel { width: 45vw; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
+    #zoom-indicator { bottom: 20px; }
+}
+
+@keyframes flash-danger {
+    0% { background: #ff4444; color: #000; box-shadow: 0 0 10px #ff4444; }
+    50% { background: #aa0000; color: #fff; box-shadow: 0 0 20px #ff4444; }
+    100% { background: #ff4444; color: #000; box-shadow: 0 0 10px #ff4444; }
+}
+button.danger-btn.active {
+    animation: flash-danger 0.5s infinite !important;
+    border-color: #ff4444 !important;
+}
+
+/* Layout stability for MCC button */
+#mcc-container { 
+    min-height: 45px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100%;
+    margin-bottom: 5px;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script></head>
+<body>
+    <div id="ui-layer">
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            
+            <div class="panel" title="Real-time flight data. All units are accurate to real-world physics.">
+                <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
+                <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
+                <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
+                <p><span class="tooltip" title="Mission Elapsed Time: Total duration since the simulation began.">MET:</span> <span id="met-time">00:00:00:00</span></p>
+                <hr style="border-color: #00ffff; opacity: 0.3;">
+                <p><span class="tooltip" title="Altitude above Earth's sea level. Low Earth Orbit is typically 400km.">Alt (Earth):</span> <span id="alt-earth">400 km</span></p>
+                <p><span class="tooltip" title="Maximum distance achieved from Earth during this flight">Max Alt:</span> <span id="max-alt" class="nominal">400 km</span></p>
+                <p><span class="tooltip" title="Distance from the Moon's surface.">Dist (Moon):</span> <span id="dist-moon">380,000 km</span></p>
+                <p><span class="tooltip" title="Angle between the center of your view and the Moon. Use this to find it!">Moon Heading:</span> <span id="moon-heading" class="caution">0&deg;</span></p>
+                <p><span class="tooltip" title="Absolute velocity relative to Earth. Must reach ~10.9 km/s to escape to the Moon.">Velocity:</span> <span id="velocity">7.67 km/s</span></p>
+                <div id="velocity-vector-info" style="font-size: 0.7rem; color: #888; display: flex; justify-content: space-between;">
+                    <span>Vx: <span id="vx">0.0</span></span>
+                    <span>Vy: <span id="vy">0.0</span></span>
+                    <span>Vz: <span id="vz">0.0</span></span>
+                </div>
+                <hr style="border-color: #00ffff; opacity: 0.3;">
+                <p><span class="tooltip" title="Gravitational pull from Earth (m/s²)">Earth Gravity:</span> <span id="grav-earth">0.00000</span></p>
+                <p><span class="tooltip" title="Gravitational pull from the Moon (m/s²)">Moon Gravity:</span> <span id="grav-moon">0.00000</span></p>
+                <p><span class="tooltip" title="Remaining propellant in the Trans-Lunar Injection stage.">Fuel (TLI Stage):</span> <span id="fuel">100%</span></p>
+                <div class="controls">
+                    <button id="btn-abort" class="btn-danger" title="Emergency stop. Resets spacecraft back to a stable 400km Low Earth Orbit.">ABORT / RESTART</button>
+                </div>
+            </div>
+            
+            <div></div>
+        </div>
+
+        <div id="zoom-indicator" title="Current camera zoom level. Use your mouse scroll wheel to zoom in and out.">FOV: 70&deg; (1.0x Zoom)</div>
+        <div id="crosshair-view"></div>
+        <div id="target-popup">
+            <strong id="target-name">TARGET</strong><br>
+            Dist: <span id="target-dist">0 km</span><br>
+            <span id="target-hint"></span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+            
+            <div class="panel" title="Your mission checklist. Follow the steps to safely reach the Moon.">
+                <h1 title="Track your progress through the mission phases">Mission Itinerary</h1>
+                <ul class="checklist">
+                    <li id="itin-tli" class="active" title="Trans-Lunar Injection: The massive engine burn required to stretch our orbit to the Moon.">[ ] TLI Burn (Target: <span id="tli-est-time">145.0</span>s)</li>
+                    <li id="itin-coast" title="The 3-day freefall journey through deep space after the engines cut off.">[ ] Trans-Lunar Coast (ETA: <span id="tli-eta">N/A</span>)</li>
+                    <li id="itin-flyby" title="Swinging around the far side of the Moon using its gravity to return to Earth.">[ ] Free Return / Lunar Flyby</li>
+                </ul>
+                <div class="controls">
+                    <button id="btn-save-log" title="Downloads a JSON file of your telemetry data at various mission timestamps. Includes G-Force data!">SAVE FLIGHT LOG</button>
+                    <button id="btn-load-log" style="border-color: #555; color: #555; cursor: not-allowed;" title="Playback system currently under maintenance." disabled>LOAD FLIGHT LOG (OFFLINE)</button>
+                    <button id="btn-cinematic" style="border-color: #555; color: #555; cursor: not-allowed;" title="Automation system currently under maintenance." disabled>🔴 CINEMATIC (OFFLINE)</button>
+                </div>
+            </div>
+
+            <div class="panel" title="Ship control systems. Engage the autopilot or control the burn manually.">
+                <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
+                <div style="min-height: 3.5rem; display: flex; flex-direction: column; justify-content: center;">
+                    <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite; margin: 0; text-align: center;">[SEQUENCE RUNNING: SHOT 01]</p>
+                    <div id="nav-msg" style="color:#ff4444; font-size:0.75rem; height:1.2rem; font-weight:bold; text-align:center;"></div>
+                </div>
+                <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
+                <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn. Target phase angle is opposite the moon.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
+                <p><span class="tooltip" title="Flight Path Angle. Target -6.5° for safe reentry.">Entry Angle:</span> <span id="entry-angle" class="nominal">0.00&deg;</span></p>
+                <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically ignite and cut off engines to perfectly reach the Moon.">Autopilot:</span> <span id="autopilot-status" class="danger">OFF</span></p>
+                <div class="controls">
+                    <button id="btn-toggle-auto" title="Click to arm the flight computer. It will wait for the Next Action timer to hit zero, then fire.">ENABLE AUTO TMI</button>
+                    <button id="btn-skip-window" title="Warps time forward to exactly 60 seconds before the next burn window.">SKIP TO ACTION</button>
+                    <button id="btn-track-target" title="Automatically keep the current target centered in view. Click a target to select it first!">TRACK TARGET: OFF</button>
+                </div>
+                <hr style="border-color: #00ffff; opacity: 0.3; margin-top: 15px;">
+                <p><span class="tooltip" title="Estimated time the engines need to fire to achieve the required orbital energy.">Target Burn:</span> <span id="burn-target" class="nominal">145.0 s</span></p>
+                <p><span class="tooltip" title="How long the engines have actually been firing.">Actual Burn:</span> <span id="burn-actual" class="nominal">0.0 s</span></p>
+                <p><span class="tooltip" title="Gravitational force currently felt by the crew. 0.00 G is weightless freefall. Engine thrust creates positive G-force.">G-Force:</span> <span id="g-force" class="nominal">0.00 G</span></p>
+
+                <p style="margin-top: 10px; white-space: nowrap;"><span class="tooltip" title="Current simulation speed. Use carefully to traverse the 3-day gap to the Moon!">Time Warp:</span> <span id="warp-text" class="nominal">1x (Realtime)</span></p>
+                <p><span class="tooltip" title="Propulsion system state.">Engines:</span> <span id="engine-status" class="nominal">STANDBY</span></p>
+
+                <div class="controls">
+                    <button id="btn-warp-1" class="active" title="Realtime (1s = 1s)">1x</button>
+                    <button id="btn-warp-10" title="1s = 10s">10x</button>
+                    <button id="btn-warp-30" title="1s = 30s">30x</button>
+                    <button id="btn-warp-60" title="1s = 1 Minute">60x</button>
+                    <button id="btn-warp-300" title="1s = 5 Minutes">300x</button>
+                    <button id="btn-warp-600" title="1s = 10 Minutes">600x</button>
+                    <button id="btn-warp-1800" title="1s = 30 Minutes">1.8kx</button>
+                    <button id="btn-warp-3600" title="1s = 1 Hour">3.6kx</button>
+                    <button id="btn-warp-7200" title="1s = 2 Hours">7.2kx</button>
+                </div>
+                <div id="mcc-container">
+                    <button id="btn-autopilot-mcc" class="btn-danger caution-btn" style="visibility:hidden; font-size: 0.9rem;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE TRAJECTORY ALIGNMENT</button>
+                </div>
+                <div class="controls">
+                    <button id="btn-thrust" class="btn-danger" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Artemis: Lunar Flyby XR - Educational Orbital Dynamics Engine
+         * Features: Velocity Verlet Integration, Real-world units, Orbital Energy Targeting, 
+         * Latching Autopilot, Target Scanning, Burn Diagnostics, G-Force, Milestone Tracking.
+         */
+        const SIM_VERSION = "1.9.8.3";
+
+        // --- USER CONFIGURED FLYBY THRESHOLDS ---
+        // Edit these limits to control when the high-warp yellow warnings appear
+        const WARP_LIMITS = {
+            APPROACH_SOI_DIST: 100000, 
+            APPROACH_SOI_WARP: 600,   // Drop to 600x entering cislunar space
+            ENTER_SOI_DIST: 60000,
+            ENTER_SOI_WARP: 300,      // Drop to 300x inside Lunar SOI
+            PROXIMITY_DIST: 5000,
+            PROXIMITY_WARP: 10        // Drop to 10x for ultra-close flyby visualization
+        };
+
+        // --- REAL-WORLD PHYSICS CONSTANTS ---
+        const MISSION_LEAD_ANGLE = 0.74; // Restored stable Artemis II phase offset
+        const muEarth = 398600.4418; // km^3/s^2
+        const muMoon = 4902.8000;    // km^3/s^2
+        const radEarth = 6371;       // km
+        const radMoon = 1737;        // km
+        const distMoon = 384400;     // km (Average distance)
+        const renderScale = 0.1;    // 1 unit = 10km
+
+        // --- SHIP STATE & TELEMETRY ---
+        let shipPos, shipVel, fuel, isBurning, timeWarp, autoPilotEngaged, autoFastForward, metSeconds;
+        const maxFuel = 20000; // kg
+        const shipEmptyMass = 10000; // kg
+        const thrustForce = 600; // kN (KiloNewtons -> km * kg / s^2)
+        const exhaustVel = 4.414; // km/s. Mass flow rate = Thrust / ExhaustVel = 135.9 kg/s
+        const massFlowRate = thrustForce / exhaustVel; 
+        
+        let moonAngle = 0; 
+        let flightLog = []; // Stores {met, event, alt, vel, gforce}
+        let lastLogTime = 0;
+        let globalMaxAlt = 0;
+        
+        // --- RE-ENTRY & DRAG CONSTANTS ---
+        let parachuteState = 'NONE'; // NONE, ENTRY, DROGUES, MAINS, SPLASHDOWN
+        const DRAG_AREA = 0.011; // 11 m^2 (Orion Capsule base)
+        const RHO_0 = 1.225;     // kg/m^3 (Surface density)
+        const SCALE_HEIGHT = 8.5; // km
+        
+        // --- WAYPOINTS ---
+        const MISSION_WAYPOINTS_OUTBOUND = [
+            { name: "Geosynchronous Orbit Check", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Trans-Lunar Midpoint (Equidistant)", distance_km: 192200, passed: false, type: "MCC" },
+            { name: "Lunar SOI Approach", distance_km: 320000, passed: false, type: "MCC" }
+        ];
+        const MISSION_WAYPOINTS_RETURN = [
+            { name: "Cislunar Return Interface (Midpoint)", distance_km: 192200, passed: false, type: "MCC" },
+            { name: "Return Trajectory Alignment (MCC)", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Re-Entry Interface", distance_km: 5000, passed: false, type: "MCC" }
+        ];
+        
+        let activeMCCWaypoint = null;
+        let isReturningHome = false;
+        let autoDecelerateTarget = -1;
+        let lastDecelTime = 0;
+        let currentMaxSafeWarp = -1;
+        let mccAutoCountdown = -1; // Added missing variable declaration
+
+        // --- BURN DIAGNOSTICS & STATE LATCHES ---
+        let actualBurnTime = 0;
+        let initialTargetBurnTime = 0;
+        let autoBurnActive = false;
+        let burnEndTime = -999;
+        let currentGForce = 0; 
+        let maxGForce = 0;
+        
+        let milestoneLatches = {
+            approachingGeosync: false,
+            atGeosync: false,
+            beyondGeosync: false,
+            approachingMidpoint: false,
+            atMidpoint: false,
+            pastMidpoint: false,
+            approachingSOI: false,
+            inSOI: false,
+            lunarProximity: false,
+            mcc1: false,
+            passedISS: false,
+            passedStarlink: false,
+            passedGPS: false
+        };
+
+        // --- CINEMATIC SCRIPT ENGINE ---
+        let cinematicActive = false;
+        let cinematicPhase = 0;
+        let cinematicTimer = 0;
+        let lookTargetLon = 0;
+        let lookTargetLat = 0;
+        let isTrackingTarget = false;
+        let currentTargetObj = null;
+
+        // --- GEAR SHIFTING WARP LOGIC ---
+        let targetWarp = 1;
+        let warpStepTimer = 0;
+        const warpLevels = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200];
+
+        function shiftWarp(target) {
+            targetWarp = target;
+        }
+
+        function updateWarpStepping(dt, telemetry) {
+            if (timeWarp === targetWarp) return;
+            
+            warpStepTimer += dt;
+            if (warpStepTimer > 0.5) { // Responsive shifting: 0.5s per gear
+                let currentIndex = warpLevels.indexOf(timeWarp);
+                let targetIndex = warpLevels.indexOf(targetWarp);
+                
+                let nextWarp = timeWarp;
+                if (currentIndex < targetIndex) {
+                    nextWarp = warpLevels[currentIndex + 1];
+                } else if (currentIndex > targetIndex) {
+                    nextWarp = warpLevels[currentIndex - 1];
+                }
+                
+                updateWarpUI(nextWarp);
+                logEvent(`AUTO: Gear shift to ${nextWarp}x`, telemetry);
+                warpStepTimer = 0;
+            }
+        }
+
+        function updateCinematic(dt, telemetry) {
+            if (!cinematicActive) return;
+            cinematicTimer += dt;
+
+            let altE = shipPos.length() - radEarth;
+            let distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+
+            switch (cinematicPhase) {
+                case 0: // INIT
+                    resetMission();
+                    autoPilotEngaged = true;
+                    document.getElementById('btn-toggle-auto').textContent = "AUTOPILOT ON";
+                    document.getElementById('btn-toggle-auto').classList.add('active');
+                    document.getElementById('autopilot-status').textContent = "ENGAGED";
+                    document.getElementById('autopilot-status').className = "nominal";
+                    shiftWarp(10);
+                    cinematicPhase = 1;
+                    logEvent("CINEMATIC: Phase 1 - Pre-Launch Alignment");
+                    break;
+
+                case 1: // IGNITION PREP
+                    if (telemetry.timeToWindow < 15) {
+                        shiftWarp(1);
+                        cinematicPhase = 2;
+                        logEvent("CINEMATIC: Phase 2 - Ignition Prep");
+                    }
+                    break;
+
+                case 2: // BURN START
+                    if (isBurning) {
+                        cinematicTimer = 0; 
+                        cinematicPhase = 3;
+                        logEvent("CINEMATIC: Phase 3 - TMI Ignition Recorded");
+                    }
+                    break;
+
+                case 3: // BURN MONITORING
+                    if (cinematicTimer > 15) {
+                        shiftWarp(10);
+                        cinematicPhase = 4;
+                        logEvent("CINEMATIC: Phase 4 - Departure Acceleration");
+                    }
+                    break;
+
+                case 4: // EARLY DEPARTURE
+                    if (telemetry.isTliCoast) {
+                        shiftWarp(30); 
+                        cinematicPhase = 4.5;
+                        logEvent("CINEMATIC: Phase 4.5 - MEO Departure (30x)");
+                    }
+                    break;
+
+                case 4.5: // MID MEO
+                    if (altE > 15000) {
+                        shiftWarp(60);
+                        cinematicPhase = 5;
+                        logEvent("CINEMATIC: Phase 5 - Climbing to Geosync (60x)");
+                    }
+                    break;
+
+                case 5: // GEOSYNC APPROACH
+                    if (altE > 30000) { // Approaching Geosync
+                        shiftWarp(600);
+                        cinematicPhase = 5.5;
+                        logEvent("CINEMATIC: Phase 5.5 - Passing Geosync (600x)");
+                    }
+                    break;
+
+                case 5.5: // DEEP SPACE ACCELERATION
+                    if (altE > 100000) {
+                        shiftWarp(7200);
+                        cinematicPhase = 7;
+                        logEvent("CINEMATIC: Phase 7 - Deep Space (Maximum Warp)");
+                    }
+                    break;
+
+                case 7: // LUNAR APPROACH PREP
+                    if (distM < 150000) {
+                        shiftWarp(3600);
+                        cinematicPhase = 8;
+                        logEvent("CINEMATIC: Phase 8 - Lunar Outskirts (3.6kx)");
+                    }
+                    break;
+
+                case 8: // LUNAR SOI ENTRY
+                    if (distM < 80000) { 
+                        shiftWarp(1800);
+                        cinematicPhase = 8.5;
+                        logEvent("CINEMATIC: Phase 8.5 - Approaching SOI (1.8kx)");
+                    }
+                    break;
+
+                case 8.5: // SOI TRANSITION
+                    if (distM < 60000) { 
+                        shiftWarp(600);
+                        cinematicPhase = 9;
+                        logEvent("CINEMATIC: Phase 9 - Lunar SOI Entry (600x)");
+                    }
+                    break;
+
+                case 9: // CLOSE APPROACH
+                    if (distM < 40000) {
+                        shiftWarp(300);
+                        cinematicPhase = 9.5;
+                        logEvent("CINEMATIC: Phase 9.5 - Close Approach (300x)");
+                    }
+                    break;
+
+                case 9.5: // FINAL APPROACH
+                    if (distM < 25000) {
+                        shiftWarp(60);
+                        cinematicPhase = 10;
+                        logEvent("CINEMATIC: Phase 10 - Final Approach (60x)");
+                    }
+                    break;
+
+                case 10: // PRE-FLYBY
+                    if (distM < 15000) {
+                        shiftWarp(10);
+                        cinematicPhase = 11;
+                        logEvent("CINEMATIC: Phase 11 - Pre-Flyby (10x)");
+                    }
+                    break;
+
+                case 11: // ENCOUNTER
+                    if (distM < 10000) {
+                        shiftWarp(1);
+                        if (timeWarp === 1 || playbackActive) { // Allow playback to continue through encounter
+                            cinematicActive = false;
+                            document.getElementById('cinematic-status').style.display = 'none';
+                            logEvent("CINEMATIC: Shot 01 Complete. Flyby in progress.");
+                        }
+                    }
+                    break;
+            }
+        }
+
+        document.getElementById('btn-cinematic').addEventListener('click', () => {
+            cinematicActive = !cinematicActive;
+            if (cinematicActive) {
+                cinematicPhase = 0;
+                cinematicTimer = 0;
+                document.getElementById('cinematic-status').style.display = 'block';
+                logEvent("CINEMATIC: Starting Shot 01 - The Cislunar Crossing");
+            } else {
+                document.getElementById('cinematic-status').style.display = 'none';
+                logEvent("CINEMATIC: Sequence Aborted by User.");
+            }
+        });
+
+        document.getElementById('btn-track-target').addEventListener('click', (e) => {
+            isTrackingTarget = !isTrackingTarget;
+            e.target.textContent = isTrackingTarget ? "TRACK TARGET: ON" : "TRACK TARGET: OFF";
+            if (isTrackingTarget) {
+                e.target.classList.add('active');
+                // If we have a current target from the raycaster, lock onto it
+                // currentTargetObj is updated by the raycaster loop in the main render loop
+                if (currentTargetObj) {
+                    logEvent(`Tracking locked to: ${currentTargetObj.name || "Target"}`);
+                }
+            } else {
+                e.target.classList.remove('active');
+                logEvent("Target tracking disabled.");
+            }
+        });
+
+        // --- CORE ENGINE SETUP ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        
+        // Base FOV is 70. Will be adjusted by scroll wheel.
+        let baseFov = 70;
+        const camera = new THREE.PerspectiveCamera(baseFov, window.innerWidth / window.innerHeight, 0.01, 100000000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            powerPreference: "high-performance",
+            logarithmicDepthBuffer: true 
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // Buttons for VR and View Reset (Moved to bottom behind UI panels)
+        const btnVR = document.createElement('button');
+        btnVR.style.cssText = 'position:absolute; bottom:20px; left:50%; transform:translateX(5px); width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
+        btnVR.textContent = 'ENTER VR FLYBY';
+        btnVR.title = "Jump into an immersive WebXR headset view if supported.";
+        document.body.appendChild(btnVR);
+        
+        btnVR.addEventListener('click', async () => {
+            if (navigator.xr) {
+                try {
+                    const session = await navigator.xr.requestSession('immersive-vr', {
+                        requiredFeatures: ['local-floor'],
+                        optionalFeatures: ['dom-overlay'],
+                        domOverlay: { root: document.getElementById('ui-layer') }
+                    });
+                    renderer.xr.setSession(session);
+                    btnVR.style.display = 'none';
+                    btnResetView.style.display = 'none';
+                    
+                    // WebXR Controller Setup
+                    const setupController = (controller, index) => {
+                        controller.addEventListener('selectstart', () => {
+                            if (index === 0) { // Left Controller: Manual Burn
+                                if (fuel > 0) isBurning = true;
+                            } else { // Right Controller: Toggle Tracking
+                                isTrackingTarget = !isTrackingTarget;
+                                const trackBtn = document.getElementById('btn-track-target');
+                                trackBtn.textContent = isTrackingTarget ? "TRACK TARGET: ON" : "TRACK TARGET: OFF";
+                                if (isTrackingTarget) trackBtn.classList.add('active');
+                                else trackBtn.classList.remove('active');
+                            }
+                        });
+                        controller.addEventListener('selectend', () => {
+                            if (index === 0) isBurning = false;
+                        });
+                        scene.add(controller);
+                    };
+
+                    setupController(renderer.xr.getController(0), 0);
+                    setupController(renderer.xr.getController(1), 1);
+                    
+                    // WebXR session management
+                    session.addEventListener('end', () => {
+                        btnVR.style.display = 'block';
+                        btnResetView.style.display = 'block';
+                    });
+                } catch (e) { 
+                    console.error("VR Session failed:", e);
+                    alert("VR Session not supported or failed to start. Check if you are using HTTPS and a compatible browser."); 
+                }
+            } else { alert("WebXR not supported in this browser."); }
+        });
+
+        const btnResetView = document.createElement('button');
+        btnResetView.style.cssText = 'position:absolute; bottom:20px; left:50%; transform:translateX(calc(-100% - 5px)); width:150px; z-index:0; padding:15px; background:rgba(0,255,255,0.2); color:#00ffff; border:1px solid #00ffff; cursor:pointer; font-weight:bold; pointer-events:auto;';
+        btnResetView.textContent = 'RESET VIEW';
+        btnResetView.title = "Re-centers the camera to face exactly along the Prograde travel vector.";
+        document.body.appendChild(btnResetView);
+
+        btnResetView.addEventListener('click', () => {
+            lookLon = 0; lookLat = 0;
+            baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix();
+            document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
+        });
+
+        // --- RESIZE EVENT LISTENER ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- ZOOM CONTROLS (Scroll Wheel) ---
+        document.addEventListener('wheel', (e) => {
+            baseFov += e.deltaY * 0.05;
+            baseFov = Math.max(10, Math.min(100, baseFov)); 
+            camera.fov = baseFov;
+            camera.updateProjectionMatrix();
+            let zoomLevel = (70 / baseFov).toFixed(1);
+            document.getElementById('zoom-indicator').innerHTML = `FOV: ${Math.round(baseFov)}&deg; (${zoomLevel}x Zoom)`;
+        });
+
+        // --- SCENE OBJECTS ---
+        const textureLoader = new THREE.TextureLoader();
+
+        const earthGeo = new THREE.SphereGeometry(radEarth * renderScale, 64, 64);
+        const earthMat = new THREE.MeshStandardMaterial({ map: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'), roughness: 0.6, metalness: 0.1 });
+        const earth = new THREE.Mesh(earthGeo, earthMat);
+        earth.name = "EARTH";
+        scene.add(earth);
+
+        const moonGeo = new THREE.SphereGeometry(radMoon * renderScale, 64, 64);
+        const moonMat = new THREE.MeshStandardMaterial({ map: textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/moon_1024.jpg'), roughness: 0.9, metalness: 0.0 });
+        const moon = new THREE.Mesh(moonGeo, moonMat);
+        moon.name = "THE MOON";
+        scene.add(moon);
+
+        // Starfield
+        const starGeo = new THREE.BufferGeometry();
+        const starVerts = new Float32Array(5000 * 3);
+        for(let i=0; i < 5000 * 3; i+=3) {
+            let r = 50000000; // 500 Million km away
+            let theta = Math.random() * 2 * Math.PI;
+            let phi = Math.acos((Math.random() * 2) - 1);
+            starVerts[i] = r * Math.sin(phi) * Math.cos(theta);
+            starVerts[i+1] = r * Math.sin(phi) * Math.sin(theta);
+            starVerts[i+2] = r * Math.cos(phi);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starVerts, 3));
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 1.5, sizeAttenuation: false}));
+        scene.add(stars);
+
+        // Lighting & The Sun
+        const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+        const sunPosition = new THREE.Vector3(-1000, 200, 0).normalize().multiplyScalar(15000000); // 150 Million km
+        sunLight.position.copy(sunPosition); 
+        scene.add(sunLight);
+        
+        const sunMeshGeo = new THREE.SphereGeometry(70000, 32, 32); // Scaled up for distance
+        const sunMeshMat = new THREE.MeshBasicMaterial({color: 0xffffee}); 
+        const sunMesh = new THREE.Mesh(sunMeshGeo, sunMeshMat);
+        sunMesh.position.copy(sunPosition);
+        sunMesh.name = "THE SUN";
+        scene.add(sunMesh);
+
+        scene.add(new THREE.AmbientLight(0x666677)); 
+
+        // Ship Cockpit & Prograde Marker
+        const shipGroup = new THREE.Group();
+        const frameGeo = new THREE.BoxGeometry(0.005, 0.005, 0.005);
+        const frameMat = new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide});
+        const cockpit = new THREE.Mesh(frameGeo, frameMat);
+        shipGroup.add(cockpit);
+        
+        // 3D Prograde Marker (Forward Velocity Vector)
+        const progradeGeo = new THREE.RingGeometry(0.04, 0.05, 16);
+        const progradeMat = new THREE.MeshBasicMaterial({color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.8});
+        const progradeMesh = new THREE.Mesh(progradeGeo, progradeMat);
+        progradeMesh.name = "PROGRADE VECTOR"; // Name added for Raycaster
+        progradeMesh.position.set(0, 0, -3); 
+        const pgLineMat = new THREE.LineBasicMaterial({color: 0x00ff00});
+        const pgPts1 = [new THREE.Vector3(-0.08, 0, 0), new THREE.Vector3(-0.04, 0, 0)];
+        const pgPts2 = [new THREE.Vector3(0.08, 0, 0), new THREE.Vector3(0.04, 0, 0)];
+        const pgPts3 = [new THREE.Vector3(0, 0.08, 0), new THREE.Vector3(0, 0.04, 0)];
+        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts1), pgLineMat));
+        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts2), pgLineMat));
+        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pgPts3), pgLineMat));
+        
+        shipGroup.add(progradeMesh);
+
+        shipGroup.add(camera);
+        scene.add(shipGroup);
+
+        // --- MOUSE / TOUCH LOOK CONTROLS ---
+        let lookLon = 0; let lookLat = 0; let isDraggingView = false; let prevMousePos = { x: 0, y: 0 };
+        document.addEventListener('mousedown', (e) => {
+            if (isTrackingTarget) return; // Still lock if tracking is actively engaged
+            if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; }
+        });
+        document.addEventListener('mouseup', () => isDraggingView = false);
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingView && !isTrackingTarget) {
+                let deltaX = e.clientX - prevMousePos.x; let deltaY = e.clientY - prevMousePos.y;
+                lookLon -= deltaX * 0.2; lookLat -= deltaY * 0.2;
+                lookLat = Math.max(-85, Math.min(85, lookLat));
+                prevMousePos = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        // --- TOUCH LOOK CONTROLS ---
+        document.addEventListener('touchstart', (e) => {
+            if (isTrackingTarget) return;
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+                isDraggingView = true;
+                prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => isDraggingView = false);
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDraggingView && !isTrackingTarget) {
+                let deltaX = e.touches[0].clientX - prevMousePos.x;
+                let deltaY = e.touches[0].clientY - prevMousePos.y;
+                lookLon -= deltaX * 0.3; // Slightly higher sensitivity for touch
+                lookLat -= deltaY * 0.3;
+                lookLat = Math.max(-85, Math.min(85, lookLat));
+                prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                
+                // Prevent scrolling when dragging the view
+                if (e.cancelable) e.preventDefault();
+            }
+        }, { passive: false });
+        // --- ORBITAL MATH & INITIALIZATION ---
+        function resetMission() {
+            let startRadius = radEarth + 400; 
+            let vOrbit = Math.sqrt(muEarth / startRadius); 
+            moonAngle = 0; 
+            
+            // Use global Phase Angle for synchronized window calculation
+            const targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
+            
+            const shipAngularVel = vOrbit / startRadius;
+            const moonAngularVel = Math.sqrt(muEarth / Math.pow(distMoon, 3));
+            const relativeAngularVel = shipAngularVel - moonAngularVel;
+            
+            const offsetAngle = 120 * relativeAngularVel; // Start exactly 120 seconds before window
+            const startShipAngle = targetPhaseAngle - offsetAngle; 
+
+            shipPos = new THREE.Vector3(startRadius * Math.cos(startShipAngle), 0, startRadius * Math.sin(startShipAngle));
+            shipVel = new THREE.Vector3(vOrbit * -Math.sin(startShipAngle), 0, vOrbit * Math.cos(startShipAngle));
+
+            fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0;
+            actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0;
+            
+            // Reset State Latches
+            milestoneLatches = {
+                approachingGeosync: false,
+                atGeosync: false,
+                beyondGeosync: false,
+                approachingMidpoint: false,
+                atMidpoint: false,
+                pastMidpoint: false,
+                approachingSOI: false,
+                inSOI: false,
+                lunarProximity: false,
+                mcc1: false,
+                passedISS: false,
+                passedStarlink: false,
+                passedGPS: false
+            };
+
+            lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix();
+            
+            document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
+            updateWarpUI(1);
+            
+            // Reset UI
+            flightLog = [];
+            logEvent("Mission Started - System initialized in LEO.", { magEarth: muEarth/Math.pow(radEarth+400, 2), magMoon: 0 });
+            const autoBtn = document.getElementById('btn-toggle-auto');
+            autoBtn.classList.remove('active'); autoBtn.textContent = "ENABLE AUTO TMI";
+            document.getElementById('autopilot-status').textContent = "OFF"; document.getElementById('autopilot-status').className = "danger";
+            
+            document.getElementById('itin-tli').className = "active";
+            document.getElementById('itin-coast').className = "";
+            document.getElementById('itin-flyby').className = "";
+        }
+
+        resetMission();
+
+        let playbackActive = false;
+        let playbackLog = [];
+        let playbackIndex = 0;
+
+        // --- LOGGING SYSTEM ---
+        function logEvent(eventMsg, telemetry) {
+            let r = shipPos.length() - radEarth;
+            let v = shipVel.length();
+            flightLog.push({ 
+                version: SIM_VERSION,
+                timestamp_real: new Date().toISOString(),
+                met: metSeconds, 
+                met_formatted: formatTime(metSeconds),
+                event: eventMsg, 
+                altitude_km: r.toFixed(2), 
+                velocity_kms: v.toFixed(3),
+                vx: shipVel.x.toFixed(5),
+                vy: shipVel.y.toFixed(5),
+                vz: shipVel.z.toFixed(5),
+                gforce: currentGForce.toFixed(2),
+                magEarth: (telemetry && telemetry.magEarth) ? telemetry.magEarth.toFixed(8) : "0",
+                magMoon: (telemetry && telemetry.magMoon) ? telemetry.magMoon.toFixed(8) : "0",
+                warp: timeWarp,
+                x: shipPos.x.toFixed(4),
+                y: shipPos.y.toFixed(4),
+                z: shipPos.z.toFixed(4),
+                target_burn_s: initialTargetBurnTime.toFixed(1),
+                actual_burn_s: actualBurnTime.toFixed(1)
+            });
+        }
+
+        document.getElementById('btn-save-log').addEventListener('click', () => {
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const blob = new Blob([JSON.stringify(flightLog, null, 2)], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Artemis_FlightLog_${timestamp}.json`; a.click();
+        });
+
+        // Add file input for loading
+        const logInput = document.createElement('input');
+        logInput.type = 'file';
+        logInput.accept = '.json';
+        logInput.style.display = 'none';
+        document.body.appendChild(logInput);
+
+        document.getElementById('btn-load-log').addEventListener('click', () => logInput.click());
+
+        logInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    playbackLog = JSON.parse(event.target.result);
+                    playbackActive = true;
+                    playbackIndex = 0;
+                    resetMission();
+                    cinematicActive = false; // Disable hardcoded cinematic
+                    document.getElementById('cinematic-status').textContent = "[PLAYBACK ACTIVE]";
+                    document.getElementById('cinematic-status').style.display = 'block';
+                    logEvent("SYSTEM: Starting Flight Log Playback");
+                } catch (err) {
+                    alert("Error parsing flight log JSON.");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function updatePlayback(dt) {
+            if (!playbackActive || playbackIndex >= playbackLog.length) {
+                if (playbackActive) {
+                    playbackActive = false;
+                    document.getElementById('cinematic-status').style.display = 'none';
+                    logEvent("SYSTEM: Playback Complete.");
+                }
+                return;
+            }
+
+            // Find the next log entry that matches or has passed the current MET
+            while (playbackIndex < playbackLog.length && playbackLog[playbackIndex].met <= metSeconds) {
+                let entry = playbackLog[playbackIndex];
+                if (entry.warp !== undefined) updateWarpUI(entry.warp);
+                playbackIndex++;
+            }
+        }
+
+        // --- BUTTON BINDINGS ---
+        document.getElementById('btn-abort').addEventListener('click', () => {
+            if (cinematicActive) {
+                cinematicActive = false;
+                document.getElementById('cinematic-status').style.display = 'none';
+                logEvent("CINEMATIC: Aborted via manual reset.");
+            }
+            resetMission();
+        });
+        document.getElementById('btn-warp-1').addEventListener('click', () => { shiftWarp(1); autoFastForward = false; });
+        document.getElementById('btn-warp-10').addEventListener('click', () => { shiftWarp(10); autoFastForward = false; });
+        document.getElementById('btn-warp-30').addEventListener('click', () => { shiftWarp(30); autoFastForward = false; });
+        document.getElementById('btn-warp-60').addEventListener('click', () => { shiftWarp(60); autoFastForward = false; });
+        document.getElementById('btn-warp-300').addEventListener('click', () => { shiftWarp(300); autoFastForward = false; });
+        document.getElementById('btn-warp-600').addEventListener('click', () => { shiftWarp(600); autoFastForward = false; });
+        document.getElementById('btn-warp-1800').addEventListener('click', () => { shiftWarp(1800); autoFastForward = false; });
+        document.getElementById('btn-warp-3600').addEventListener('click', () => { shiftWarp(3600); autoFastForward = false; });
+        document.getElementById('btn-warp-7200').addEventListener('click', () => { shiftWarp(7200); autoFastForward = false; });
+        
+        document.getElementById('btn-toggle-auto').addEventListener('click', (e) => {
+            cinematicActive = false; // Manual override
+            document.getElementById('cinematic-status').style.display = 'none';
+            autoPilotEngaged = !autoPilotEngaged;
+            e.target.textContent = autoPilotEngaged ? "AUTOPILOT ON" : "ENABLE AUTO TMI";
+            if (autoPilotEngaged) {
+                e.target.classList.add('active'); e.target.classList.remove('caution-btn');
+                document.getElementById('autopilot-status').textContent = "ENGAGED"; document.getElementById('autopilot-status').className = "nominal";
+            } else {
+                e.target.classList.remove('active');
+                document.getElementById('autopilot-status').textContent = "OFF"; document.getElementById('autopilot-status').className = "danger";
+            }
+        });
+
+        document.getElementById('btn-skip-window').addEventListener('click', () => { 
+            cinematicActive = false; // Manual override
+            document.getElementById('cinematic-status').style.display = 'none';
+            autoFastForward = true; 
+            shiftWarp(3600); 
+        });
+        
+        function startManualBurn() { 
+            cinematicActive = false; // Manual override
+            document.getElementById('cinematic-status').style.display = 'none';
+            if(fuel > 0) { 
+                isBurning = true; autoPilotEngaged = false; autoBurnActive = false;
+                const autoBtn = document.getElementById('btn-toggle-auto');
+                if (autoBtn) {
+                    autoBtn.textContent = "ENABLE AUTO TMI"; 
+                    autoBtn.classList.remove('active'); 
+                }
+                safeSetText('autopilot-status', "OFF", "danger");
+            } 
+        }
+        function stopManualBurn() { isBurning = false; }
+        
+        function updateWarpUI(w) {
+            timeWarp = w;
+            document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active'));
+            // Highlight the TARGET button if we are still shifting
+            if(document.getElementById(`btn-warp-${targetWarp}`)) document.getElementById(`btn-warp-${targetWarp}`).classList.add('active');
+            
+            const warpTextEl = document.getElementById('warp-text');
+            if(warpTextEl) {
+                let speedLabel = w + "x";
+                if(w === 1) speedLabel = "1x (Realtime)";
+                if(w === 30) speedLabel = "30x (Steady)";
+                if(w === 60) speedLabel = "60x (1m/s)";
+                if(w === 300) speedLabel = "300x (5m/s)";
+                if(w === 600) speedLabel = "600x (10m/s)";
+                if(w === 1800) speedLabel = "1.8kx (Fast)";
+                if(w === 3600) speedLabel = "3.6kx (Cruise)";
+                if(w === 7200) speedLabel = "7.2kx (Maximum)";
+                
+                // Show transition in HUD
+                if (timeWarp !== targetWarp) {
+                    warpTextEl.textContent = `${speedLabel} [>> ${targetWarp}x]`;
+                } else {
+                    warpTextEl.textContent = speedLabel;
+                }
+                warpTextEl.className = w === 1 ? "nominal" : "caution";
+            }
+        }
+
+        function showNavMsg(text, duration = 3000, className = "") {
+            const msgEl = document.getElementById('nav-msg');
+            if (msgEl) {
+                msgEl.textContent = text;
+                msgEl.className = className;
+                setTimeout(() => { 
+                    if (msgEl.textContent === text) {
+                        msgEl.textContent = ""; 
+                        msgEl.className = "";
+                    }
+                }, duration);
+            }
+        }
+
+        function triggerButtonFlash(w) {
+            const btn = document.getElementById(`btn-warp-${w}`);
+            if (btn) btn.classList.add('caution-btn');
+        }
+        
+        let pendingDangerWarp = null;
+        let maxSafeWarp = 7200;
+
+        function resetWarpButtonTexts() {
+            const labels = {1: "1x", 10: "10x", 30: "30x", 60: "60x", 300: "300x", 600: "600x", 1800: "1.8kx", 3600: "3.6kx", 7200: "7.2kx"};
+            [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+                const btn = document.getElementById(`btn-warp-${w}`);
+                if (btn && btn.textContent === "CONFIRM") btn.textContent = labels[w];
+            });
+        }
+
+        [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+            const btn = document.getElementById(`btn-warp-${w}`);
+            if (btn) btn.addEventListener('click', () => {
+                if (isBurning) {
+                    showNavMsg("COMMAND DENIED: ENGINES ACTIVE", 3000, "flash-warning");
+                    return;
+                }
+                
+                // Double Click Latch Logic for Dangerous Warps
+                if (w > maxSafeWarp) {
+                    if (pendingDangerWarp !== w) {
+                        resetWarpButtonTexts();
+                        pendingDangerWarp = w;
+                        btn.textContent = "CONFIRM";
+                        showNavMsg(`ADVISORY: DANGEROUS WARP LEVEL. CLICK AGAIN TO CONFIRM.`, 4000, "flash-warning");
+                        return; // Halt shift
+                    }
+                }
+                
+                // Authorized Shift
+                pendingDangerWarp = null;
+                resetWarpButtonTexts();
+                
+                cinematicActive = false; // Manual override
+                playbackActive = false; // Manual override
+                document.getElementById('cinematic-status').style.display = 'none';
+                
+                // Clear any flashing suggestions
+                [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(wVal => {
+                    const b = document.getElementById(`btn-warp-${wVal}`);
+                    if(b) b.classList.remove('caution-btn');
+                });
+
+                shiftWarp(w); // Set target warp for incremental shifting
+                updateWarpUI(timeWarp); // Immediate visual feedback
+                logEvent(`MANUAL: Target Warp set to ${w}x`, {});
+            });
+        });
+
+        // --- ORBITAL PHYSICS ENGINE (VELOCITY VERLET) ---
+        // --- PRE-ALLOCATED MATH VECTORS (ZERO-ALLOCATION LOOP) ---
+        const _aEarth = new THREE.Vector3();
+        const _aMoon = new THREE.Vector3();
+        const _dirMoon = new THREE.Vector3();
+        const _moonPos = new THREE.Vector3();
+        const _accel = new THREE.Vector3();
+        const _nextAccel = new THREE.Vector3();
+        const _thrustAcc = new THREE.Vector3();
+        const _nextThrustAcc = new THREE.Vector3();
+        const _totalAccel = new THREE.Vector3();
+        const _nextTotalAccel = new THREE.Vector3();
+        const _tempVec1 = new THREE.Vector3();
+        const _tempVec2 = new THREE.Vector3();
+        const _camDir = new THREE.Vector3();
+        const _dirToMoon = new THREE.Vector3();
+        const _lookTarget = new THREE.Vector3();
+
+        // Optimized physics step to avoid GC lag at high warp.
+        // Uses pre-allocated vectors to achieve zero allocations per function call.
+        function getAcceleration(pos, accelOut) {
+            // Gravity from Earth
+            let rEarth = pos.length();
+            let magEarth = muEarth / (rEarth * rEarth); // Acceleration magnitude (km/s^2)
+            _aEarth.copy(pos).multiplyScalar(-muEarth / (rEarth * rEarth * rEarth));
+            
+            // Gravity from Moon
+            _moonPos.copy(moon.position).divideScalar(renderScale);
+            _dirMoon.subVectors(_moonPos, pos);
+            let rMoon = Math.max(0.0001, _dirMoon.length()); // Prevent dev by zero
+            let magMoon = muMoon / (rMoon * rMoon); // Acceleration magnitude (km/s^2)
+            _aMoon.copy(_dirMoon).multiplyScalar(muMoon / (rMoon * rMoon * rMoon));
+            
+            accelOut.copy(_aEarth).add(_aMoon);
+            
+            return {
+                magEarth: magEarth,
+                magMoon: magMoon
+            };
+        }
+
+        function updatePhysics(dt) {
+            const moonAngularVel = Math.sqrt(muEarth / Math.pow(distMoon, 3));
+            moonAngle += moonAngularVel * dt;
+            moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
+
+            let r = shipPos.length();
+            let currentVelMag = shipVel.length();
+            _moonPos.copy(moon.position).divideScalar(renderScale);
+            let distToMoon = shipPos.distanceTo(_moonPos);
+
+            // Waypoint Checks
+            let activeWaypoints = isReturningHome ? MISSION_WAYPOINTS_RETURN : MISSION_WAYPOINTS_OUTBOUND;
+            for (let wp of activeWaypoints) {
+                let conditionMet = isReturningHome ? (r <= wp.distance_km) : (r >= wp.distance_km);
+                if (conditionMet && !wp.passed) {
+                    wp.passed = true;
+                    logEvent(`WAYPOINT REACHED: ${wp.name}`);
+                    autoDecelerateTarget = 1; // Trigger Sequential Auto-Braking
+                    evaluateMCC(wp);
+                }
+            }
+            
+            // Target Energy (including Earth and Moon potential for higher precision)
+            let currentEnergy = (currentVelMag * currentVelMag) / 2 - (muEarth / r) - (muMoon / Math.max(1, distToMoon));
+            let a_transfer = (radEarth + 400 + distMoon) / 2; 
+            let targetEnergy = -muEarth / (2 * a_transfer);
+            let isTliCoast = currentEnergy >= targetEnergy; 
+            
+            // Calculate remaining ΔV for UI
+            let targetVelAtCurrentAlt = Math.sqrt(2 * (targetEnergy + (muEarth / r) + (muMoon / Math.max(1, distToMoon))));
+            let dvRequired = Math.max(0, targetVelAtCurrentAlt - currentVelMag);
+            
+            // Rocket Equation for precise burn time: dV = Ve * ln(m0/m1)
+            // m1 = m0 * exp(-dV/Ve) | massLost = m0 - m1 | time = massLost / massFlowRate
+            let m0 = shipEmptyMass + fuel;
+            let m1 = m0 * Math.exp(-dvRequired / exhaustVel);
+            let estimatedBurnTime = (m0 - m1) / massFlowRate;
+
+            if (isBurning && initialTargetBurnTime === 0 && dvRequired > 0) {
+                initialTargetBurnTime = estimatedBurnTime;
+            }
+
+            // Phase Angle Window Logic
+            // Use global Phase Angle for synchronized window calculation
+            let targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
+            let shipAngle = Math.atan2(shipPos.z, shipPos.x); if(shipAngle < 0) shipAngle += Math.PI * 2;
+            let angleDiff = targetPhaseAngle - shipAngle; if(angleDiff < 0) angleDiff += Math.PI * 2;
+            let shipAngularVel = currentVelMag / r;
+            let timeToWindow = angleDiff / Math.max(0.0001, (shipAngularVel - moonAngularVel));
+            if(autoFastForward && timeToWindow < 60 && !isTliCoast) { autoFastForward = false; updateWarpUI(1); }
+
+            // Latching Autopilot
+            let wasBurning = isBurning;
+            if (autoPilotEngaged && !isTliCoast) {
+                if (timeToWindow < 5 && !autoBurnActive) {
+                    autoBurnActive = true; 
+                    initialTargetBurnTime = estimatedBurnTime; 
+                }
+            }
+            
+            if (autoBurnActive && !isTliCoast) {
+                isBurning = true; 
+            } else if (autoPilotEngaged && isTliCoast && autoBurnActive) {
+                isBurning = false; 
+                autoBurnActive = false;
+            }
+
+            if(isBurning && !wasBurning) {
+                logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) });
+                if (timeWarp > 1) {
+                    updateWarpUI(1);
+                    showNavMsg("WARP RESET: ENGINES ACTIVE", 3000, "flash-warning");
+                }
+            }
+            if(!isBurning && wasBurning) {
+                logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) });
+                if (isTliCoast) burnEndTime = metSeconds;
+            }
+
+            if (isBurning) actualBurnTime += dt;
+
+            // --- Standard Velocity Verlet Integration (Zero-Allocation) ---
+            let currentMass = shipEmptyMass + fuel;
+            let altE = shipPos.length() - radEarth;
+            let accelData = getAcceleration(shipPos, _accel);
+            let magEarth = accelData.magEarth;
+            let magMoon = accelData.magMoon;
+            
+            // 1. Inbound Midcourse Correction (MCC) Logic
+            let isReturning = shipVel.dot(shipPos) < 0; // Negative dot product means falling toward Earth
+            if (autoPilotEngaged && isReturning) {
+                if (altE < 192200 && !milestoneLatches.mcc1) {
+                    milestoneLatches.mcc1 = true;
+                    logEvent('AUTO: Inbound Midcourse Correction (MCC) Executed', { magEarth, magMoon });
+                    // Instantaneous impulse to ensure we thread the 122km keyhole
+                    let currentTangent = shipVel.clone().projectOnPlane(shipPos).normalize();
+                    let correctionMagnitude = 0.005; // 5 m/s nudge
+                    shipVel.add(currentTangent.multiplyScalar(correctionMagnitude));
+                }
+            }
+
+            // Calculate Flight Path Angle (Entry Angle) - Zero Allocation
+            _tempVec1.copy(shipVel).normalize();
+            _tempVec2.copy(shipPos).normalize();
+            let dot = _tempVec1.dot(_tempVec2);
+            let fpaRad = Math.asin(Math.max(-1, Math.min(1, dot)));
+            let flightPathAngle = THREE.MathUtils.radToDeg(fpaRad);
+
+            // 2. Atmospheric Drag Equation
+            let dragAccMag = 0;
+            let isReentry = false;
+            if (altE < 122 && altE > 0) { // Entry Interface
+                isReentry = true;
+                let dragCd = 1.5; // Capsule blunt body
+                if (altE < 7.3) dragCd = 50.0;  // Drogue Chutes
+                if (altE < 3.0) dragCd = 150.0; // Main Chutes
+
+                let density = 1.225 * Math.exp(-altE / 8.5); // Barometric density (kg/m^3)
+                let v_ms = currentVelMag * 1000; // km/s to m/s
+                let dragForce = 0.5 * density * v_ms * v_ms * dragCd * 10.5; // Newtons (Area = 10.5)
+                dragAccMag = (dragForce / 8000) / 1000; // Force / Mass (8000kg capsule) in km/s^2
+            }
+
+            currentGForce = 0; 
+            _thrustAcc.set(0,0,0);
+            
+            if (isBurning && fuel > 0) {
+                let thrustAccMag = (thrustForce / currentMass); 
+                _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
+                fuel -= (massFlowRate * dt); 
+                if(fuel < 0) fuel = 0;
+                currentGForce = thrustAccMag / 0.00980665; 
+            }
+            
+            // Add Reentry G-Forces to the dial
+            if (isReentry) {
+                currentGForce += dragAccMag / 0.00980665;
+            }
+            if (currentGForce > maxGForce) maxGForce = currentGForce;
+
+            // 1. pos(t + dt) = pos(t) + v(t)dt + 0.5 * a(t)dt^2
+            _totalAccel.copy(_accel).add(_thrustAcc);
+            if (isReentry && currentVelMag > 0) {
+                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); // Drag opposes velocity
+                _totalAccel.add(_tempVec1);
+            }
+
+            _tempVec1.copy(shipVel).multiplyScalar(dt);
+            _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt);
+            shipPos.add(_tempVec1).add(_tempVec2);
+            
+            // 2. a(t + dt)
+            let nextAccelData = getAcceleration(shipPos, _nextAccel);
+            _nextThrustAcc.set(0,0,0);
+            
+            if (isBurning && fuel > 0) {
+                let thrustAccMag = (thrustForce / currentMass);
+                _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag);
+            }
+            _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
+            
+            if (isReentry && shipVel.length() > 0) {
+                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag);
+                _nextTotalAccel.add(_tempVec1);
+            }
+
+            // 3. v(t + dt) = v(t) + 0.5 * (a(t) + a(t + dt))dt
+            _tempVec1.addVectors(_totalAccel, _nextTotalAccel).multiplyScalar(0.5 * dt);
+            shipVel.add(_tempVec1);
+
+            shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
+            _tempVec1.copy(shipVel).normalize();
+            _lookTarget.copy(shipGroup.position).sub(_tempVec1);
+            shipGroup.lookAt(_lookTarget); 
+            
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = THREE.MathUtils.degToRad(lookLon);
+            camera.rotation.x = THREE.MathUtils.degToRad(lookLat);
+
+            earth.rotation.y += 0.0000727 * dt;
+
+            // Task 5: Auto-Warp Decelerator for Reentry Approach
+            if (isReturningHome && altE < 5000 && timeWarp > 60 && !cinematicActive && !playbackActive) {
+                shiftWarp(60);
+                showNavMsg("ADVISORY: ATMOSPHERIC APPROACH - REDUCING WARP", 4000, "flash-warning");
+            }
+
+            // Safety Warning only: Do not force warp down per user feedback
+            if (distToMoon < WARP_LIMITS.ENTER_SOI_DIST && timeWarp > WARP_LIMITS.ENTER_SOI_WARP && !cinematicActive && !playbackActive) {
+                showNavMsg("ADVISORY: REDUCE WARP FOR SOI STABILITY", 4000, "flash-warning");
+            }
+
+            return { 
+                timeToWindow, 
+                isTliCoast, 
+                estimatedBurnTime,
+                magEarth: accelData.magEarth,
+                magMoon: accelData.magMoon,
+                flightPathAngle: flightPathAngle
+            };
+        }
+        function formatTime(totalSeconds) {
+            let d = Math.floor(totalSeconds / 86400); let h = Math.floor((totalSeconds % 86400) / 3600);
+            let m = Math.floor((totalSeconds % 3600) / 60); let s = Math.floor(totalSeconds % 60);
+            return `${d.toString().padStart(2, '0')}:${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        const clock = new THREE.Clock();
+        const raycaster = new THREE.Raycaster();
+        const centerScreen = new THREE.Vector2(0, 0);
+
+        function safeSetText(id, text, className) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (text !== undefined) el.textContent = text;
+                if (className !== undefined) el.className = className;
+            }
+            return el;
+        }
+
+        // Main Simulation Loop
+        renderer.setAnimationLoop(() => {
+            try {
+                const dt_real = Math.min(clock.getDelta(), 0.1);
+                let simSecondsToProcess = dt_real * timeWarp;
+
+                // Sub-stepping for physics stability
+                // High warp (7.2kx) needs finer sub-stepping to capture gravity gradients
+                _moonPos.copy(moon.position).divideScalar(renderScale);
+                let distM = shipPos.distanceTo(_moonPos) - radMoon;
+                let stepSize = 0.5; // Default 0.5s step
+                if (distM < 60000) stepSize = 0.1; // Standard SOI precision
+                if (distM < 5000) stepSize = 0.01; // Ultra-fine for close flyby only
+                
+                // Increase step budget to 10,000 to support higher warp speeds
+                let steps = Math.max(1, Math.min(10000, Math.ceil(simSecondsToProcess / stepSize)));
+                let dt_step = simSecondsToProcess / steps;
+
+                let telemetry = null;
+                for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
+                metSeconds += simSecondsToProcess;
+                
+                // Update Smooth Gearbox (Gradual Warp Ramp-up/down)
+                updateWarpStepping(dt_real, telemetry);
+                
+                // Task 2: Auto-MCC Countdown Logic
+                if (mccAutoCountdown > 0 && timeWarp === 1) {
+                    mccAutoCountdown -= dt_real;
+                    showNavMsg(`AUTO-CORRECTION IN ${Math.ceil(mccAutoCountdown)}s`, 1000, "flash-warning");
+                    // Dynamic yellow flash for the alignment button
+                    const mccBtn = document.getElementById('btn-autopilot-mcc');
+                    if (mccBtn) {
+                        let isFlash = Math.floor(Date.now() / 500) % 2 === 0;
+                        mccBtn.style.backgroundColor = isFlash ? "rgba(255, 255, 0, 0.9)" : "rgba(255, 68, 68, 0.1)";
+                        mccBtn.style.color = isFlash ? "#000" : "#ff4444";
+                        mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`;
+                    }
+                } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) {
+                    executeAutopilotBurn();
+                } else {
+                    // Restore default text when not counting down
+                    const mccBtn = document.getElementById('btn-autopilot-mcc');
+                    if (mccBtn && mccAutoCountdown === -1) {
+                        mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT";
+                    }
+                }
+                
+                // Update cinematic sequence
+                if (cinematicActive) updateCinematic(dt_real, telemetry);
+                updatePlayback(dt_real);
+
+                // Auto-Warp Decelerator Sequence (MCC Stage Braking)
+                if (typeof targetWarp !== 'undefined' && autoDecelerateTarget > 0 && targetWarp > autoDecelerateTarget) {
+                    let now = performance.now();
+                    if (now - lastDecelTime > 1200) { // step down every 1.2 seconds for dramatic effect
+                        lastDecelTime = now;
+                        const gears = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200];
+                        let currentIndex = gears.indexOf(targetWarp);
+                        if (currentIndex > 0) {
+                            let nextWarp = gears[currentIndex - 1];
+                            shiftWarp(nextWarp);
+                            updateWarpUI(timeWarp); // UI refresh
+                            triggerAlertFlash(`btn-warp-${nextWarp}`); // Yellow blink directly onto the button
+                        }
+                    }
+                } else if (typeof targetWarp !== 'undefined' && targetWarp <= autoDecelerateTarget) {
+                    autoDecelerateTarget = -1; // Braking complete
+                }
+
+                // --- AUTO TRACKING LOGIC ---
+                if (isTrackingTarget && currentTargetObj) {
+                    let targetWorldPos = new THREE.Vector3();
+                    currentTargetObj.getWorldPosition(targetWorldPos);
+                    
+                    let localTarget = shipGroup.worldToLocal(targetWorldPos.clone());
+                    localTarget.normalize();
+                    
+                    let targetLat = THREE.MathUtils.radToDeg(Math.asin(localTarget.y));
+                    let targetLon = THREE.MathUtils.radToDeg(Math.atan2(-localTarget.x, -localTarget.z));
+                    
+                    lookLon = THREE.MathUtils.lerp(lookLon, targetLon, 0.05);
+                    lookLat = THREE.MathUtils.lerp(lookLat, targetLat, 0.05);
+                }
+
+                // --- TARGETING / RAYCASTING TOOLTIP ---
+                raycaster.setFromCamera(centerScreen, camera);
+                const intersects = raycaster.intersectObjects([earth, moon, sunMesh, progradeMesh]); 
+                const popup = document.getElementById('target-popup');
+                if (intersects.length > 0 && !isDraggingView) {
+                    let target = intersects[0].object;
+                    currentTargetObj = target; 
+                    
+                    if (target.name === "PROGRADE VECTOR") {
+                        safeSetText('target-name', "PROGRADE VECTOR");
+                        safeSetText('target-dist', "Velocity Heading");
+                        safeSetText('target-hint', "Ship travels in this direction.");
+                        if (popup) popup.style.display = 'block';
+                    } else if (target.name) {
+                        let tDist = shipPos.distanceTo(target.position.clone().divideScalar(renderScale));
+                        safeSetText('target-name', target.name);
+                        
+                        if(target.name === "THE MOON") {
+                            safeSetText('target-dist', Math.round(tDist - radMoon).toLocaleString() + " km");
+                            safeSetText('target-hint', telemetry.isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn.");
+                        } else if(target.name === "EARTH") {
+                            safeSetText('target-dist', Math.round(tDist - radEarth).toLocaleString() + " km");
+                            safeSetText('target-hint', "Origin / Communications Hub.");
+                        } else if (target.name === "THE SUN") {
+                            safeSetText('target-dist', "149,597,870 km"); 
+                            safeSetText('target-hint', "Solar Array Charging Nominal.");
+                        }
+                        if (popup) popup.style.display = 'block';
+                    }
+                } else {
+                    if (popup) popup.style.display = 'none';
+                }
+
+                // --- UI UPDATE LOGIC ---
+                let altE = shipPos.length() - radEarth;
+                distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
+
+                if (altE > globalMaxAlt) globalMaxAlt = altE;
+
+                safeSetText('met-time', formatTime(metSeconds));
+                
+                // Task 4: Aviation Mode (High Precision below 10km)
+                if (altE < 10 && altE > 0) {
+                    safeSetText('alt-earth', altE.toFixed(3) + " km");
+                    safeSetText('velocity', (shipVel.length() * 1000).toFixed(1) + " m/s");
+                } else {
+                    safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+                    safeSetText('velocity', shipVel.length().toFixed(2) + " km/s");
+                }
+                
+                // Task 3: Entry Angle UI Formatting
+                let fpaColor = "danger"; 
+                if (telemetry.flightPathAngle < -5.5 && telemetry.flightPathAngle > -7.5) fpaColor = "nominal"; 
+                else if (telemetry.flightPathAngle <= -4.5 && telemetry.flightPathAngle >= -8.5) fpaColor = "caution"; 
+                safeSetText('entry-angle', telemetry.flightPathAngle.toFixed(2) + "°", fpaColor);
+
+                safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+
+                safeSetText('vx', shipVel.x.toFixed(3));
+                safeSetText('vy', shipVel.y.toFixed(3));
+                safeSetText('vz', shipVel.z.toFixed(3));
+
+                // Units: Convert km/s² to m/s² (x1000) for better readability
+                safeSetText('grav-earth', (telemetry.magEarth * 1000).toFixed(4) + " m/s²");
+                safeSetText('grav-moon', (telemetry.magMoon * 1000).toFixed(4) + " m/s²");
+                safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%");
+                safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
+
+                _moonPos.copy(moon.position).divideScalar(renderScale);
+                _dirToMoon.subVectors(_moonPos, shipPos).normalize();
+                camera.getWorldDirection(_camDir);
+                let angleToMoon = _camDir.angleTo(_dirToMoon) * (180 / Math.PI);
+
+                safeSetText('moon-heading', angleToMoon.toFixed(1) + (angleToMoon > 40 ? "° (Pan to find)" : "° (In View)"), angleToMoon > 40 ? "caution" : "nominal");
+
+                // Region Logic & Milestone Alerts (Removed forced resets, replaced with suggestions)
+                let region = "Low Earth Orbit";
+                const clearWarpSuggestions = () => {
+                    [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+                        const btn = document.getElementById(`btn-warp-${w}`);
+                        if(btn) btn.classList.remove('caution-btn');
+                    });
+                };
+
+                if (distM < WARP_LIMITS.PROXIMITY_DIST) {
+                    region = "Lunar Proximity";
+                    if (!milestoneLatches.lunarProximity) {
+                        logEvent("Milestone: Entering Lunar Proximity", telemetry);
+                        milestoneLatches.lunarProximity = true;
+                        triggerAlertFlash("region-text");
+                        if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.PROXIMITY_WARP) {
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.PROXIMITY_WARP + "x", 3000, "flash-warning");
+                            const b = document.getElementById('btn-warp-' + WARP_LIMITS.PROXIMITY_WARP); if(b) b.classList.add('caution-btn');
+                        }
+                    }
+                }
+                else if (distM < 40000) region = "Final Lunar Approach";
+                else if (distM < WARP_LIMITS.ENTER_SOI_DIST) {
+                    region = "Lunar Sphere of Influence";
+                    if (!milestoneLatches.inSOI) {
+                        logEvent("Milestone: Entered Lunar Sphere of Influence", telemetry);
+                        milestoneLatches.inSOI = true;
+                        triggerAlertFlash("region-text");
+                        if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.ENTER_SOI_WARP) {
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.ENTER_SOI_WARP + "x", 3000, "flash-warning");
+                            const b = document.getElementById('btn-warp-' + WARP_LIMITS.ENTER_SOI_WARP); if(b) b.classList.add('caution-btn');
+                        }
+                    }
+                }
+                else if (distM < WARP_LIMITS.APPROACH_SOI_DIST) {
+                    region = "Approaching Lunar SOI";
+                    if (!milestoneLatches.approachingSOI) {
+                        logEvent("Milestone: Approaching Lunar SOI", telemetry);
+                        milestoneLatches.approachingSOI = true;
+                        if (!cinematicActive && !playbackActive && timeWarp > WARP_LIMITS.APPROACH_SOI_WARP) {
+                            showNavMsg("SUGGESTED WARP: " + WARP_LIMITS.APPROACH_SOI_WARP + "x", 3000, "flash-warning");
+                            const b = document.getElementById('btn-warp-' + WARP_LIMITS.APPROACH_SOI_WARP); if(b) b.classList.add('caution-btn');
+                        }
+                    }
+                }
+                else if (altE > 202200) {
+                    region = "Deep Space (Cislunar Inbound)";
+                    if (!milestoneLatches.pastMidpoint) {
+                        logEvent("Milestone: Beyond Trans-Lunar Midpoint", telemetry);
+                        milestoneLatches.pastMidpoint = true;
+                    }
+                }
+                else if (altE > 182200 && altE < 202200) {
+                    region = "Trans-Lunar Midpoint";
+                    if (!milestoneLatches.atMidpoint) {
+                        logEvent("Milestone: Midpoint Transition Reached", telemetry);
+                        milestoneLatches.atMidpoint = true;
+                        triggerAlertFlash("region-text");
+                    }
+                }
+                else if (altE > 150000) {
+                    region = "Approaching Midpoint";
+                    if (!milestoneLatches.approachingMidpoint) {
+                        logEvent("Milestone: Approaching Midpoint", telemetry);
+                        milestoneLatches.approachingMidpoint = true;
+                    }
+                }
+                else if (altE > 100000) region = "Deep Space (Cislunar Outbound)";
+                else if (altE > 36300) {
+                    region = "Beyond Geosynchronous";
+                    if (!milestoneLatches.beyondGeosync) {
+                        logEvent("Milestone: Beyond Geosynchronous Altitude", telemetry);
+                        milestoneLatches.beyondGeosync = true;
+                    }
+                }
+                else if (altE > 35286 && altE < 36286) {
+                    region = "Geosynchronous Orbit";
+                    if (!milestoneLatches.atGeosync) {
+                        logEvent("Milestone: Geosynchronous Altitude Reached", telemetry);
+                        milestoneLatches.atGeosync = true;
+                        triggerAlertFlash("region-text");
+                    }
+                }
+                else if (altE > 30000) {
+                    region = "Approaching Geosync";
+                    if (!milestoneLatches.approachingGeosync) {
+                        logEvent("Milestone: Approaching Geosync", telemetry);
+                        milestoneLatches.approachingGeosync = true;
+                    }
+                }
+                else if (altE > 2000) region = "Medium Earth Orbit";
+                safeSetText('region-text', region);
+
+                // Safe Warp UI Indicator Logic (State Cached for Performance)
+                maxSafeWarp = 7200;
+                if (altE <= 150) maxSafeWarp = 1;         // Atmosphere
+                else if (altE <= 2000) maxSafeWarp = 10;  // LEO Warning
+                else if (distM < WARP_LIMITS.PROXIMITY_DIST) maxSafeWarp = WARP_LIMITS.PROXIMITY_WARP; // Proximity
+                else if (distM < WARP_LIMITS.ENTER_SOI_DIST) maxSafeWarp = WARP_LIMITS.ENTER_SOI_WARP; // In SOI
+                else if (distM < WARP_LIMITS.APPROACH_SOI_DIST) maxSafeWarp = WARP_LIMITS.APPROACH_SOI_WARP; // Approaching Moon
+
+                if (maxSafeWarp !== currentMaxSafeWarp) {
+                    currentMaxSafeWarp = maxSafeWarp;
+                    [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
+                        const btn = document.getElementById(`btn-warp-${w}`);
+                        if (btn) {
+                            if (w <= maxSafeWarp) {
+                                btn.classList.add('safe-btn'); btn.classList.remove('danger-btn');
+                            } else {
+                                btn.classList.add('danger-btn'); btn.classList.remove('safe-btn');
+                            }
+                        }
+                    });
+                }
+
+                function triggerAlertFlash(elementId) {
+                    const el = document.getElementById(elementId);
+                    if (el) {
+                        el.classList.add('flash-yellow');
+                        setTimeout(() => el.classList.remove('flash-yellow'), 5000);
+                    }
+                }
+
+                // Diagnostics & G-Force
+                safeSetText('burn-target', (initialTargetBurnTime > 0 ? initialTargetBurnTime : telemetry.estimatedBurnTime).toFixed(1) + " s");
+                safeSetText('g-force', currentGForce.toFixed(2) + " G", currentGForce > 0 ? "caution" : "nominal");
+
+                const burnActualEl = document.getElementById('burn-actual');
+                if (burnActualEl) {
+                    burnActualEl.textContent = actualBurnTime.toFixed(1) + " s";
+                    if (isBurning) {
+                        let ratio = actualBurnTime / (initialTargetBurnTime || 145.0);
+                        burnActualEl.className = ratio < 0.8 ? "flash-red" : "flash-yellow";
+                    } else if (telemetry.isTliCoast) {
+                        burnActualEl.className = (metSeconds - burnEndTime < 5) ? "flash-green" : "solid-green";
+                    } else {
+                        burnActualEl.className = "nominal"; 
+                    }
+                }
+
+                // Itinerary
+                const itinTli = document.getElementById('itin-tli');
+                const itinCoast = document.getElementById('itin-coast');
+                const tliEstEl = document.getElementById('tli-est-time');
+                const tliEtaEl = document.getElementById('tli-eta');
+                
+                if(telemetry.isTliCoast) {
+                    if (itinTli) {
+                        itinTli.className = "complete";
+                        if (!itinTli.dataset.done) {
+                            itinTli.innerHTML = `[X] TLI Burn Complete`;
+                            itinTli.dataset.done = "true";
+                        }
+                    }
+                    if (itinCoast) itinCoast.className = "active";
+                    if (tliEtaEl) {
+                        let etaSeconds = distM / Math.max(0.1, shipVel.length());
+                        tliEtaEl.textContent = formatTime(etaSeconds);
+                    }
+                    progradeMat.color.setHex(0x00ff00);
+                } else {
+                    if (itinTli) {
+                        itinTli.className = "active";
+                        if (itinTli.dataset.done) {
+                            itinTli.innerHTML = `[ ] TLI Burn (Target: <span id="tli-est-time">${Math.ceil(telemetry.estimatedBurnTime)}</span>s)`;
+                            delete itinTli.dataset.done;
+                        }
+                    }
+                    if (tliEstEl) tliEstEl.textContent = Math.ceil(telemetry.estimatedBurnTime);
+                    progradeMat.color.setHex(isBurning ? 0xffff00 : 0x00ffff); 
+                }
+
+                // Timers & Hazards
+                if (telemetry.isTliCoast) {
+                    safeSetText('window-timer', "N/A (EN ROUTE)", "nominal");
+                } else {
+                    const winClass = telemetry.timeToWindow < 60 ? "danger" : (telemetry.timeToWindow < 300 ? "caution" : "nominal");
+                    safeSetText('window-timer', "T- " + formatTime(telemetry.timeToWindow).substring(3), winClass);
+                }
+
+                if (isBurning) {
+                    safeSetText('engine-status', autoPilotEngaged ? "AUTO TLI FIRING" : "MANUAL FIRING", "danger");
+                } else {
+                    safeSetText('engine-status', "STANDBY", "nominal");
+                }
+
+                // Orbital Traffic Checkpoints
+                if (altE > 380 && altE < 420 && !milestoneLatches.passedISS) {
+                    milestoneLatches.passedISS = true;
+                    showNavMsg("CHECKPOINT: ISS ORBITAL PLANE (400km)", 5000, "flash-warning");
+                    logEvent("CHECKPOINT: Passed ISS Orbital Plane");
+                }
+                if (altE > 530 && altE < 570 && !milestoneLatches.passedStarlink) {
+                    milestoneLatches.passedStarlink = true;
+                    showNavMsg("CHECKPOINT: STARLINK CONSTELLATION (550km)", 5000, "flash-warning");
+                    logEvent("CHECKPOINT: Passed Starlink Constellation");
+                }
+                if (altE > 19000 && altE < 21000 && !milestoneLatches.passedGPS) {
+                    milestoneLatches.passedGPS = true;
+                    showNavMsg("CHECKPOINT: GPS SATELLITE BELT (20,200km)", 5000, "flash-warning");
+                    logEvent("CHECKPOINT: Passed GPS Satellite Belt");
+                }
+
+                // State-based Phase/Status UI
+                if (altE <= 0) {
+                    let impactVel = shipVel.length() * 1000; // m/s
+                    // Task 3: Strict Survival Logic (Impact < 15 m/s AND Max G < 15)
+                    if (impactVel < 15 && maxGForce < 15) {
+                        safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal");
+                        safeSetText('nav-status', `CREW SECURE (Impact: ${impactVel.toFixed(1)} m/s | Max G: ${maxGForce.toFixed(1)}G)`, "nominal");
+                        progradeMat.color.setHex(0x00ff00);
+                    } else {
+                        let failureMsg = impactVel >= 15 ? `IMPACT: ${impactVel.toFixed(1)} m/s` : `EXCESSIVE G-LOAD: ${maxGForce.toFixed(1)}G`;
+                        safeSetText('phase-text', "FATAL IMPACT", "danger");
+                        safeSetText('nav-status', `MISSION FAILED (${failureMsg})`, "danger");
+                        progradeMat.color.setHex(0xff0000); 
+                    }
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (altE < 3.0) {
+                    safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal");
+                    safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal");
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (altE < 7.3) {
+                    safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution");
+                    safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution");
+                    safeSetText('window-timer', "DEPLOY MAINS (3.0 km)", "caution");
+                } else if (altE < 122) {
+                    safeSetText('phase-text', "ENTRY INTERFACE", "danger");
+                    // Task 4: Reentry Terminology
+                    if (altE > 40) {
+                        safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "danger");
+                    } else {
+                        safeSetText('nav-status', "TARGET DROGUES: 7.300 km", "danger");
+                    }
+                    safeSetText('window-timer', "DEPLOY DROGUES (7.3 km)", "danger");
+                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-1);
+                    _lookTarget.copy(shipGroup.position).add(_tempVec1);
+                    shipGroup.lookAt(_lookTarget);
+                } else if (distM < 0) {
+                    safeSetText('phase-text', "LITHOBRAKING (IMPACT)", "danger");
+                    safeSetText('nav-status', "MISSION FAILURE", "danger");
+                    if (timeWarp > 1) updateWarpUI(1);
+                } else if (distM <= 60000) {
+                    safeSetText('phase-text', "LUNAR ENCOUNTER", "caution");
+                    safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");
+                    if (itinCoast) {
+                        itinCoast.className = "complete";
+                        if (!itinCoast.dataset.done) {
+                            itinCoast.innerHTML = "[X] Trans-Lunar Coast Complete";
+                            itinCoast.dataset.done = "true";
+                        }
+                    }
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (itinFlyby) itinFlyby.className = "active";
+                    if (!milestoneLatches.inSOI) {
+                        milestoneLatches.inSOI = true;
+                        logEvent("LUNAR SOI ENCOUNTER: Entered Lunar Sphere of Influence", telemetry);
+                    }
+                } else if (distM > 60000 && milestoneLatches.inSOI) {
+                    isReturningHome = true;
+                    safeSetText('phase-text', "EARTH RETURN TRANSIT", "nominal");
+                    safeSetText('nav-status', "EXITING LUNAR SOI", "nominal");
+                    const itinFlyby = document.getElementById('itin-flyby');
+                    if (!milestoneLatches.exitedSOI) {
+                        milestoneLatches.exitedSOI = true;
+                        logEvent("LUNAR SOI BOUNDARY: Exited Lunar Sphere of Influence", telemetry);
+                    }
+                } else if (telemetry.isTliCoast) {
+                    safeSetText('phase-text', "TRANS-LUNAR COAST", "nominal");
+                    if (milestoneLatches.inSOI && distM > 60000) {
+                        safeSetText('nav-status', "EARTH RETURN EN ROUTE", "nominal");
+                        const itinFlyby = document.getElementById('itin-flyby');
+                        if (itinFlyby) {
+                            itinFlyby.className = "complete";
+                            if (!itinFlyby.dataset.done) {
+                                itinFlyby.innerHTML = "[X] Lunar Flyby Complete";
+                                itinFlyby.dataset.done = "true";
+                            }
+                        }
+                    } else {
+                        safeSetText('nav-status', "EN ROUTE TO MOON", "nominal");
+                    }
+                } else {
+                    safeSetText('phase-text', altE > 100000 ? "DEEP SPACE" : "LOW EARTH ORBIT", "nominal");
+                    if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) {
+                        safeSetText('nav-status', "ACTION REQ: ENABLE AUTOPILOT", "caution");
+                    } else {
+                        safeSetText('nav-status', "ORBIT STABLE", "nominal");
+                    }
+                }
+
+                // Autopilot Warning Flashing
+                const autoBtn = document.getElementById('btn-toggle-auto');
+                if (autoBtn) {
+                    if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 300) { 
+                        autoBtn.classList.add('caution-btn'); 
+                    } else { 
+                        autoBtn.classList.remove('caution-btn'); 
+                    }
+                }
+
+                renderer.render(scene, camera);
+            } catch (err) {
+                console.error("Simulation Loop Error:", err);
+            }
+        });
+
+        // --- AVIONICS: WAYPOINT & MCC EXECUTION ---
+        function evaluateMCC(waypoint) {
+            showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`, 5000, "flash-warning");
+            activeMCCWaypoint = waypoint;
+            mccAutoCountdown = 45; // 45 second countdown to auto-correction
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) btn.style.visibility = 'visible';
+        }
+
+        function executeAutopilotBurn() {
+            if (!activeMCCWaypoint) return;
+            
+            let dV = 0.02; // km/s
+            let altE = shipPos.length() - radEarth;
+            let currentVel = shipVel.length();
+            
+            if (isReturningHome) {
+                _tempVec1.copy(shipPos).normalize().multiplyScalar(-1);
+                _tempVec2.copy(_tempVec1).projectOnPlane(shipVel);
+                
+                if (_tempVec2.lengthSq() > 0.000001) {
+                    _tempVec2.normalize();
+                    shipVel.add(_tempVec2.multiplyScalar(dV));
+                } else {
+                    // Fallback to prograde if exactly radial
+                    shipVel.add(shipVel.clone().normalize().multiplyScalar(dV));
+                }
+                
+                let m0 = shipEmptyMass + fuel;
+                let fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel));
+                fuel -= fuelConsumed;
+                if (fuel < 0) fuel = 0;
+
+                let logMsg = `MCC EXECUTED: Return Trajectory Alignment. Target: ~40km Perigee. dV: ${dV}km/s Radial. Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km. V: ${currentVel.toFixed(2)}km/s`;
+                logEvent(logMsg);
+                showNavMsg(`MCC COMPLETE: TRAJECTORY ALIGNED (-${dV} km/s Radial)`);
+            } else {
+                let prograde = shipVel.clone().normalize();
+                shipVel.add(prograde.multiplyScalar(dV));
+                
+                let m0 = shipEmptyMass + fuel;
+                let fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel));
+                fuel -= fuelConsumed;
+                if (fuel < 0) fuel = 0;
+
+                let logMsg = `MCC EXECUTED: Outbound Trajectory Correction (+${dV} km/s Prograde). Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`;
+                logEvent(logMsg);
+                showNavMsg(`MCC COMPLETE: +${dV} km/s Delta-V`);
+            }
+            
+            activeMCCWaypoint = null;
+            mccAutoCountdown = -1;
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) {
+                btn.style.visibility = 'hidden';
+                btn.style.backgroundColor = "rgba(255, 68, 68, 0.1)"; // Reset flash colors
+                btn.style.color = "#ff4444";
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

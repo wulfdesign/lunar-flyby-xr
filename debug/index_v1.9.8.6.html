@@ -14,12 +14,6 @@
             padding: 20px; box-sizing: border-box; z-index: 10;
         }
 
-        #plasma-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,100,0,0) 30%, rgba(255,50,0,0.85) 100%);
-            opacity: 0; pointer-events: none; z-index: 5; transition: opacity 0.2s linear;
-        }
-
         .panel {
             background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.4);
             padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);
@@ -40,10 +34,7 @@
         .flash-red { color: #ff4444; font-weight: bold; animation: flash 0.5s infinite; text-shadow: 0 0 8px rgba(255, 68, 68, 0.8); }
         .flash-yellow { color: #ffff44; font-weight: bold; animation: flash 1.5s infinite; text-shadow: 0 0 8px rgba(255, 255, 68, 0.8); }
         .flash-green { color: #44ff44; font-weight: bold; animation: flash 1.5s infinite; text-shadow: 0 0 8px rgba(68, 255, 68, 0.8); }
-        
         .solid-green { color: #44ff44; font-weight: bold; text-shadow: 0 0 5px rgba(68, 255, 68, 0.5); }
-        .solid-yellow { color: #ffff44; font-weight: bold; text-shadow: 0 0 5px rgba(255, 255, 68, 0.5); }
-        .solid-red { color: #ff4444; font-weight: bold; text-shadow: 0 0 5px rgba(255, 68, 68, 0.5); }
         
         ul.checklist { list-style-type: none; padding: 0; margin: 10px 0; font-size: 0.85rem;}
         ul.checklist li { margin-bottom: 8px; color: #aaa; transition: color 0.3s; cursor: help; pointer-events: auto; }
@@ -51,11 +42,7 @@
         ul.checklist li.complete { color: #44ff44; text-decoration: line-through; }
         
         @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        @keyframes flash-btn-yellow { 
-            0% { background: rgba(255, 255, 0, 0.2); color: #ffff44; border-color: #ffff44; box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); } 
-            50% { background: rgba(255, 255, 0, 0.8); color: #000; border-color: #ffff44; box-shadow: 0 0 20px rgba(255, 255, 68, 1); } 
-            100% { background: rgba(255, 255, 0, 0.2); color: #ffff44; border-color: #ffff44; box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); } 
-        }
+        @keyframes flash-btn { 0% { box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); } 50% { box-shadow: 0 0 20px rgba(255, 255, 68, 1); } 100% { box-shadow: 0 0 10px rgba(255, 255, 68, 0.5); } }
 
         .controls { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; justify-content: flex-start;}
         button {
@@ -65,18 +52,18 @@
         }
         button:hover:not(:disabled) { background: #00ffff; color: #000; box-shadow: 0 0 10px #00ffff;}
         button:active:not(:disabled) { transform: scale(0.95); }
-        button:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555 !important; color: #555 !important; background: rgba(0,0,0,0.5) !important; }
-        button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; border-color: #00ffff !important; box-shadow: 0 0 10px #00ffff !important; animation: none !important;}
+        button:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555; color: #555; background: rgba(0,0,0,0.5); }
         
-        button.danger-btn { border-color: #ff4444 !important; color: #ff4444 !important; background: rgba(255, 68, 68, 0.1) !important; }
-        button.danger-btn:hover:not(:disabled) { background: #ff4444 !important; color: #000 !important; box-shadow: 0 0 10px #ff4444 !important;}
-        button.danger-btn.active { background: #aa0000 !important; color: #fff !important; border-color: #ff4444 !important; box-shadow: inset 0 0 10px #000 !important; animation: none !important; }
+        button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; }
+        
+        button.btn-danger { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+        button.btn-danger:hover:not(:disabled) { background: #ff4444; color: #000; box-shadow: 0 0 10px #ff4444;}
+        button.btn-danger.active { background: #aa0000 !important; color: #fff !important; border-color: #ff4444 !important; box-shadow: inset 0 0 10px #000 !important; animation: none !important; }
 
-        button.caution-btn { animation: flash-btn-yellow 1s infinite !important; border-color: #ffff44 !important; color: #ffff44 !important; }
-        
-        button.safe-btn { border-color: #44ff44 !important; color: #44ff44 !important; background: rgba(68, 255, 68, 0.1) !important; }
-        button.safe-btn.active { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44 !important; border-color: #44ff44 !important; animation: none !important;}
-        button.safe-btn:hover:not(:disabled) { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44 !important;}
+        button.caution-btn { animation: flash-btn 1s infinite; }
+        button.safe-btn { border-color: #44ff44; color: #44ff44; }
+        button.safe-btn.active { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44; }
+        button.safe-btn:hover:not(:disabled) { background: #44ff44 !important; color: #000 !important; }
         
         #crosshair-view {
             position: absolute; top: 50%; left: 50%; width: 16px; height: 16px;
@@ -120,7 +107,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <div id="plasma-overlay"></div>
     <div id="ui-layer">
         <div style="display: flex; justify-content: space-between; width: 100%;">
             <div class="panel" title="Real-time flight data. All units are accurate to real-world physics.">
@@ -130,8 +116,8 @@
                 <p><span class="tooltip" title="Mission Elapsed Time: Total duration since the simulation began.">MET:</span> <span id="met-time">00:00:00:00</span></p>
                 <hr style="border-color: #00ffff; opacity: 0.3;">
                 <p><span class="tooltip" title="Altitude above Earth's sea level.">Alt (Earth):</span> <span id="alt-earth">400 km</span></p>
+                <p><span class="tooltip" title="Maximum distance achieved from Earth during this flight">Max Alt:</span> <span id="max-alt" class="nominal">400 km</span></p>
                 <p><span class="tooltip" title="Distance from the Moon's surface.">Dist (Moon):</span> <span id="dist-moon">380,000 km</span></p>
-                <p><span class="tooltip" title="The closest distance achieved to the Moon during this flight.">Min Lunar Approach:</span> <span id="min-moon-dist" class="nominal">N/A</span></p>
                 <p><span class="tooltip" title="Angle between the center of your view and the Moon.">Moon Heading:</span> <span id="moon-heading" class="caution">0&deg;</span></p>
                 <p><span class="tooltip" title="Absolute velocity relative to Earth.">Velocity:</span> <span id="velocity">7.67 km/s</span></p>
                 <div id="velocity-vector-info" style="font-size: 0.7rem; color: #888; display: flex; justify-content: space-between;">
@@ -142,7 +128,7 @@
                 <p><span class="tooltip" title="Gravitational pull from the Moon (m/s²)">Moon Gravity:</span> <span id="grav-moon">0.00000</span></p>
                 <p><span class="tooltip" title="Remaining propellant in the Trans-Lunar Injection stage.">Fuel (TLI Stage):</span> <span id="fuel">100%</span></p>
                 <div class="controls">
-                    <button id="btn-abort" class="danger-btn" title="Emergency stop. Resets spacecraft back to Earth.">ABORT / RESTART</button>
+                    <button id="btn-abort" class="btn-danger" title="Emergency stop. Resets spacecraft back to Earth.">ABORT / RESTART</button>
                 </div>
             </div>
             <div></div>
@@ -162,8 +148,8 @@
                 </ul>
                 <div class="controls">
                     <button id="btn-save-log" title="Downloads a JSON file of your telemetry data at various mission timestamps.">SAVE FLIGHT LOG</button>
-                    <button id="btn-load-log" style="border-color: #555 !important; color: #555 !important; cursor: not-allowed;" title="Playback system currently under maintenance." disabled>LOAD FLIGHT LOG (OFFLINE)</button>
-                    <button id="btn-cinematic" style="border-color: #555 !important; color: #555 !important; cursor: not-allowed;" title="Automation system currently under maintenance." disabled>🔴 CINEMATIC (OFFLINE)</button>
+                    <button id="btn-load-log" style="border-color: #555; color: #555; cursor: not-allowed;" title="Playback system currently under maintenance." disabled>LOAD FLIGHT LOG (OFFLINE)</button>
+                    <button id="btn-cinematic" style="border-color: #555; color: #555; cursor: not-allowed;" title="Automation system currently under maintenance." disabled>🔴 CINEMATIC (OFFLINE)</button>
                 </div>
             </div>
 
@@ -175,13 +161,10 @@
                 </div>
                 <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
                 <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
-                
-                <p><span class="tooltip" title="Flight Path Angle projected at 122km altitude. Target -6.5° for safe reentry.">Proj. Entry Angle:</span> <span id="entry-angle" class="nominal">N/A</span></p>
-                <p><span class="tooltip" title="Calculated trajectory status for Earth Return.">Corridor Status:</span> <span id="corridor-status" class="nominal">AWAITING TLI</span></p>
-                
+                <p><span class="tooltip" title="Flight Path Angle projected at 122km altitude. Target -6.5° for safe reentry. Use manual burn to adjust.">Proj. Entry Angle:</span> <span id="entry-angle" class="nominal">N/A</span></p>
                 <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically execute trajectory maneuvers.">Autopilot:</span> <span id="autopilot-status" class="danger">OFF</span></p>
                 <div class="controls">
-                    <button id="btn-toggle-auto" class="caution-btn" title="Click to arm the flight computer.">ENABLE AUTO TMI</button>
+                    <button id="btn-toggle-auto" title="Click to arm the flight computer.">ENABLE AUTO TMI</button>
                     <button id="btn-skip-window" title="Warps time forward to exactly 60 seconds before the next burn window.">SKIP TO ACTION</button>
                     <button id="btn-track-target" title="Automatically keep the current target centered in view.">TRACK TARGET: OFF</button>
                 </div>
@@ -205,24 +188,17 @@
                     <button id="btn-warp-7200" title="1s = 2 Hours">7.2kx</button>
                 </div>
                 <div id="mcc-container">
-                    <button id="btn-autopilot-mcc" style="visibility:hidden; font-size: 0.9rem;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE TRAJECTORY ALIGNMENT</button>
+                    <button id="btn-autopilot-mcc" class="btn-danger caution-btn" style="visibility:hidden; font-size: 0.9rem;" title="Execute Mid-Course Correction (MCC) Burn." onclick="executeAutopilotBurn()">EXECUTE TRAJECTORY ALIGNMENT</button>
                 </div>
-                
-                <div id="standard-controls" class="controls">
-                    <button id="btn-thrust" class="danger-btn" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
-                </div>
-                <div id="reentry-controls" class="controls" style="display:none;">
-                    <button id="btn-lift-up" class="safe-btn" onmousedown="liftUp=true" onmouseup="liftUp=false" ontouchstart="liftUp=true" ontouchend="liftUp=false" title="Roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (REDUCE Gs)</button>
-                    <button id="btn-lift-down" class="danger-btn" onmousedown="liftDown=true" onmouseup="liftDown=false" ontouchstart="liftDown=true" ontouchend="liftDown=false" title="Roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (STEEPEN)</button>
+                <div class="controls">
+                    <button id="btn-thrust" class="btn-danger" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const SIM_VERSION = "1.9.8.10";
-
-        const ALLOW_7200X_IN_SYSTEM = false; 
+        const SIM_VERSION = "1.9.8.6";
 
         const WARP_LIMITS = {
             APPROACH_SOI_DIST: 100000, APPROACH_SOI_WARP: 600,
@@ -249,11 +225,11 @@
         let flightLog = []; 
         let lastLogTime = 0;
         let globalMaxAlt = 0;
-        let globalMinMoonDist = Infinity;
         
-        // Active Reentry Controls
-        let liftUp = false;
-        let liftDown = false;
+        let parachuteState = 'NONE'; 
+        const DRAG_AREA = 0.011; 
+        const RHO_0 = 1.225;     
+        const SCALE_HEIGHT = 8.5; 
         
         const MISSION_WAYPOINTS_OUTBOUND = [
             { name: "Geosynchronous Orbit Check", distance_km: 42164, passed: false, type: "MCC" },
@@ -262,7 +238,8 @@
         ];
         const MISSION_WAYPOINTS_RETURN = [
             { name: "Cislunar Return Interface", distance_km: 192200, passed: false, type: "MCC" },
-            { name: "Return Trajectory Alignment", distance_km: 42164, passed: false, type: "MCC" }
+            { name: "Return Trajectory Alignment", distance_km: 42164, passed: false, type: "MCC" },
+            { name: "Re-Entry Interface", distance_km: 5000, passed: false, type: "MCC" }
         ];
         
         let activeMCCWaypoint = null;
@@ -397,10 +374,8 @@
         const shipGroup = new THREE.Group();
         shipGroup.add(new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.005, 0.005), new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide})));
         
-        const progradeMat = new THREE.MeshBasicMaterial({color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.8});
-        const progradeMesh = new THREE.Mesh(new THREE.RingGeometry(0.04, 0.05, 16), progradeMat);
-        progradeMesh.name = "PROGRADE VECTOR"; 
-        progradeMesh.position.set(0, 0, -3); 
+        const progradeMesh = new THREE.Mesh(new THREE.RingGeometry(0.04, 0.05, 16), new THREE.MeshBasicMaterial({color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.8}));
+        progradeMesh.name = "PROGRADE VECTOR"; progradeMesh.position.set(0, 0, -3); 
         const pgLineMat = new THREE.LineBasicMaterial({color: 0x00ff00});
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.08, 0, 0), new THREE.Vector3(-0.04, 0, 0)]), pgLineMat));
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.08, 0, 0), new THREE.Vector3(0.04, 0, 0)]), pgLineMat));
@@ -422,25 +397,12 @@
             const startShipAngle = targetPhaseAngle - offsetAngle; 
             shipPos = new THREE.Vector3(startRadius * Math.cos(startShipAngle), 0, startRadius * Math.sin(startShipAngle));
             shipVel = new THREE.Vector3(vOrbit * -Math.sin(startShipAngle), 0, vOrbit * Math.cos(startShipAngle));
-            fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0; actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0; globalMinMoonDist = Infinity;
-            liftUp = false; liftDown = false;
-            
+            fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0; actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0;
             for (let key in milestoneLatches) milestoneLatches[key] = false;
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix(); document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
             updateWarpUI(1); flightLog = []; logEvent("Mission Started - System initialized in LEO.", { magEarth: muEarth/Math.pow(radEarth+400, 2), magMoon: 0 });
-            
-            const autoBtn = document.getElementById('btn-toggle-auto'); 
-            autoBtn.className = "caution-btn"; 
-            autoBtn.textContent = "ENABLE AUTO TMI"; 
-            document.getElementById('autopilot-status').textContent = "OFF"; 
-            document.getElementById('autopilot-status').className = "danger";
-            
+            const autoBtn = document.getElementById('btn-toggle-auto'); autoBtn.classList.remove('active'); autoBtn.textContent = "ENABLE AUTO TMI"; document.getElementById('autopilot-status').textContent = "OFF"; document.getElementById('autopilot-status').className = "danger";
             document.getElementById('itin-tli').className = "active"; document.getElementById('itin-coast').className = ""; document.getElementById('itin-flyby').className = "";
-            document.getElementById('standard-controls').style.display = 'flex';
-            document.getElementById('reentry-controls').style.display = 'none';
-            document.getElementById('plasma-overlay').style.opacity = 0;
-            
-            isReturningHome = false;
         }
         resetMission();
 
@@ -448,6 +410,8 @@
 
         function logEvent(eventMsg, telemetry) {
             let r = shipPos.length() - radEarth; let v = shipVel.length();
+            
+            // Generate Projected FPA for the log if returning
             let projectedGammaLog = "N/A";
             if (isReturningHome && r > 122) {
                 let h_mag = new THREE.Vector3().crossVectors(shipPos, shipVel).length();
@@ -464,7 +428,7 @@
                 version: SIM_VERSION, timestamp_real: new Date().toISOString(), met: metSeconds, met_formatted: formatTime(metSeconds),
                 event: eventMsg, altitude_km: r.toFixed(2), velocity_kms: v.toFixed(3),
                 vx: shipVel.x.toFixed(5), vy: shipVel.y.toFixed(5), vz: shipVel.z.toFixed(5),
-                gforce: currentGForce.toFixed(2), max_gforce: maxGForce.toFixed(2), min_moon_dist_km: globalMinMoonDist === Infinity ? "N/A" : globalMinMoonDist.toFixed(2),
+                gforce: currentGForce.toFixed(2), max_gforce: maxGForce.toFixed(2),
                 magEarth: (telemetry && telemetry.magEarth) ? telemetry.magEarth.toFixed(8) : "0", magMoon: (telemetry && telemetry.magMoon) ? telemetry.magMoon.toFixed(8) : "0",
                 warp: timeWarp, target_burn_s: initialTargetBurnTime.toFixed(1), actual_burn_s: actualBurnTime.toFixed(1),
                 projected_entry_angle: projectedGammaLog
@@ -472,26 +436,12 @@
         }
 
         document.getElementById('btn-save-log').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(flightLog, null, 2)], {type: "application/json"})); a.download = `Artemis_FlightLog_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.json`; a.click(); });
-        document.getElementById('btn-abort').addEventListener('click', () => { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; resetMission(); });
         
-        document.getElementById('btn-toggle-auto').addEventListener('click', (e) => { 
-            cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; 
-            autoPilotEngaged = !autoPilotEngaged; 
-            e.target.textContent = autoPilotEngaged ? "AUTOPILOT ON" : "ENABLE AUTO TMI"; 
-            if (autoPilotEngaged) { 
-                e.target.className = 'active'; 
-                document.getElementById('autopilot-status').textContent = "ENGAGED"; 
-                document.getElementById('autopilot-status').className = "nominal"; 
-            } else { 
-                e.target.className = 'caution-btn';
-                document.getElementById('autopilot-status').textContent = "OFF"; 
-                document.getElementById('autopilot-status').className = "danger"; 
-            } 
-        });
-
+        document.getElementById('btn-abort').addEventListener('click', () => { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; resetMission(); });
+        document.getElementById('btn-toggle-auto').addEventListener('click', (e) => { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; autoPilotEngaged = !autoPilotEngaged; e.target.textContent = autoPilotEngaged ? "AUTOPILOT ON" : "ENABLE AUTO TMI"; if (autoPilotEngaged) { e.target.classList.add('active'); e.target.classList.remove('caution-btn'); document.getElementById('autopilot-status').textContent = "ENGAGED"; document.getElementById('autopilot-status').className = "nominal"; } else { e.target.classList.remove('active'); document.getElementById('autopilot-status').textContent = "OFF"; document.getElementById('autopilot-status').className = "danger"; } });
         document.getElementById('btn-skip-window').addEventListener('click', () => { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; autoFastForward = true; shiftWarp(3600); });
         
-        function startManualBurn() { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; if(fuel > 0) { isBurning = true; autoPilotEngaged = false; autoBurnActive = false; const autoBtn = document.getElementById('btn-toggle-auto'); if (autoBtn) { autoBtn.textContent = "ENABLE AUTO TMI"; autoBtn.className = "caution-btn"; } safeSetText('autopilot-status', "OFF", "danger"); const btnMcc = document.getElementById('btn-autopilot-mcc'); if (btnMcc) { btnMcc.style.visibility = 'hidden'; mccAutoCountdown = -1; } } }
+        function startManualBurn() { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; if(fuel > 0) { isBurning = true; autoPilotEngaged = false; autoBurnActive = false; const autoBtn = document.getElementById('btn-toggle-auto'); if (autoBtn) { autoBtn.textContent = "ENABLE AUTO TMI"; autoBtn.classList.remove('active'); } safeSetText('autopilot-status', "OFF", "danger"); const btnMcc = document.getElementById('btn-autopilot-mcc'); if (btnMcc) { btnMcc.style.visibility = 'hidden'; mccAutoCountdown = -1; } } }
         function stopManualBurn() { isBurning = false; }
         
         function updateWarpUI(w) {
@@ -557,67 +507,42 @@
 
             let currentMass = shipEmptyMass + fuel; let altE = shipPos.length() - radEarth; let accelData = getAcceleration(shipPos, _accel); let magEarth = accelData.magEarth; let magMoon = accelData.magMoon;
             
+            let isReturning = shipVel.dot(shipPos) < 0; 
+            if (autoPilotEngaged && isReturning) { if (altE < 192200 && !milestoneLatches.mcc1) { milestoneLatches.mcc1 = true; logEvent('AUTO: Inbound Midcourse Correction (MCC) Executed', { magEarth, magMoon }); let currentTangent = shipVel.clone().projectOnPlane(shipPos).normalize(); shipVel.add(currentTangent.multiplyScalar(0.005)); } }
+
             _tempVec1.copy(shipVel).normalize(); _tempVec2.copy(shipPos).normalize(); let dot = _tempVec1.dot(_tempVec2);
             let flightPathAngle = THREE.MathUtils.radToDeg(Math.asin(Math.max(-1, Math.min(1, dot))));
 
-            let dragAccMag = 0; let isReentry = false; let liftAccMag = 0;
-            
+            let dragAccMag = 0; let isReentry = false;
             if (altE < 122 && altE > 0) {
-                isReentry = true; 
-                let dragCd = 1.5; 
-                
-                if (altE < 7.3 && altE >= 5.0) { let factor = (7.3 - altE) / 2.3; dragCd = 1.5 + (factor * 48.5); } 
-                else if (altE < 5.0 && altE >= 3.0) { dragCd = 50.0; } 
-                else if (altE < 3.0 && altE >= 2.0) { let factor = (3.0 - altE) / 1.0; dragCd = 50.0 + (factor * 100.0); } 
-                else if (altE < 2.0) { dragCd = 150.0; }
-
+                isReentry = true; let dragCd = 1.5; if (altE < 7.3) dragCd = 50.0; if (altE < 3.0) dragCd = 150.0;
                 let density = 1.225 * Math.exp(-altE / 8.5); let v_ms = currentVelMag * 1000;
                 dragAccMag = ((0.5 * density * v_ms * v_ms * dragCd * 10.5) / 8000) / 1000; 
-                
-                // AERODYNAMIC LIFT CALCULATION (L/D Ratio ~ 0.25)
-                if (liftUp || liftDown) { liftAccMag = dragAccMag * 0.25; }
             }
 
             currentGForce = 0; _thrustAcc.set(0,0,0);
             if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); fuel -= (massFlowRate * dt); if(fuel < 0) fuel = 0; currentGForce = thrustAccMag / 0.00980665; }
-            
-            if (isReentry) {
-                // Vector summation for Drag and Lift G-forces
-                let totalReentryAcc = Math.sqrt((dragAccMag * dragAccMag) + (liftAccMag * liftAccMag));
-                currentGForce += totalReentryAcc / 0.00980665;
-            }
+            if (isReentry) currentGForce += dragAccMag / 0.00980665;
             if (currentGForce > maxGForce) maxGForce = currentGForce;
 
             _totalAccel.copy(_accel).add(_thrustAcc);
-            if (isReentry && currentVelMag > 0) { 
-                _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _totalAccel.add(_tempVec1); 
-                if (liftUp || liftDown) {
-                    _tempVec2.copy(shipPos).normalize().multiplyScalar(liftUp ? liftAccMag : -liftAccMag);
-                    _totalAccel.add(_tempVec2);
-                }
-            }
+            if (isReentry && currentVelMag > 0) { _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _totalAccel.add(_tempVec1); }
             _tempVec1.copy(shipVel).multiplyScalar(dt); _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt); shipPos.add(_tempVec1).add(_tempVec2);
             
             if (shipPos.length() - radEarth <= 0) {
-                shipPos.setLength(radEarth); 
-                shipVel.set(0,0,0); 
+                shipPos.setLength(radEarth); // Clamp exactly to surface
+                shipVel.set(0,0,0); // Zero velocity
                 if (!milestoneLatches.splashdown) {
                     milestoneLatches.splashdown = true;
                     let impactV = currentVelMag * 1000;
                     let isSafe = impactV < 15 && maxGForce < 15;
-                    logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G)`, { magEarth: accelData.magEarth, magMoon: accelData.magMoon });
+                    logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G)`, telemetry);
                 }
             } else {
                 let nextAccelData = getAcceleration(shipPos, _nextAccel); _nextThrustAcc.set(0,0,0);
                 if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); }
                 _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
-                if (isReentry && shipVel.length() > 0) { 
-                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _nextTotalAccel.add(_tempVec1); 
-                    if (liftUp || liftDown) {
-                        _tempVec2.copy(shipPos).normalize().multiplyScalar(liftUp ? liftAccMag : -liftAccMag);
-                        _nextTotalAccel.add(_tempVec2);
-                    }
-                }
+                if (isReentry && shipVel.length() > 0) { _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _nextTotalAccel.add(_tempVec1); }
                 _tempVec1.addVectors(_totalAccel, _nextTotalAccel).multiplyScalar(0.5 * dt); shipVel.add(_tempVec1);
             }
 
@@ -648,18 +573,13 @@
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
                 metSeconds += simSecondsToProcess;
                 
-                if (distM < globalMinMoonDist && distM > 0) globalMinMoonDist = distM;
-                
                 updateWarpStepping(dt_real, telemetry);
                 
                 if (mccAutoCountdown > 0 && timeWarp === 1) {
                     mccAutoCountdown -= dt_real; showNavMsg(`AUTO-CORRECTION IN ${Math.ceil(mccAutoCountdown)}s`, 1000, "flash-warning");
                     const mccBtn = document.getElementById('btn-autopilot-mcc');
-                    if (mccBtn) { 
-                        mccBtn.className = "caution-btn"; 
-                        mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`; 
-                    }
-                } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) { executeAutopilotBurn(); } else { const mccBtn = document.getElementById('btn-autopilot-mcc'); if (mccBtn && mccAutoCountdown === -1) { mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT"; mccBtn.className = "caution-btn"; } }
+                    if (mccBtn) { let isFlash = Math.floor(Date.now() / 500) % 2 === 0; mccBtn.style.backgroundColor = isFlash ? "rgba(255, 255, 0, 0.9)" : "rgba(255, 68, 68, 0.1)"; mccBtn.style.color = isFlash ? "#000" : "#ff4444"; mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`; }
+                } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) { executeAutopilotBurn(); } else { const mccBtn = document.getElementById('btn-autopilot-mcc'); if (mccBtn && mccAutoCountdown === -1) { mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT"; } }
                 
                 if (typeof targetWarp !== 'undefined' && autoDecelerateTarget > 0 && targetWarp > autoDecelerateTarget) {
                     let now = performance.now();
@@ -694,7 +614,6 @@
                 else { safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km"); safeSetText('velocity', shipVel.length().toFixed(2) + " km/s"); }
                 
                 safeSetText('dist-moon', distM.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
-                safeSetText('min-moon-dist', globalMinMoonDist === Infinity ? "N/A" : globalMinMoonDist.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
                 safeSetText('vx', shipVel.x.toFixed(3)); safeSetText('vy', shipVel.y.toFixed(3)); safeSetText('vz', shipVel.z.toFixed(3));
                 safeSetText('grav-earth', (telemetry.magEarth * 1000).toFixed(4) + " m/s²"); safeSetText('grav-moon', (telemetry.magMoon * 1000).toFixed(4) + " m/s²");
                 safeSetText('fuel', ((fuel / maxFuel) * 100).toFixed(1) + "%"); safeSetText('max-alt', globalMaxAlt.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km");
@@ -703,44 +622,44 @@
                 let angleToMoon = _camDir.angleTo(_dirToMoon) * (180 / Math.PI);
                 safeSetText('moon-heading', angleToMoon.toFixed(1) + (angleToMoon > 40 ? "° (Pan to find)" : "° (In View)"), angleToMoon > 40 ? "caution" : "nominal");
 
-                // --- PROJECTED ENTRY ANGLE MATH ---
-                let r_mag = shipPos.length(); let v_mag = shipVel.length(); let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel); let h_mag = h_vec.length();
-                let energy = (v_mag * v_mag / 2) - (muEarth / r_mag); let r_ei = radEarth + 122;
+                // --- PROJECTED ENTRY ANGLE MATH (The Geo Orbit Fix) ---
+                let r_mag = shipPos.length();
+                let v_mag = shipVel.length();
+                let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel);
+                let h_mag = h_vec.length();
+                let energy = (v_mag * v_mag / 2) - (muEarth / r_mag);
+                let r_ei = radEarth + 122;
                 
-                let projEntryText = "N/A"; let projEntryColor = "nominal"; let corridorStatus = "AWAITING TLI"; let corridorColor = "nominal";
+                let projEntryText = "N/A";
+                let projEntryColor = "nominal";
                 
                 if (energy < 0 && isReturningHome && altE > 122) { 
-                    let a = -muEarth / (2 * energy); let ecc = Math.sqrt(Math.max(0, 1 + (2 * energy * h_mag * h_mag) / (muEarth * muEarth))); let rp = a * (1 - ecc); 
+                    let a = -muEarth / (2 * energy);
+                    let ecc = Math.sqrt(Math.max(0, 1 + (2 * energy * h_mag * h_mag) / (muEarth * muEarth)));
+                    let rp = a * (1 - ecc); 
                     
-                    if (rp > r_ei) { projEntryText = "TOO SHALLOW (SKIP OUT)"; projEntryColor = "danger solid-red"; corridorStatus = "DANGER: SKIP OUT"; corridorColor = "danger solid-red"; } 
-                    else if (rp < radEarth) { projEntryText = "TOO STEEP (CRASH)"; projEntryColor = "danger solid-red"; corridorStatus = "DANGER: FATAL DESCENT"; corridorColor = "danger solid-red"; } 
+                    if (rp > r_ei) { projEntryText = "TOO SHALLOW (SKIP OUT)"; projEntryColor = "danger flash-red"; } 
+                    else if (rp < radEarth) { projEntryText = "TOO STEEP (CRASH)"; projEntryColor = "danger flash-red"; } 
                     else {
-                        let v_ei = Math.sqrt(2 * (energy + (muEarth / r_ei))); let cos_gamma = h_mag / (r_ei * v_ei);
+                        let v_ei = Math.sqrt(2 * (energy + (muEarth / r_ei)));
+                        let cos_gamma = h_mag / (r_ei * v_ei);
                         if (cos_gamma <= 1.0) {
                             let gamma = -Math.acos(cos_gamma) * (180 / Math.PI); 
                             projEntryText = gamma.toFixed(2) + "°";
-                            if (gamma <= -5.5 && gamma >= -7.5) { projEntryColor = "nominal solid-green"; corridorStatus = "NOMINAL (GREEN)"; corridorColor = "nominal solid-green"; }
-                            else if (gamma < -4.5 && gamma > -8.5) { projEntryColor = "caution solid-yellow"; corridorStatus = "FINE-TUNE AVAILABLE"; corridorColor = "caution solid-yellow"; }
-                            else { projEntryColor = "danger solid-red"; corridorStatus = "DANGER: EXTREME G-LOAD"; corridorColor = "danger solid-red"; }
+                            if (gamma <= -5.5 && gamma >= -7.5) projEntryColor = "nominal solid-green";
+                            else if (gamma < -4.5 && gamma > -8.5) projEntryColor = "caution flash-yellow";
+                            else projEntryColor = "danger flash-red";
                         }
                     }
                 } else if (altE <= 122 && altE > 0) {
+                    // Actual reading during reentry
                     projEntryText = telemetry.flightPathAngle.toFixed(2) + "°";
-                    if (telemetry.flightPathAngle <= -5.5 && telemetry.flightPathAngle >= -7.5) { projEntryColor = "nominal"; corridorStatus = "LOCKED IN CORRIDOR"; corridorColor = "nominal"; } 
-                    else if (telemetry.flightPathAngle < -4.5 && telemetry.flightPathAngle > -8.5) { projEntryColor = "caution"; corridorStatus = "UNSAFE ANGLE (USE LIFT)"; corridorColor = "caution"; } 
-                    else { projEntryColor = "danger"; corridorStatus = "LETHAL DESCENT (USE LIFT)"; corridorColor = "danger"; }
-                } else if (!isReturningHome && telemetry.isTliCoast) { corridorStatus = "EN ROUTE TO MOON"; corridorColor = "nominal"; }
-
-                safeSetText('entry-angle', projEntryText, projEntryColor);
-                safeSetText('corridor-status', corridorStatus, corridorColor);
-                
-                // --- PLASMA VISUALS ---
-                if (altE < 120 && altE > 30 && shipVel.length() > 3.0) {
-                    let op = Math.min(0.85, ((shipVel.length() - 3.0) / 8.0));
-                    document.getElementById('plasma-overlay').style.opacity = op;
-                } else {
-                    document.getElementById('plasma-overlay').style.opacity = 0;
+                    if (telemetry.flightPathAngle <= -5.5 && telemetry.flightPathAngle >= -7.5) projEntryColor = "nominal"; 
+                    else if (telemetry.flightPathAngle < -4.5 && telemetry.flightPathAngle > -8.5) projEntryColor = "caution"; 
+                    else projEntryColor = "danger";
                 }
+                safeSetText('entry-angle', projEntryText, projEntryColor);
+
 
                 if (altE < 122 && altE > 0) {
                     if (!milestoneLatches.entryInterface) { milestoneLatches.entryInterface = true; logEvent("ATMOSPHERE: Entry Interface Reached (122km)", telemetry); }
@@ -748,9 +667,6 @@
                     if (altE <= 40 && milestoneLatches.plasmaStart && !milestoneLatches.plasmaEnd) { milestoneLatches.plasmaEnd = true; logEvent("ATMOSPHERE: Plasma Blackout Ended. Comm signal restored.", telemetry); }
                     if (altE <= 7.3 && !milestoneLatches.drogues) { milestoneLatches.drogues = true; logEvent("PARACHUTES: Drogue Chutes Deployed", telemetry); }
                     if (altE <= 3.0 && !milestoneLatches.mains) { milestoneLatches.mains = true; logEvent("PARACHUTES: Main Chutes Deployed", telemetry); }
-                    
-                    document.getElementById('standard-controls').style.display = 'none';
-                    document.getElementById('reentry-controls').style.display = 'flex';
                 }
 
                 let region = "Low Earth Orbit";
@@ -772,12 +688,11 @@
                 if (altE <= 150) maxSafeWarp = 1; else if (altE <= 2000) maxSafeWarp = 10; else if (distM < WARP_LIMITS.PROXIMITY_DIST) maxSafeWarp = WARP_LIMITS.PROXIMITY_WARP; else if (distM < WARP_LIMITS.ENTER_SOI_DIST) maxSafeWarp = WARP_LIMITS.ENTER_SOI_WARP; else if (distM < WARP_LIMITS.APPROACH_SOI_DIST) maxSafeWarp = WARP_LIMITS.APPROACH_SOI_WARP;
                 if (maxSafeWarp !== currentMaxSafeWarp) { currentMaxSafeWarp = maxSafeWarp; [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => { const btn = document.getElementById(`btn-warp-${w}`); if (btn) { if (w <= maxSafeWarp) { btn.classList.add('safe-btn'); btn.classList.remove('danger-btn'); } else { btn.classList.add('danger-btn'); btn.classList.remove('safe-btn'); } } }); }
 
+                // 7.2kx Safe Lockout UI
                 const btn7200 = document.getElementById('btn-warp-7200');
                 if (btn7200) {
-                    if (!ALLOW_7200X_IN_SYSTEM && altE < 450000) { 
-                        btn7200.disabled = true; btn7200.title = "7.2kx Warp disabled within Earth-Moon system (Safety Lockout)."; 
-                        if (timeWarp === 7200) shiftWarp(3600); 
-                    } else { btn7200.disabled = false; btn7200.title = "1s = 2 Hours"; }
+                    if (altE < 100000 && !telemetry.isTliCoast) { btn7200.disabled = true; btn7200.title = "7.2kx Warp locked out within Earth-Moon proximity."; } 
+                    else { btn7200.disabled = false; btn7200.title = "1s = 2 Hours"; }
                 }
 
                 function triggerAlertFlash(elementId) { const el = document.getElementById(elementId); if (el) { el.classList.add('flash-yellow'); setTimeout(() => el.classList.remove('flash-yellow'), 5000); } }
@@ -793,10 +708,7 @@
                 if(telemetry.isTliCoast) { if (itinTli) { itinTli.className = "complete"; if (!itinTli.dataset.done) { itinTli.innerHTML = `[X] TLI Burn Complete`; itinTli.dataset.done = "true"; } } if (itinCoast) itinCoast.className = "active"; if (tliEtaEl) { let etaSeconds = distM / Math.max(0.1, shipVel.length()); tliEtaEl.textContent = formatTime(etaSeconds); } progradeMat.color.setHex(0x00ff00); } 
                 else { if (itinTli) { itinTli.className = "active"; if (itinTli.dataset.done) { itinTli.innerHTML = `[ ] TLI Burn (Target: <span id="tli-est-time">${Math.ceil(telemetry.estimatedBurnTime)}</span>s)`; delete itinTli.dataset.done; } } if (tliEstEl) tliEstEl.textContent = Math.ceil(telemetry.estimatedBurnTime); progradeMat.color.setHex(isBurning ? 0xffff00 : 0x00ffff); }
 
-                if (telemetry.isTliCoast && !isReturningHome) { safeSetText('window-timer', "N/A (EN ROUTE)", "nominal"); } 
-                else if (isReturningHome && altE > 122) { safeSetText('window-timer', `ATMO ENTRY IN: ${(altE - 122).toFixed(0)} km`, "nominal"); }
-                else if (!isReturningHome) { const winClass = telemetry.timeToWindow < 60 ? "danger" : (telemetry.timeToWindow < 300 ? "caution" : "nominal"); safeSetText('window-timer', "T- " + formatTime(telemetry.timeToWindow).substring(3), winClass); }
-                
+                if (telemetry.isTliCoast) { safeSetText('window-timer', "N/A (EN ROUTE)", "nominal"); } else { const winClass = telemetry.timeToWindow < 60 ? "danger" : (telemetry.timeToWindow < 300 ? "caution" : "nominal"); safeSetText('window-timer', "T- " + formatTime(telemetry.timeToWindow).substring(3), winClass); }
                 if (isBurning) { safeSetText('engine-status', autoPilotEngaged ? "AUTO TLI FIRING" : "MANUAL FIRING", "danger"); } else { safeSetText('engine-status', "STANDBY", "nominal"); }
 
                 if (altE > 380 && altE < 420 && !milestoneLatches.passedISS) { milestoneLatches.passedISS = true; showNavMsg("CHECKPOINT: ISS ORBITAL PLANE (400km)", 5000, "flash-warning"); logEvent("CHECKPOINT: Passed ISS Orbital Plane"); }
@@ -807,21 +719,13 @@
                     if (maxGForce < 15 && shipVel.length() * 1000 < 15) { safeSetText('phase-text', "SPLASHDOWN - MISSION SUCCESS", "nominal"); safeSetText('nav-status', `CREW SECURE (Max G: ${maxGForce.toFixed(1)}G)`, "nominal"); progradeMat.color.setHex(0x00ff00); } 
                     else { safeSetText('phase-text', "FATAL IMPACT", "danger"); safeSetText('nav-status', `MISSION FAILED (Max G: ${maxGForce.toFixed(1)}G)`, "danger"); progradeMat.color.setHex(0xff0000); }
                     if (timeWarp > 1) updateWarpUI(1);
-                } else if (altE < 3.0) { 
-                    safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal"); 
-                    safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal"); 
-                    let etaSeconds = altE / Math.max(0.0001, shipVel.length());
-                    safeSetText('window-timer', `SPLASHDOWN ETA: ${formatTime(etaSeconds).substring(3)}`, "nominal"); 
-                    if (timeWarp > 1) updateWarpUI(1); 
-                } else if (altE < 7.3) { 
-                    safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution"); 
-                    safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution"); 
-                    let etaSeconds = (altE - 3.0) / Math.max(0.0001, shipVel.length());
-                    safeSetText('window-timer', `MAINS ETA: ${formatTime(etaSeconds).substring(3)}`, "caution"); 
-                } else if (altE < 122) {
+                } else if (altE < 3.0) { safeSetText('phase-text', "MAIN CHUTES DEPLOYED", "nominal"); safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal"); safeSetText('window-timer', `SPLASHDOWN IN: ${(altE).toFixed(2)} km`, "nominal"); if (timeWarp > 1) updateWarpUI(1); } 
+                else if (altE < 7.3) { safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution"); safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution"); safeSetText('window-timer', `MAINS IN: ${(altE - 3.0).toFixed(2)} km`, "caution"); } 
+                else if (altE < 122) {
                     safeSetText('phase-text', "ENTRY INTERFACE", "danger");
                     if (altE > 40 && shipVel.length() > 5.0) { safeSetText('nav-status', "PLASMA BLACKOUT ZONE", "flash-red"); safeSetText('window-timer', `DROGUES IN: ${(altE - 7.3).toFixed(1)} km`, "danger"); } 
                     else { safeSetText('nav-status', "ATMOSPHERIC DESCENT", "caution"); safeSetText('window-timer', `DROGUES IN: ${(altE - 7.3).toFixed(1)} km`, "caution"); }
+                    _tempVec1.copy(shipVel).normalize().multiplyScalar(-1); _lookTarget.copy(shipGroup.position).add(_tempVec1); shipGroup.lookAt(_lookTarget);
                 } else if (distM < 0) { safeSetText('phase-text', "LITHOBRAKING (IMPACT)", "danger"); safeSetText('nav-status', "MISSION FAILURE", "danger"); if (timeWarp > 1) updateWarpUI(1); } 
                 else if (distM <= 60000) {
                     safeSetText('phase-text', "LUNAR ENCOUNTER", "caution"); safeSetText('nav-status', "GRAVITY WELL CAPTURE", "caution");
@@ -840,56 +744,27 @@
                     if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 120) { safeSetText('nav-status', "ACTION REQ: ENABLE AUTOPILOT", "caution"); } else { safeSetText('nav-status', "ORBIT STABLE", "nominal"); }
                 }
 
+                const autoBtn = document.getElementById('btn-toggle-auto');
+                if (autoBtn) { if (!autoPilotEngaged && !telemetry.isTliCoast && telemetry.timeToWindow < 300) { autoBtn.classList.add('caution-btn'); } else { autoBtn.classList.remove('caution-btn'); } }
+
                 renderer.render(scene, camera);
             } catch (err) { console.error("Simulation Loop Error:", err); }
         });
 
         function evaluateMCC(waypoint) {
             showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`, 5000, "flash-warning"); activeMCCWaypoint = waypoint; mccAutoCountdown = 45; 
-            const btn = document.getElementById('btn-autopilot-mcc'); if (btn) { btn.style.visibility = 'visible'; btn.className = 'caution-btn'; }
+            const btn = document.getElementById('btn-autopilot-mcc'); if (btn) btn.style.visibility = 'visible';
         }
 
         function executeAutopilotBurn() {
             if (!activeMCCWaypoint) return;
-            let altE = shipPos.length() - radEarth;
-            let fuelConsumed = 0;
-            
-            if (isReturningHome) {
-                let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel);
-                let transverseDir = new THREE.Vector3().crossVectors(h_vec, shipPos).normalize();
-                
-                let target_rp = radEarth + 40; 
-                let dV = 0;
-                let step = 0.0005; 
-                
-                for(let i=0; i<3000; i++) {
-                    let testVel = shipVel.clone().add(transverseDir.clone().multiplyScalar(dV));
-                    let h_test = new THREE.Vector3().crossVectors(shipPos, testVel).length();
-                    let e_test = (testVel.lengthSq() / 2) - (muEarth / shipPos.length());
-                    if (e_test >= 0) break; 
-                    let a_test = -muEarth / (2 * e_test);
-                    let ecc_test = Math.sqrt(Math.max(0, 1 + (2 * e_test * h_test * h_test) / (muEarth * muEarth)));
-                    let rp_test = a_test * (1 - ecc_test);
-                    
-                    if (rp_test >= target_rp) break;
-                    dV += step;
-                }
-                
-                shipVel.add(transverseDir.multiplyScalar(dV));
-                let m0 = shipEmptyMass + fuel; fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
-                logEvent(`MCC EXECUTED: Return Trajectory Alignment (+${dV.toFixed(4)} km/s Radial). Target Perigee: 40km. Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
-                showNavMsg(`MCC COMPLETE: TRAJECTORY ALIGNED`);
-                
-            } else {
-                let dV = 0.05;
-                let prograde = shipVel.clone().normalize(); shipVel.add(prograde.multiplyScalar(dV));
-                let m0 = shipEmptyMass + fuel; fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
-                logEvent(`MCC EXECUTED: Trajectory Alignment (+${dV} km/s Prograde). Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
-                showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL");
-            }
-            
+            let dV = 0.05; let altE = shipPos.length() - radEarth;
+            let prograde = shipVel.clone().normalize(); shipVel.add(prograde.multiplyScalar(dV));
+            let m0 = shipEmptyMass + fuel; let fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
+            logEvent(`MCC EXECUTED: Trajectory Alignment (+${dV} km/s Prograde). Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
+            showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL");
             activeMCCWaypoint = null; mccAutoCountdown = -1; 
-            const btn = document.getElementById('btn-autopilot-mcc'); if (btn) { btn.style.visibility = 'hidden'; btn.className = ''; }
+            const btn = document.getElementById('btn-autopilot-mcc'); if (btn) { btn.style.visibility = 'hidden'; btn.style.backgroundColor = "rgba(255, 68, 68, 0.1)"; btn.style.color = "#ff4444"; }
         }
     </script>
 </body>

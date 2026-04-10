@@ -211,16 +211,23 @@
                 <div id="standard-controls" class="controls">
                     <button id="btn-thrust" class="danger-btn" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
                 </div>
-                <div id="reentry-controls" class="controls" style="display:none;">
-                    <button id="btn-lift-up" class="safe-btn" onmousedown="liftUp=true" onmouseup="liftUp=false" ontouchstart="liftUp=true" ontouchend="liftUp=false" title="Roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (REDUCE Gs)</button>
-                    <button id="btn-lift-down" class="danger-btn" onmousedown="liftDown=true" onmouseup="liftDown=false" ontouchstart="liftDown=true" ontouchend="liftDown=false" title="Roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (STEEPEN)</button>
+                <div id="reentry-controls" style="display:none; margin-top: 10px;">
+                    <div style="font-size: 0.75rem; text-align: center; color: #00ffff; letter-spacing: 1px; margin-bottom: 2px;">AERODYNAMIC BANK ANGLE</div>
+                    <div style="width: 100%; height: 12px; background: #222; border: 1px solid #555; border-radius: 6px; position: relative; margin-bottom: 8px;">
+                        <div id="bank-indicator" style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 4px; background: #00ffff; transform: translateX(-50%); transition: left 0.1s;"></div>
+                        <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #888;"></div>
+                    </div>
+                    <div class="controls" style="margin-top: 0;">
+                        <button id="btn-lift-up" class="safe-btn" onmousedown="liftUp=true" onmouseup="liftUp=false; liftFactor=0;" ontouchstart="liftUp=true" ontouchend="liftUp=false; liftFactor=0;" title="Roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (REDUCE Gs)</button>
+                        <button id="btn-lift-down" class="danger-btn" onmousedown="liftDown=true" onmouseup="liftDown=false; liftFactor=0;" ontouchstart="liftDown=true" ontouchend="liftDown=false; liftFactor=0;" title="Roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (STEEPEN)</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const SIM_VERSION = "1.9.8.10";
+        const SIM_VERSION = "1.9.9.0";
 
         const ALLOW_7200X_IN_SYSTEM = false; 
 
@@ -251,9 +258,12 @@
         let globalMaxAlt = 0;
         let globalMinMoonDist = Infinity;
         
-        // Active Reentry Controls
         let liftUp = false;
         let liftDown = false;
+        let liftFactor = 0.0; // -1.0 to 1.0
+        
+        let flareObj = null;
+        let flareLife = 0;
         
         const MISSION_WAYPOINTS_OUTBOUND = [
             { name: "Geosynchronous Orbit Check", distance_km: 42164, passed: false, type: "MCC" },
@@ -423,7 +433,8 @@
             shipPos = new THREE.Vector3(startRadius * Math.cos(startShipAngle), 0, startRadius * Math.sin(startShipAngle));
             shipVel = new THREE.Vector3(vOrbit * -Math.sin(startShipAngle), 0, vOrbit * Math.cos(startShipAngle));
             fuel = maxFuel; isBurning = false; timeWarp = 1; autoPilotEngaged = false; autoFastForward = false; metSeconds = 0; actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0; globalMinMoonDist = Infinity;
-            liftUp = false; liftDown = false;
+            liftUp = false; liftDown = false; liftFactor = 0.0;
+            if(flareObj) { scene.remove(flareObj); flareObj = null; }
             
             for (let key in milestoneLatches) milestoneLatches[key] = false;
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix(); document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
@@ -465,6 +476,7 @@
                 event: eventMsg, altitude_km: r.toFixed(2), velocity_kms: v.toFixed(3),
                 vx: shipVel.x.toFixed(5), vy: shipVel.y.toFixed(5), vz: shipVel.z.toFixed(5),
                 gforce: currentGForce.toFixed(2), max_gforce: maxGForce.toFixed(2), min_moon_dist_km: globalMinMoonDist === Infinity ? "N/A" : globalMinMoonDist.toFixed(2),
+                bank_angle: (liftFactor * 100).toFixed(0) + "%",
                 magEarth: (telemetry && telemetry.magEarth) ? telemetry.magEarth.toFixed(8) : "0", magMoon: (telemetry && telemetry.magMoon) ? telemetry.magMoon.toFixed(8) : "0",
                 warp: timeWarp, target_burn_s: initialTargetBurnTime.toFixed(1), actual_burn_s: actualBurnTime.toFixed(1),
                 projected_entry_angle: projectedGammaLog
@@ -562,6 +574,10 @@
 
             let dragAccMag = 0; let isReentry = false; let liftAccMag = 0;
             
+            // Adjust lift factor via controls
+            if (liftUp) liftFactor = Math.min(1.0, liftFactor + 1.0 * dt);
+            if (liftDown) liftFactor = Math.max(-1.0, liftFactor - 1.0 * dt);
+            
             if (altE < 122 && altE > 0) {
                 isReentry = true; 
                 let dragCd = 1.5; 
@@ -574,15 +590,13 @@
                 let density = 1.225 * Math.exp(-altE / 8.5); let v_ms = currentVelMag * 1000;
                 dragAccMag = ((0.5 * density * v_ms * v_ms * dragCd * 10.5) / 8000) / 1000; 
                 
-                // AERODYNAMIC LIFT CALCULATION (L/D Ratio ~ 0.25)
-                if (liftUp || liftDown) { liftAccMag = dragAccMag * 0.25; }
+                if (liftFactor !== 0) { liftAccMag = dragAccMag * 0.25 * liftFactor; }
             }
 
             currentGForce = 0; _thrustAcc.set(0,0,0);
             if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); fuel -= (massFlowRate * dt); if(fuel < 0) fuel = 0; currentGForce = thrustAccMag / 0.00980665; }
             
             if (isReentry) {
-                // Vector summation for Drag and Lift G-forces
                 let totalReentryAcc = Math.sqrt((dragAccMag * dragAccMag) + (liftAccMag * liftAccMag));
                 currentGForce += totalReentryAcc / 0.00980665;
             }
@@ -591,8 +605,8 @@
             _totalAccel.copy(_accel).add(_thrustAcc);
             if (isReentry && currentVelMag > 0) { 
                 _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _totalAccel.add(_tempVec1); 
-                if (liftUp || liftDown) {
-                    _tempVec2.copy(shipPos).normalize().multiplyScalar(liftUp ? liftAccMag : -liftAccMag);
+                if (liftFactor !== 0) {
+                    _tempVec2.copy(shipPos).normalize().multiplyScalar(liftAccMag);
                     _totalAccel.add(_tempVec2);
                 }
             }
@@ -606,6 +620,14 @@
                     let impactV = currentVelMag * 1000;
                     let isSafe = impactV < 15 && maxGForce < 15;
                     logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G)`, { magEarth: accelData.magEarth, magMoon: accelData.magMoon });
+                    
+                    // SPAWN THE CELEBRATORY FLARE
+                    flareObj = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), new THREE.MeshBasicMaterial({color: 0xff3300}));
+                    let flareLight = new THREE.PointLight(0xff3300, 5, 200);
+                    flareObj.add(flareLight);
+                    flareObj.position.copy(shipGroup.position);
+                    scene.add(flareObj);
+                    flareLife = 15.0; // Lives for 15 seconds
                 }
             } else {
                 let nextAccelData = getAcceleration(shipPos, _nextAccel); _nextThrustAcc.set(0,0,0);
@@ -613,8 +635,8 @@
                 _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
                 if (isReentry && shipVel.length() > 0) { 
                     _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _nextTotalAccel.add(_tempVec1); 
-                    if (liftUp || liftDown) {
-                        _tempVec2.copy(shipPos).normalize().multiplyScalar(liftUp ? liftAccMag : -liftAccMag);
+                    if (liftFactor !== 0) {
+                        _tempVec2.copy(shipPos).normalize().multiplyScalar(liftAccMag);
                         _nextTotalAccel.add(_tempVec2);
                     }
                 }
@@ -650,16 +672,28 @@
                 
                 if (distM < globalMinMoonDist && distM > 0) globalMinMoonDist = distM;
                 
+                // Flare Logic Update
+                if (flareObj && flareLife > 0) {
+                    flareLife -= dt_real;
+                    let upDir = flareObj.position.clone().normalize();
+                    let flareSpeed = (flareLife > 12.0) ? 5.0 : -0.5; // Shoots up fast, then drifts down
+                    flareObj.position.add(upDir.multiplyScalar(flareSpeed * dt_real));
+                    if(flareLife <= 0) { scene.remove(flareObj); flareObj = null; }
+                }
+                
                 updateWarpStepping(dt_real, telemetry);
                 
                 if (mccAutoCountdown > 0 && timeWarp === 1) {
                     mccAutoCountdown -= dt_real; showNavMsg(`AUTO-CORRECTION IN ${Math.ceil(mccAutoCountdown)}s`, 1000, "flash-warning");
                     const mccBtn = document.getElementById('btn-autopilot-mcc');
                     if (mccBtn) { 
-                        mccBtn.className = "caution-btn"; 
+                        let isFlash = Math.floor(Date.now() / 500) % 2 === 0; 
+                        mccBtn.style.backgroundColor = isFlash ? "rgba(255, 255, 0, 0.8)" : "rgba(255, 255, 0, 0.1)"; 
+                        mccBtn.style.color = isFlash ? "#000" : "#ffff44"; 
+                        mccBtn.style.borderColor = "#ffff44";
                         mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`; 
                     }
-                } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) { executeAutopilotBurn(); } else { const mccBtn = document.getElementById('btn-autopilot-mcc'); if (mccBtn && mccAutoCountdown === -1) { mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT"; mccBtn.className = "caution-btn"; } }
+                } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) { executeAutopilotBurn(); } else { const mccBtn = document.getElementById('btn-autopilot-mcc'); if (mccBtn && mccAutoCountdown === -1) { mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT"; mccBtn.style.backgroundColor = ""; mccBtn.style.color = ""; mccBtn.style.borderColor = ""; } }
                 
                 if (typeof targetWarp !== 'undefined' && autoDecelerateTarget > 0 && targetWarp > autoDecelerateTarget) {
                     let now = performance.now();
@@ -703,7 +737,10 @@
                 let angleToMoon = _camDir.angleTo(_dirToMoon) * (180 / Math.PI);
                 safeSetText('moon-heading', angleToMoon.toFixed(1) + (angleToMoon > 40 ? "° (Pan to find)" : "° (In View)"), angleToMoon > 40 ? "caution" : "nominal");
 
-                // --- PROJECTED ENTRY ANGLE MATH ---
+                // Update Bank Indicator UI
+                let bankPercent = ((liftFactor + 1.0) / 2.0) * 100;
+                document.getElementById('bank-indicator').style.left = bankPercent + "%";
+
                 let r_mag = shipPos.length(); let v_mag = shipVel.length(); let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel); let h_mag = h_vec.length();
                 let energy = (v_mag * v_mag / 2) - (muEarth / r_mag); let r_ei = radEarth + 122;
                 
@@ -734,7 +771,6 @@
                 safeSetText('entry-angle', projEntryText, projEntryColor);
                 safeSetText('corridor-status', corridorStatus, corridorColor);
                 
-                // --- PLASMA VISUALS ---
                 if (altE < 120 && altE > 30 && shipVel.length() > 3.0) {
                     let op = Math.min(0.85, ((shipVel.length() - 3.0) / 8.0));
                     document.getElementById('plasma-overlay').style.opacity = op;
@@ -750,7 +786,7 @@
                     if (altE <= 3.0 && !milestoneLatches.mains) { milestoneLatches.mains = true; logEvent("PARACHUTES: Main Chutes Deployed", telemetry); }
                     
                     document.getElementById('standard-controls').style.display = 'none';
-                    document.getElementById('reentry-controls').style.display = 'flex';
+                    document.getElementById('reentry-controls').style.display = 'block';
                 }
 
                 let region = "Low Earth Orbit";

@@ -2,6 +2,58 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-10 14:15] - V1.9.8.5 HOTFIX: Trajectory & Integration Stability
+### 📝 Summary
+Resolved a major physics regression that caused trajectory instability and rendering failures. Restored the proven lunar flyby keyhole and stabilized the numerical integration loop.
+
+### 🛠️ Work Done
+- **Vector Corruption Fix**: Identified a critical bug in the Velocity Verlet integration where the `_totalAccel` vector was being used as an accumulator without being properly initialized from the base gravity state. Fixed by using `.copy(_accel)` to ensure thrust and drag are added to a clean gravitational baseline, eliminating the "crazy numbers" and black screen issues.
+- **Keyhole Restoration**: Reverted `MISSION_LEAD_ANGLE` from 0.85 to **0.74 rad**. Testing confirmed that 0.74 is the correct phase offset for the current high-fidelity integration sub-stepping to achieve a proper leading-edge flyby.
+- **Auto-Correction Polish**: Verified the auto-MCC sequence functionality. The flight computer successfully manages the 45s countdown and trajectory alignment, ensuring the ship targets the 40km perigee keyhole automatically if the user is at 1x speed.
+- **Roadmap Update**: Formalized the "Mission Settings Panel" in the task tracker to eventually allow user-toggling of automated flight features.
+- **Internal Versioning**: Bumped SIM_VERSION to **v1.9.8.5**.
+
+---
+
+## [2026-04-10 13:00] - V1.9.8.4 HOTFIX: Physics Stabilization & HUD Polishing
+### 📝 Summary
+Resolved a critical "NaN explosion" bug that caused black screens and corrupted physics data. Enhanced the auto-correction sequence with automated self-alignment and implemented detailed mission logging for trajectory adjustments.
+
+### 🛠️ Work Done
+- **NaN Crash Hotfix**: Identified that floating-point precision errors were causing the `Math.asin()` input in the Flight Path Angle calculation to exceed 1.0. Implemented a `Math.max(-1, Math.min(1, dot))` clamp to stabilize the physics engine and restore visual rendering.
+- **Auto-Alignment Intelligence**: Refined the MCC sequence to be fully automated. The flight computer now initiates a 45-second HUD countdown; if at 1x speed and no manual override is provided, the ship automatically executes the course correction. The button text now dynamically reflects the timer.
+- **Enhanced Flight Logging**: Updated the trajectory alignment system to log high-fidelity data, including the ship's instantaneous altitude, velocity, and the specific fuel mass consumed during the maneuver.
+- **Button Contrast & Hover Fix**: Overhauled CSS hover rules for safe/danger buttons. Mouse-over now triggers a background fill with absolute black text, ensuring maximum legibility for warp speed selection.
+- **Version Calibration**: Re-stabilized the `MISSION_LEAD_ANGLE` at 0.85 rad to ensure proper lunar interception timing. Bumped internal version to **v1.9.8.4**.
+
+---
+
+## [2026-04-10 11:30] - V1.9.8.4: Physics Calibration & Auto-MCC Sequence
+### 📝 Summary
+Addressed a physics regression discovered in v1.9.8.3, implemented an automated trajectory alignment sequence, and improved button legibility for high-contrast UI states.
+
+### 🛠️ Work Done
+- **Physics Regression Fix**: Identified that the ship was missing the "leading edge" lunar keyhole (slingshot) due to an incorrect phase angle. Refined `MISSION_LEAD_ANGLE` from 0.74 back to **0.85 rad**, restoring the proper free-return trajectory timing for outbound flights.
+- **Auto-MCC Sequence**: Implemented a **45-second automated countdown** for all Mid-Course Correction (MCC) checkpoints. When the ship is at 1x speed, the Trajectory Alignment button now flashes yellow and displays a HUD timer; if the user doesn't manually intervene or override, the flight computer automatically executes the burn at T-0.
+- **Hover UX Polish**: Added specialized CSS `:hover` rules for Safe (Green) and Danger (Red) buttons to ensure the background fills and text shifts to absolute black, making the labels readable during mouse-over.
+- **Roadmap Expansion**: Added "Mission Settings Panel" to the development queue to allow future toggling of Auto-MCC and other automated flight features.
+- **Internal Versioning**: Bumped SIM_VERSION to **v1.9.8.4**.
+
+---
+
+## [2026-04-10 10:15] - V1.9.8.3: Trajectory Alignment & Fuel Calibration
+### 📝 Summary
+Resolved the "Missed Earth" overshoot caused by excessive MCC thrust in v1.9.8.2. Calibrated return trajectory alignment math, implemented fuel consumption for mid-course corrections, and enhanced the UI for dangerous warp speeds.
+
+### 🛠️ Work Done
+- **MCC Math Correction**: Replaced the overpowering 0.42 km/s tangential boost with a highly targeted **0.02 km/s radial impulse**. The correction is now applied perpendicular to the velocity vector, pointing towards Earth center, to steer the perigee precisely to the ~40km target without adding excessive orbital energy that causes Earth-escape.
+- **Fuel Consumption Integration**: Mid-course corrections (MCC) now physically consume fuel using the Tsiolkovsky Rocket Equation approximation. Added fuel tracking to the `executeAutopilotBurn` function and updated the HUD log to report fuel mass lost during the maneuver.
+- **Dangerous Warp UX**: Implemented a new `@keyframes flash-danger` CSS animation. Buttons that are both `.active` and `.danger-btn` (indicating the user is currently holding a dangerously high warp speed for their current altitude) now pulse aggressively in red with black text to maximize situational awareness.
+- **HUD Stability Fix**: Resolved UI "jitter" and touch misclicks by wrapping the Trajectory Alignment button in a fixed-height container (`#mcc-container`) and transitioning from `display: none` to `visibility: hidden`. This locks the DOM layout permanently.
+- **Terminology & Cleanup**: Renamed return waypoints to "Return Trajectory Alignment (MCC)" for mission accuracy. Performed a version bump to **v1.9.8.3** and removed the stray version string that was cluttering the top-left of the screen.
+
+---
+
 ## [2026-04-09 15:55] - HOTFIX: Black Screen & RenderScale Calibration
 ### 📝 Summary
 Resolved the "black screen" issue reported after the V1.9.8 integration and optimized the `renderScale` to better support re-entry visualization.
