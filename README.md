@@ -18,7 +18,7 @@
 ![Earth Return](Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
 *Approaching Earth on the return trajectory.*
 
-> **🚀 Current Status (v1.9.7):** The simulation has achieved a fully validated Lunar Flyby and Earth Return capability! The physics engine now utilizes distance-based Waypoints and a Mid-Course Correction (MCC) framework to execute leading-edge intercepts without needing "God-Mode" cheats. Current development is focused on End-of-Mission sequences: Earth return, atmospheric re-entry heating, and parachute splashdown mechanics.
+> **🚀 Current Status (v1.9.9.0):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence including True Transverse Orbital Targeting for precise mid-course corrections (MCC), Atmospheric Drag, Parachute Reefing, and Active Aerodynamic Reentry. Users must now actively manage their bank angle to surf the atmosphere, bleed off velocity, and survive lethal G-forces during the plasma blackout phase. 
 
 ## **🚀 The Vision**
 
@@ -31,11 +31,13 @@ Originally inspired by a proposal for the now-canceled *dearMoon* project and ti
 This isn't a pre-rendered animation; it's a living physics sandbox.
 
 * **Real Newtonian Physics:** Powered by a custom Velocity Verlet integration engine using real-world units (kilometers, kilograms, seconds) and true N-body gravity (Earth and Moon).  
-* **Orbital Energy Targeting:** The flight computer calculates Trans-Lunar Injection (TLI) burns using the Vis-viva equation and orbital energy, not just preset timers.  
-* **Dynamic Telemetry HUD:** Real-time G-Force, relative velocity, altitude, and fuel mass-flow calculations.  
-* **Time Warp System:** Accelerate time up to 3,600x to cross the 3-day cislunar gap.  
-* **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser (Still needs testing & QA on stand alone quest standalone headsets, however it did work on the Quest 3 link when lauched from browser on vr ready pc. STILL NEEDS QA & TESTING).  
-* **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis.
+* **Orbital Energy Targeting:** The flight computer calculates Trans-Lunar Injection (TLI) burns using the Vis-viva equation and orbital energy, not just preset timers.
+* **True Trajectory Avionics:** Iterative targeting solver calculates exact transverse Delta-V for Mid-Course Corrections, displaying projected Entry Angles days before reaching Earth.
+* **Active Aerodynamic Reentry:** Dynamic atmospheric drag modeling. Bank the capsule UP to generate lift and shallow your descent, or DOWN to dig into the atmosphere, managing lethal G-forces through the plasma blackout. 
+* **Dynamic Telemetry HUD:** Real-time G-Force, relative velocity, altitude, orbital traffic checkpoints (ISS, Starlink, GPS), and fuel mass-flow calculations.  
+* **Time Warp System:** Accelerate time up to 7,200x to cross the 3-day cislunar gap, with automated safety lockouts near gravitational bodies.  
+* **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser (Tested on Quest 3 via PC Link).  
+* **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis, including max G-force, minimum lunar distance, and parachute deployment timestamps.
 
 ## **🛠️ Tech Stack & Architecture**
 
@@ -67,9 +69,9 @@ This project began as an AI-assisted rapid prototype session on March 30-31, 202
 This project is currently completely self-contained in a single file for maximum accessibility.
 
 1. Clone or download this repository.  
-2. Double-click index.html to open it in any modern web browser.  
+2. Double-click index.html to open it in any modern web browser (or run via a local server to bypass file-protocol CORS restrictions).  
 3. (Optional) Put on a WebXR-compatible headset (like the Meta Quest) and click "ENTER VR FLYBY".
-4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! However, be very careful with the high-warp buttons (like 7.2kx) during critical course corrections, as the touch UI layout currently places them close together. Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
+4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
 
 <p align="center">
   <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg" width="23%" title="At the Moon" alt="Mobile View at the Moon"/>
@@ -90,14 +92,10 @@ If you use this project for your own research, education, or as a base for your 
 
 ## **🗺️ V2.0 Roadmap**
 
-* \[ \] **Orbital Traffic Checkpoints:** Add altitude milestones indicating when the player passes through the orbits of the ISS, Starlink network, GPS satellites, or Geosynchronous orbit. Include ambient visual elements outside the window for scale context.
-
 * \[ \] **Mobile UX Overhaul:** Design a dedicated, touch-friendly UI layout specifically for mobile browsers to prevent misclicks on critical time-warp buttons and fix landscape orientation clipping.
 * \[ \] **Bug Investigation:** Time warp seems to halt/reset repeatedly when deep inside the Lunar Sphere of Influence. Need to refine the SOI trigger latch.  
-* \[ \] **Mid-Course Correction (MCC):** Add an "Off Course Detected" warning and a "Recalculate Destination" button to execute a burn midway to the Moon if alignment drifts.  
 * \[ \] **Trajectory Trails:** Render the actual path flown (white line) vs projected path (blue dotted line).  
 * \[ \] **Overview Map:** A 3/4 top-down orthographic minimap overlay showing Earth, Moon, and ship position.  
-* \[ \] **Post-Flight Report:** After flyby/crash, generate a UI report showing Max Gs, flight time, and fuel remaining.  
 * \[ \] **Lagrangian Points (L1-L4):** Add invisible targets/markers to the raycaster for L1 (between Earth/Moon), L2 (behind Moon), etc.  
 * \[ \] **Lunar Orbit Insertion (LOI):** Add capability to do a retrograde burn at perilune to establish Lunar Orbit instead of a Free Return.  
 * \[ \] **Target Waypoint HUD Overlay:** Add a floating marker in 3D space that physically points at the Moon or Earth (DESTINATION VECTOR) so users can easily visually locate targets when they are perpendicular to travel velocity.
@@ -105,6 +103,9 @@ If you use this project for your own research, education, or as a base for your 
 * \[ \] **Asset Upgrades:** Replace procedural geometry with high-res NASA .glb models for the Orion capsule and SLS.
 
 ## **🏆 Completed Ready to Archive**
+* [x] **Active Reentry & Aerodynamics:** Implemented Lift/Drag bank vectors, parachute reefing, and plasma visual effects.
+* [x] **True MCC Trajectory Alignment:** Replaced static delta-v bumps with an iterative targeting solver to perfectly calculate Earth entry angle.
+* [x] **Orbital Traffic Checkpoints:** Added HUD warnings for crossing ISS, Starlink, and GPS orbital planes.
 
 ## **👨‍🚀 About the Creator**
 
