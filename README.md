@@ -6,19 +6,19 @@
 
 *(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
 
-![LEO Orbit TMI Burn Start](Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png)
+![LEO Orbit TMI Burn Start](images/Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png)
 *Initial Burn toward the Moon from Low Earth Orbit.*
 
-![At the Moon](Lunar-Flyby-XR_Screenshot_2026-03-31_002_At-Moon.png)
+![At the Moon](images/Lunar-Flyby-XR_Screenshot_2026-03-31_002_At-Moon.png)
 *Arriving at the Moon after a 3-day cislunar coast.*
 
-![Earth, Sun, and Moon](Lunar-Flyby-XR_Screenshot_2026-04-07_001_Earth-Sun-Moon.png)
+![Earth, Sun, and Moon](images/Lunar-Flyby-XR_Screenshot_2026-04-07_001_Earth-Sun-Moon.png)
 *Aligning the Earth, Sun, and Moon during the flyby.*
 
-![Earth Return](Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
+![Earth Return](images/Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
 *Approaching Earth on the return trajectory.*
 
-> **🚀 Current Status (v1.9.9.0):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence including True Transverse Orbital Targeting for precise mid-course corrections (MCC), Atmospheric Drag, Parachute Reefing, and Active Aerodynamic Reentry. Users must now actively manage their bank angle to surf the atmosphere, bleed off velocity, and survive lethal G-forces during the plasma blackout phase. 
+> **🚀 Current Status (v1.9.9.1):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence. **XR UPDATE:** Successfully tested and verified on **Meta Quest 3s (Standalone Browser)** and **Mobile XR** platforms. The simulation is now stable in VR headsets, with detailed "Pro-Tips" and setup instructions forthcoming for mobile VR users.
 
 ## **🚀 The Vision**
 
@@ -74,10 +74,10 @@ This project is currently completely self-contained in a single file for maximum
 4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
 
 <p align="center">
-  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg" width="23%" title="At the Moon" alt="Mobile View at the Moon"/>
-  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_002_Sun-Earth-Moon.jpg" width="23%" title="Sun Earth Moon Alignment" alt="Mobile Sun Earth Moon"/>
-  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_003_Moon-Com-Blackout.jpg" width="23%" title="Lunar Comms Blackout" alt="Mobile Lunar Comms Blackout"/>
-  <img src="Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_004_Sun-Moon-Earth.jpg" width="23%" title="Sun Moon Earth Return" alt="Mobile Earth Return"/>
+  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg" width="23%" title="At the Moon" alt="Mobile View at the Moon"/>
+  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_002_Sun-Earth-Moon.jpg" width="23%" title="Sun Earth Moon Alignment" alt="Mobile Sun Earth Moon"/>
+  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_003_Moon-Com-Blackout.jpg" width="23%" title="Lunar Comms Blackout" alt="Mobile Lunar Comms Blackout"/>
+  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_004_Sun-Moon-Earth.jpg" width="23%" title="Sun Moon Earth Return" alt="Mobile Earth Return"/>
 </p>
 
 ## **⭐ Attribution & Giving Credit**

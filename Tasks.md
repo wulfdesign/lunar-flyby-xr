@@ -7,7 +7,19 @@
 
 ---
 
+## 🩹 Tech Debt & Documentation
+- [x] 🏆 **Repo: Directory Cleanup**: Moved redundant `index_v*.html` versions from root to `/archive` or `/debug`.
+- [ ] 🩹 **Repo: Version Audit**: Double-check version numbers in `index.html` commits and the initial commit metadata (time/date) to ensure accuracy; resolve the accidental "v2.0" jump in the commit history for chronological clarity.
+- [ ] 🩹 **Docs: Search for Missing Sprint**: Investigate suspected Gemini WebUI save failure to recover the original chat logs for the final "Landing Sprint" (v1.9.8.10 / v1.9.9.1).
+- [ ] 🩹 **Docs: Link Validation**: Fix broken links in `README.md` and `docs/` after directory reorganization.
+- [ ] 🩹 **Docs: Recover Stripped Comments**: Extract educational documentation from `index_Rescue_V04.html` and move to `index_html.md` or re-weave into code using context-efficient markers.
+- [ ] 🛠️ **UI: Mission Settings Panel**: Build a panel to toggle "Auto-MCC", "Auto-Warp Deceleration", and "Auto-Warp to Recommended" speed settings.
+
 ## 🛠️ Current Work
+- [ ] 🔥🔥🔥 **Media: Quest 3s Offload**: Offload 4K screenshots and flight video from the Quest 3s validation flight.
+- [ ] 🔥🔥🔥 **Media: Stitch & Edit**: Edit and stitch the final mission video for promotional use and README update.
+- [ ] 🛠️ **Docs: Mobile XR Instructions**: Add detailed setup "Pro-Tips" to the README for getting the best experience on Meta Quest and Mobile XR browsers.
+- [ ] 🛠️ **UI: Mobile XR UX Overhaul**: Optimize the XR HUD for mobile headsets; implement the "Floating Browser Window" workaround to allow HUD operation while in the VR view.
 - [ ] 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial `MISSION_LEAD_ANGLE` moon-moving cheat with realistic TLI parameters (ejection angle, transit time) to calculate leading-edge interception of a naturally orbiting Moon.
 - [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
 - [ ] 🔥🔥🔥 **HUD: Visual Trajectory Indicator**: Show "On Target" / "Off Course" status based on real-time physics projection.
@@ -32,9 +44,9 @@
 ## 🔥🔥 End-of-Mission Flow (Re-Entry & Splashdown)
 - [ ] 🔥🔥 **UI/HUD: Phase Checklist Updates**: Add "Loss of Signal (LOS) Warning", "Cislunar Return", "Re-entry Prep". 
 - [ ] 🔥🔥 **UX: Comms Radio UI**: Add a dedicated scrolling log box for CAPCOM radio instructions and ground-control readouts, logging them to the json output.
-- [ ] 🔥🔥 **Simulation: Re-Entry Heating & Plasma Blackout**: Implement visual indicators and a comms blackout period as altitude drops below 120km.
-- [ ] 🔥🔥 **Mechanics: Atmospheric Drag**: Program velocity bleed-off (`F_drag`) interacting with `updatePhysics` once `altE < 100km`, allowing the ship to aerodynamically slow down before impact.
-- [ ] 🔥🔥 **Mechanics: Splashdown Sequence**: Add retro-fire targeting, heat shield orientation requirement, drogue chute deployment, and main chute splashdown restrictions interacting with the aerodynamic load.
+- [x] 🏆 **Simulation: Re-Entry Heating & Plasma Blackout**: Implemented visual indicators and a comms blackout period as altitude drops below 120km.
+- [x] 🏆 **Mechanics: Atmospheric Drag**: Programmed velocity bleed-off (`F_drag`) interacting with `updatePhysics` once `altE < 122km`, allowing the ship to aerodynamically slow down.
+- [x] 🏆 **Mechanics: Splashdown Sequence**: Added lifting-entry bank controls, interpolated drogue/main chutes, and structural survivability checks.
 - [ ] 🔥🔥 **Mechanics: Earth-Return Waypoints**: Duplicate the Mission Waypoint script to track distance *decreasing* for inbound flights, triggering the same auto-warp slowdowns and MCC checks.
 - [ ] 🔥🔥 **Simulation: Splashdown Geolocation Tracking**: Calculate geographic latitude/longitude impact coordinates by syncing the final Cartesian position vector with a rotating Earth texture base based on Mission Elapsed Time.
 
@@ -74,9 +86,14 @@
 - [ ] 🧊 **Mechanic**: Dragon-style Powered Landing (Fire retros, discard chutes, zero-velocity touchdown).
 - [ ] 🧊 **Restore Load Flight Log**: Re-enable log playback once stability issues are resolved.
 - [ ] 🧊 **Refine Auto Camera Tracking**: Automated pans currently disabled.
-
 ## 🏆 Completed Ready to Archive
+- [x] 🏆 **Mechanics: Atmospheric Drag & Parachutes**: Implemented exponential density drag math and multi-stage chute deployment (Drogues @ 7.3km, Mains @ 3km).
+- [x] 🏆 **Mechanics: Splashdown State Machine**: Added mission success/failure logic based on 15m/s impact velocity threshold and 15G structural limit.
+- [x] 🏆 **Mechanics: Lifting Entry Physics**: Integrated capsule roll/lift (L/D ~0.25) allowing for manual trajectory steering during reentry.
+- [x] 🏆 **Physics: Vector Corruption Hotfix (v1.9.8.5)**: Fixed integration bug where `_totalAccel` was overwriting base gravity instead of copying it, causing the "crazy numbers" and black screen failures.
+- [x] 🏆 **Physics: Trajectory Keyhole Restoration**: Reverted `MISSION_LEAD_ANGLE` to 0.74 to restore the proven Free-Return slingshot timing.
 - [x] 🏆 **Avionics: Waypoint MCC Autopilot**: Implemented Mid-Course Correction distance triggers and prototype Delta-V execution frame. (Verified 2026-04-07)
+...
 - [x] 🏆 **Burn Precision Logging**: Added `target_burn_s` and `actual_burn_s` to logs. (Verified 2026-04-01)
 - [x] 🏆 **UI Stability & Crash Prevention**: Implemented `safeSetText` and `try...catch` in the main loop to resolve "Cannot set properties of null" errors. (Verified 2026-04-06)
 - [x] 🏆 **Log Folder Organization**: Established `/logs` directory. (Verified 2026-04-01)
