@@ -87,7 +87,7 @@ The simulation runs successfully on mobile browsers, but **must remain locked to
 
 Once launched, simply click the "ENTER VR FLYBY" button to step inside the capsule. We were able to ride through atmospheric re-entry, drogue parachute deployment, and successful ocean splashdown from the commander's seat!
 
-> **⚠️ XR UI Notice:** The 3D physics engine is perfectly stable in VR, but the UI HUD requires a workaround. To operate the ship controls, you must pull up a separate floating browser window alongside the immersive VR view. A dedicated Mobile XR UI overhaul and detailed configuration instructions are coming in V2.0.
+> **⚠️ XR UI Notice:** The 3D physics engine is perfectly stable in VR, but the UI HUD requires a workaround. To operate the ship controls, you must pull up a separate floating browser window alongside the immersive VR view. A dedicated Mobile XR UI overhaul and detailed configuration instructions are coming in V2.0. *(Also full instructions, in-headset screenshots, and captured video to come).*
 
 ## **⭐ Attribution & Giving Credit**
 
