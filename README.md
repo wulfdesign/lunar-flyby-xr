@@ -64,14 +64,16 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 
 This project began as an AI-assisted rapid prototype session on March 30-31, 2026. After a successful iteration process, the source code was rescued from a browser canvas glitch and reconstructed into this repository to serve as a foundation for further development of educational space simulations.
 
-## **💻 How to Run**
+## **💻 Platforms & Setup**
 
 This project is currently completely self-contained in a single file for maximum accessibility.
 
+### 🖥️ Desktop Browsers
 1. Clone or download this repository.  
-2. Double-click index.html to open it in any modern web browser (or run via a local server to bypass file-protocol CORS restrictions).  
-3. (Optional) Put on a WebXR-compatible headset (like the Meta Quest) and click "ENTER VR FLYBY".
-4. **📱 Mobile Devices:** The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
+2. Double-click `index.html` to open it in any modern web browser (or run via a local server to bypass file-protocol CORS restrictions).  
+
+### 📱 Mobile Devices
+The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
 
 <p align="center">
   <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg" width="23%" title="At the Moon" alt="Mobile View at the Moon"/>
@@ -79,6 +81,11 @@ This project is currently completely self-contained in a single file for maximum
   <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_003_Moon-Com-Blackout.jpg" width="23%" title="Lunar Comms Blackout" alt="Mobile Lunar Comms Blackout"/>
   <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_004_Sun-Moon-Earth.jpg" width="23%" title="Sun Moon Earth Return" alt="Mobile Earth Return"/>
 </p>
+
+### 🥽 WebXR (Meta Quest & Standalone VR)
+*Artemis: The Free Return* was fundamentally built for immersion. Before treating exhibit guests at the Greenwood Art Show, we executed a flawless standalone flight test directly inside the **Meta Quest 3s** headset using its native XR browser. 
+
+Once launched, simply click the "ENTER VR FLYBY" button. The physics engine stability and UI positioning adapt perfectly to spatial computing. We were able to ride the capsule through atmospheric re-entry, drogue parachute deployment, and successful ocean splashdown from the commander's seat!
 
 ## **⭐ Attribution & Giving Credit**
 
