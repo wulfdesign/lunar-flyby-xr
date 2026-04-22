@@ -85,7 +85,9 @@ The simulation runs successfully on mobile browsers, but **must remain locked to
 ### 🥽 WebXR (Meta Quest & Standalone VR)
 *Artemis: The Free Return* was fundamentally built for immersion. Before treating exhibit guests at the Greenwood Art Show, we executed a flawless standalone flight test directly inside the **Meta Quest 3s** headset using its native XR browser. 
 
-Once launched, simply click the "ENTER VR FLYBY" button. The physics engine stability and UI positioning adapt perfectly to spatial computing. We were able to ride the capsule through atmospheric re-entry, drogue parachute deployment, and successful ocean splashdown from the commander's seat!
+Once launched, simply click the "ENTER VR FLYBY" button to step inside the capsule. We were able to ride through atmospheric re-entry, drogue parachute deployment, and successful ocean splashdown from the commander's seat!
+
+> **⚠️ XR UI Notice:** The 3D physics engine is perfectly stable in VR, but the UI HUD requires a workaround. To operate the ship controls, you must pull up a separate floating browser window alongside the immersive VR view. A dedicated Mobile XR UI overhaul and detailed configuration instructions are coming in V2.0.
 
 ## **⭐ Attribution & Giving Credit**
 

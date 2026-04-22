@@ -17,9 +17,10 @@
 
 ## 🛠️ Current Work
 - [ ] 🔥🔥🔥 **Media: Quest 3s Offload**: Offload 4K screenshots and flight video from the Quest 3s validation flight.
-- [ ] 🔥🔥🔥 **Media: Stitch & Edit**: Edit and stitch the final mission video for promotional use and README update.
-- [ ] 🛠️ **Docs: Mobile XR Instructions**: Add detailed setup "Pro-Tips" to the README for getting the best experience on Meta Quest and Mobile XR browsers.
-- [ ] 🛠️ **UI: Mobile XR UX Overhaul**: Optimize the XR HUD for mobile headsets; implement the "Floating Browser Window" workaround to allow HUD operation while in the VR view.
+- [ ] 🔥🔥🔥 **Media: Stitch & Edit**: Edit and stitch the final mission video for promotional use.
+- [ ] 🛠️ **Media: Update README Visuals**: Insert the Quest 3s screenshots and stitched video into the README XR section once offloaded.
+- [ ] 🛠️ **Docs: Mobile XR Instructions**: Write detailed step-by-step setup instructions for the Mobile XR / Quest 3s section in the README (explaining how to set up the floating browser window workaround).
+- [ ] 🛠️ **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively, removing the need for a separate floating browser window to operate the flyby (V2.0 priority).
 - [ ] 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial `MISSION_LEAD_ANGLE` moon-moving cheat with realistic TLI parameters (ejection angle, transit time) to calculate leading-edge interception of a naturally orbiting Moon.
 - [ ] 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files into the simulation mission profile.
 - [ ] 🔥🔥🔥 **HUD: Visual Trajectory Indicator**: Show "On Target" / "Off Course" status based on real-time physics projection.
