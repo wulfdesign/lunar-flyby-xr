@@ -18,9 +18,12 @@
 ![Earth Return](images/Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
 *Approaching Earth on the return trajectory.*
 
-> **🪂 Current Status (v1.9.9.3):** Refactored the core HUD UI layout architecture into geometric corner Quadrants, optimizing the interface for squashed laptop un-maximized window frames so all text and telemetry scale flawlessly. Reintegrated educational physics contexts into a dedicated live documentation Wiki.
-> 
-> **🚀 Previous (v1.9.9.1):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence. **XR UPDATE:** Successfully tested and verified on **Meta Quest 3s (Standalone Browser)** and **Mobile XR** platforms. The simulation is now stable in VR headsets, with detailed "Pro-Tips" and setup instructions forthcoming for mobile VR users.
+> **🚀 Current Stable Release (v1.9.9.1):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence. **XR UPDATE:** Successfully tested and verified on **Meta Quest 3s (Standalone Browser)** and **Mobile XR** platforms. The simulation is stable in VR headsets and verified on mobile devices.
+>
+> 🧪 **Bleeding Edge Dev Sandboxes:**
+> - [v1.9.9.3 (Desktop Absolute Quadrant UI Pass)](dev/index_v1.9.9.3.html) - *Under Active Mobile Debugging*
+> - [v1.9.9.2 (Educational Physics Reintegration)](dev/index_v1.9.9.2.html)
+
 
 ## **🚀 The Vision**
 
