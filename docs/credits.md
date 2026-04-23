@@ -19,6 +19,8 @@ This project leverages open-source technology, NASA scientific data, and histori
 *   **Orbital Mechanics:** Physics calculations (Vis-viva equation, Delta-V) cross-referenced with:
     *   [Wikipedia: Orbital Mechanics](https://en.wikipedia.org/wiki/Orbital_mechanics)
     *   [Wikipedia: Trans-Lunar Injection](https://en.wikipedia.org/wiki/Trans-lunar_injection)
+*   **Physics Engine:** [Velocity Verlet Integration](https://en.wikipedia.org/wiki/Verlet_integration) used for energy-stable multi-day orbital rendering.
+*   **Reentry Dynamics:** Atmospheric drag modeled directly using the [Barometric Formula (Exponential Density)](https://en.wikipedia.org/wiki/Barometric_formula) and the [Drag Equation](https://en.wikipedia.org/wiki/Drag_equation) for realistic 2-degree keyhole calculations.
 
 ## 🎞️ Historical & Creator Credits
 *   **Creator:** Larry James (Wulf Design Studios / UpLiftVR Studios)
