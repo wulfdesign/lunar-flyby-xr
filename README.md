@@ -30,10 +30,10 @@ Originally inspired by a proposal for the now-canceled *dearMoon* project and ti
 
 This isn't a pre-rendered animation; it's a living physics sandbox.
 
-* **Real Newtonian Physics:** Powered by a custom Velocity Verlet integration engine using real-world units (kilometers, kilograms, seconds) and true N-body gravity (Earth and Moon).  
+* **Real Newtonian Physics:** Powered by a custom Velocity Verlet integration engine using real-world units (kilometers, kilograms, seconds) and true N-body gravity (Earth and Moon). Unlike space visualizers that pull from pre-calculated JPL ephemeris data (moving the ship on "rails"), this engine calculates raw gravitational forces dynamically frame-by-frame.
 * **Orbital Energy Targeting:** The flight computer calculates Trans-Lunar Injection (TLI) burns using the Vis-viva equation and orbital energy, not just preset timers.
 * **True Trajectory Avionics:** Iterative targeting solver calculates exact transverse Delta-V for Mid-Course Corrections, displaying projected Entry Angles days before reaching Earth.
-* **Active Aerodynamic Reentry:** Dynamic atmospheric drag modeling. Bank the capsule UP to generate lift and shallow your descent, or DOWN to dig into the atmosphere, managing lethal G-forces through the plasma blackout. 
+* **Active Aerodynamic Reentry:** Dynamic atmospheric drag modeling requiring you to thread a brutal 2-degree reentry keyhole to survive. Bank the capsule UP to generate lift and shallow your descent, or DOWN to dig into the atmosphere, managing lethal G-forces through the plasma blackout. 
 * **Dynamic Telemetry HUD:** Real-time G-Force, relative velocity, altitude, orbital traffic checkpoints (ISS, Starlink, GPS), and fuel mass-flow calculations.  
 * **Time Warp System:** Accelerate time up to 7,200x to cross the 3-day cislunar gap, with automated safety lockouts near gravitational bodies.  
 * **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser (Tested on Quest 3 via PC Link).  
@@ -43,6 +43,7 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 
 * **Engine:** Three.js (r128)
 * **Physics:** Custom Velocity Verlet Integration
+* **Performance:** Zero-allocation object pooling to eliminate JavaScript Garbage Collection lag during high-speed integration loops.
 * **Frontend:** Vanilla HTML5/CSS3 (No Tailwind/Bootstrap)
 * **Immersion:** WebXR API (VR Support)
 
