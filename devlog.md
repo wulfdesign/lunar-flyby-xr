@@ -2,6 +2,14 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-22 19:15] - v1.9.9.3: Quadrant Absolute Screen Layout Fix
+### 📝 Summary
+Refactored the core `#ui-layer` architecture into absolute corner "Quadrants" instead of stacked flex rows. This definitively solves a critical cutoff edge-case where squashed/unmaximized display windows (like laptops or split-screen tablets) were forcing menus to overflow rather than smartly expanding into dead space.
+
+### 🛠️ Work Done
+- **Layout Decoupling**: Replaced horizontal flex row bounds with decoupled Quadrant edge-bindings.
+- **Top-Right Void Utilization**: Bottom-right Orbital Navigation panel is now allowed up to 100% vertical screen height minus a 40px margin, enabling it to swallow the blank space in the upper right.
+
 ## [2026-04-22 18:30] - v1.9.9.2: Educational Wiki & Re-entry Physics Breakdown
 ### 📝 Summary
 Reintegrated the core educational constraints of the physics engine into a dedicated live documentation Wiki (`docs/physics.html`), explicitly linking orbital dynamics and re-entry mathematics to the `index.html` runtime via inline anchor tags. 

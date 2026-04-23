@@ -87,6 +87,9 @@
 - [ ] 🧊 **Mechanic**: Dragon-style Powered Landing (Fire retros, discard chutes, zero-velocity touchdown).
 - [ ] 🧊 **Restore Load Flight Log**: Re-enable log playback once stability issues are resolved.
 - [ ] 🧊 **Refine Auto Camera Tracking**: Automated pans currently disabled.
+## 🧪 Waiting for QA
+- [/] 🧪 **UI/UX Layout: Quadrant Expansion Bugfix**: Completely decoupled CSS rigid flex rows and rebuilt HUD wrapper to absolute Quadrants. Bottom-Right Navigation panel now correctly consumes empty Top-Right space dynamically on squashed non-maximized viewports instead of cutting off behind taskbars. Awaiting tests on Tablet, Mobile, and Quest.
+
 ## 🏆 Completed Ready to Archive
 - [x] 🪂 **Docs: Restore Educational Wiki Mechanics**: Transitioned the raw physics constraints (Orbital Velocity, Gimbaling, Reefing) into a dedicated `docs/physics.html` live wiki, mapping explicit anchor URLs down into the `index.html` integration loop.
 - [x] 🏆 **UI/Simulation: AI Syntax Corruption Hotfix**: Sliced off duplicated HTML closing tags and restored the `mccAutoCountdown` global variable to prevent a fatal ReferenceError from killing the animation loop.
