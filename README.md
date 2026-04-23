@@ -18,15 +18,14 @@
 ![Earth Return](images/Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
 *Approaching Earth on the return trajectory.*
 
-> **🚀 Current Stable Release (v1.9.9.1):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence. **XR UPDATE:** Successfully tested and verified on **Meta Quest 3s (Standalone Browser)** and **Mobile XR** platforms. The simulation is stable in VR headsets and verified on mobile devices.
-> - **[Play Last Known Tested XR Version: v1.9.9.1](index.html)**
+> **🚀 Current Stable Release (v1.9.9.6):** Fully refactored the core HUD UI layout architecture into geometric corner Quadrants, optimizing the interface for squashed laptop un-maximized window frames so all text and telemetry scale flawlessly. 
+> - **[Play Last Known Tested XR Version: v1.9.9.1](dev/index_v1.9.9.1.html)**
 >
 > 🧪 **Bleeding Edge Dev Sandboxes:**
-> - [v1.9.9.6 (Fix: Strict Mobile Proportion Grid Widths)](dev/index_v1.9.9.6.html) - *Under Active Mobile Debugging*
 > - [v1.9.9.2 (Educational Physics Reintegration)](dev/index_v1.9.9.2.html)
 >
 > > [!WARNING]
-> > **Mobile Users:** The v1.9.9.5 layout engine is currently optimized for Desktop and VR viewports. To experience the optimal UI layout on iOS/Android, please select **"Request Desktop Site"** in your mobile browser settings. Native responsive mobile support is currently actively tracked in the developer backlog.
+> > **Mobile Users:** The v1.9.9.6 layout engine is currently optimized for Desktop and VR viewports. To experience the optimal UI layout on iOS/Android, please select **"Request Desktop Site"** in your mobile browser settings. Native responsive mobile support is currently actively tracked in the developer backlog.
 
 
 ## **🚀 The Vision**

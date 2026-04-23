@@ -2,6 +2,15 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-22 20:30] - v1.9.9.6: Mobile Grid Ratios & Production Promotion
+### 📝 Summary
+Finalized proportional CSS grid boundaries for mobile UI testing. Deployed `v1.9.9.6` to production under root `index.html`. Explicitly retained `v1.9.9.1` in the new `/dev` directory as a fallback stable XR release, and introduced the "Request Desktop Site" workaround logic into official documentation for mobile users.
+
+### 🛠️ Work Done
+- **Layout Math Fix**: Locked mobile `.panel` blocks to mathematically stretch to cell constraints (`justify-items: stretch`).
+- **Column Sizing**: Forced `1fr 1.3fr` logic to give Orbital Navigation (bottom-right) priority horizontal screen usage over Mission Itinerary (bottom-left) to resolve extremely squashed button layouts.
+- **Workflow Overhaul**: Formalized the separation of `main` branch into a `/dev` subdirectory staging environment, and committed `v1.9.9.6` to `index.html` as the active live release.
+
 ## [2026-04-22 19:15] - v1.9.9.3: Quadrant Absolute Screen Layout Fix
 ### 📝 Summary
 Refactored the core `#ui-layer` architecture into absolute corner "Quadrants" instead of stacked flex rows. This definitively solves a critical cutoff edge-case where squashed/unmaximized display windows (like laptops or split-screen tablets) were forcing menus to overflow rather than smartly expanding into dead space.
