@@ -19,10 +19,10 @@
 *Approaching Earth on the return trajectory.*
 
 > **🚀 Current Stable Release (v1.9.9.1):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence. **XR UPDATE:** Successfully tested and verified on **Meta Quest 3s (Standalone Browser)** and **Mobile XR** platforms. The simulation is stable in VR headsets and verified on mobile devices.
+> - **[Play Last Known Tested XR Version: v1.9.9.1](index.html)**
 >
 > 🧪 **Bleeding Edge Dev Sandboxes:**
-> - [v1.9.9.5 (Desktop Absolute Quadrant UI Pass)](dev/index_v1.9.9.5.html) - *See Mobile Warning Below*
-> - [v1.9.9.4 (Archived Dev Scaling Test)](dev/index_v1.9.9.4.html)
+> - [v1.9.9.6 (Fix: Strict Mobile Proportion Grid Widths)](dev/index_v1.9.9.6.html) - *Under Active Mobile Debugging*
 > - [v1.9.9.2 (Educational Physics Reintegration)](dev/index_v1.9.9.2.html)
 >
 > > [!WARNING]
