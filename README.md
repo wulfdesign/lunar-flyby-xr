@@ -21,8 +21,12 @@
 > **🚀 Current Stable Release (v1.9.9.1):** We have splashdown! The simulation now features a fully functional End-of-Mission sequence. **XR UPDATE:** Successfully tested and verified on **Meta Quest 3s (Standalone Browser)** and **Mobile XR** platforms. The simulation is stable in VR headsets and verified on mobile devices.
 >
 > 🧪 **Bleeding Edge Dev Sandboxes:**
-> - [v1.9.9.3 (Desktop Absolute Quadrant UI Pass)](dev/index_v1.9.9.3.html) - *Under Active Mobile Debugging*
+> - [v1.9.9.5 (Desktop Absolute Quadrant UI Pass)](dev/index_v1.9.9.5.html) - *See Mobile Warning Below*
+> - [v1.9.9.4 (Archived Dev Scaling Test)](dev/index_v1.9.9.4.html)
 > - [v1.9.9.2 (Educational Physics Reintegration)](dev/index_v1.9.9.2.html)
+>
+> > [!WARNING]
+> > **Mobile Users:** The v1.9.9.5 layout engine is currently optimized for Desktop and VR viewports. To experience the optimal UI layout on iOS/Android, please select **"Request Desktop Site"** in your mobile browser settings. Native responsive mobile support is currently actively tracked in the developer backlog.
 
 
 ## **🚀 The Vision**

@@ -13,6 +13,7 @@
 - [ ] 🩹 **Docs: Search for Missing Sprint**: Investigate suspected Gemini WebUI save failure to recover the original chat logs for the final "Landing Sprint" (v1.9.8.10 / v1.9.9.1).
 - [ ] 🩹 **Docs: Link Validation**: Fix broken links in `README.md` and `docs/` after directory reorganization.
 - [ ] 🩹 **Docs: Recover Stripped Comments**: Extract educational documentation from `index_Rescue_V04.html` and move to `index_html.md` or re-weave into code using context-efficient markers.
+- [ ] 🐛 **UI: Mobile View (Portrait & Landscape)**: Fix native responsive mobile layout sizing and CSS Grid limits. Wait for UI overhaul or apply proportional scaling. Current workaround requires "Desktop Site" enabled on mobile.
 - [ ] 🛠️ **UI: Mission Settings Panel**: Build a panel to toggle "Auto-MCC", "Auto-Warp Deceleration", and "Auto-Warp to Recommended" speed settings.
 
 ## 🛠️ Current Work
