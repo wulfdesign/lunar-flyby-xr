@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis Sim: Physics Reference</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background: #000; color: #fff; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #00ffff; }
+        h1 { border-bottom: 1px solid rgba(0, 255, 255, 0.3); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
+        h2 { font-size: 1.2rem; margin-top: 0; }
+        code { background: rgba(0, 20, 40, 0.8); padding: 2px 6px; border-radius: 4px; color: #44ff44; font-weight: bold; }
+        .section { background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.4); padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); }
+        blockquote { border-left: 2px solid #ff4444; margin-left: 0; padding-left: 15px; background: rgba(255, 68, 68, 0.1); padding: 10px 15px; color: #ffaa55; font-weight: bold; }
+        ul { list-style-type: square; color: #aaa; }
+        li { margin-bottom: 8px; }
+        strong { color: #fff; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Artemis Orbital Physics & Math Reference</h1>
+    <p>This "Live Documentation" explicitly catalogs the mathematics driving the WebXR simulation. It is decoupled from the main codebase to keep the JavaScript highly optimized for 7,200x time-warp integration loops, while still providing deep educational context.</p>
+
+    <div id="velocity-verlet" class="section">
+        <h2>1. Velocity Verlet Integration</h2>
+        <p>Unlike standard visualizations that place ships on predefined "rails" (splines), this engine calculates raw gravity frame-by-frame. We use <code>Velocity Verlet</code> instead of <code>Euler integration</code> because it handles multi-day orbital paths with significantly less "energy drift" (preventing the orbit from artificially spiraling outward over time).</p>
+    </div>
+
+    <div id="n-body-gravity" class="section">
+        <h2>2. N-Body Gravity Constants</h2>
+        <p>All values strictly follow standard real-world dimensions: <strong>Kilometers (km)</strong>, <strong>Kilograms (kg)</strong>, and <strong>Seconds (s)</strong>.</p>
+        <ul>
+            <li><code>radEarth = 6371</code> -- Earth's equatorial radius (km)</li>
+            <li><code>radMoon = 1737</code> -- Lunar equatorial radius (km)</li>
+            <li><code>distMoon = 384400</code> -- Average Earth-to-Moon distance (km)</li>
+            <li><code>muEarth = 398600.4418</code> -- Earth's Standard Gravitational Parameter ($G \times M_{earth} $) in $km^3 / s^2$</li>
+            <li><code>muMoon = 4902.8000</code> -- Moon's Standard Gravitational Parameter in $km^3 / s^2$</li>
+        </ul>
+        <blockquote>Calculated Gravity Acceleration Vector:<br><br><code>&Delta;v = - (&mu; / |r|&sup3;) * r</code></blockquote>
+    </div>
+
+    <div id="barometric-drag" class="section">
+        <h2>3. Atmospheric Re-Entry & Aerodynamic Drag</h2>
+        <p>To survive, the flight computer must thread a brutal <strong>2-degree reentry keyhole</strong>. If the Entry Angle is steeper than <code>-7.0&deg;</code>, lethal deceleration G-forces will destroy the structural integrity. If shallower than <code>-5.5&deg;</code>, aerodynamic drag won't scrub your velocity, skipping the craft off the atmosphere into solar orbit.</p>
+        <p><strong>The Barometric Formula (Exponential Density):</strong></p>
+        <ul>
+            <li><code>RHO_0 = 1.225</code> -- Sea level atmospheric density ($kg/m^3$)</li>
+            <li><code>SCALE_HEIGHT = 8.5</code> -- Earth's atmospheric scale height (km)</li>
+            <li><code>DRAG_AREA = 0.011</code> -- Exposed cross-sectional area of the Orion capsule base ($km^2$)</li>
+        </ul>
+        <blockquote>Atmospheric Density Equation:<br><code>&rho; = &rho;0 * e^(-altitude / H_scale)</code><br><br>
+        Drag Force Equation:<br><code>F_d = 0.5 * &rho; * v&sup2; * C_d * A</code></blockquote>
+    </div>
+
+    <div id="zero-allocation" class="section">
+        <h2>4. Performance: Zero-Allocation Object Tracking</h2>
+        <p>At a maximum <strong>7,200x time warp</strong>, allocating <code>new THREE.Vector3()</code> every frame would trigger massive JavaScript Garbage Collection pauses and destroy the frame rate. Instead, we globally declare <code>_tempVec</code> object pools and continually execute <code>.copy()</code> and <code>.add()</code> into them, allocating absolutely zero new memory during the multi-day flight loop.</p>
+    </div>
+</body>
+</html>

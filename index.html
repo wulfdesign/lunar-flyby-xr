@@ -237,6 +237,8 @@
             PROXIMITY_DIST: 5000, PROXIMITY_WARP: 10
         };
 
+        // --- REAL-WORLD PHYSICS CONSTANTS ---
+        // N-Body gravity variables. See context: /docs/physics.html#n-body-gravity
         const MISSION_LEAD_ANGLE = 0.74; 
         const muEarth = 398600.4418; 
         const muMoon = 4902.8000;    
@@ -623,6 +625,8 @@
                 else if (altE < 3.0 && altE >= 2.0) { let factor = (3.0 - altE) / 1.0; dragCd = 50.0 + (factor * 100.0); } 
                 else if (altE < 2.0) { dragCd = 150.0; }
 
+                // --- AERODYNAMIC DRAG ---
+                // Calculating Barometric Formula. See context: /docs/physics.html#barometric-drag
                 let density = 1.225 * Math.exp(-altE / 8.5); let v_ms = currentVelMag * 1000;
                 dragAccMag = ((0.5 * density * v_ms * v_ms * dragCd * 10.5) / 8000) / 1000; 
                 
@@ -648,6 +652,9 @@
                     _totalAccel.add(_tempVec2);
                 }
             }
+            // --- VELOCITY VERLET INTEGRATION LOOP ---
+            // Calculating next position via zero-allocation pooling.
+            // See context: /docs/physics.html#velocity-verlet AND /docs/physics.html#zero-allocation
             _tempVec1.copy(shipVel).multiplyScalar(dt); _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt); shipPos.add(_tempVec1).add(_tempVec2);
             
             if (shipPos.length() - radEarth <= 0) {
