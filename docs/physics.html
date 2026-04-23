@@ -33,8 +33,8 @@
             <li><code>radEarth = 6371</code> -- Earth's equatorial radius (km)</li>
             <li><code>radMoon = 1737</code> -- Lunar equatorial radius (km)</li>
             <li><code>distMoon = 384400</code> -- Average Earth-to-Moon distance (km)</li>
-            <li><code>muEarth = 398600.4418</code> -- Earth's Standard Gravitational Parameter ($G \times M_{earth} $) in $km^3 / s^2$</li>
-            <li><code>muMoon = 4902.8000</code> -- Moon's Standard Gravitational Parameter in $km^3 / s^2$</li>
+            <li><code>muEarth = 398600.4418</code> -- Earth's Standard Gravitational Parameter (G &times; M<sub>earth</sub>) in km&sup3;/s&sup2;</li>
+            <li><code>muMoon = 4902.8000</code> -- Moon's Standard Gravitational Parameter in km&sup3;/s&sup2;</li>
         </ul>
         <blockquote>Calculated Gravity Acceleration Vector:<br><br><code>&Delta;v = - (&mu; / |r|&sup3;) * r</code></blockquote>
     </div>
@@ -44,9 +44,9 @@
         <p>To survive, the flight computer must thread a brutal <strong>2-degree reentry keyhole</strong>. If the Entry Angle is steeper than <code>-7.0&deg;</code>, lethal deceleration G-forces will destroy the structural integrity. If shallower than <code>-5.5&deg;</code>, aerodynamic drag won't scrub your velocity, skipping the craft off the atmosphere into solar orbit.</p>
         <p><strong>The Barometric Formula (Exponential Density):</strong></p>
         <ul>
-            <li><code>RHO_0 = 1.225</code> -- Sea level atmospheric density ($kg/m^3$)</li>
+            <li><code>RHO_0 = 1.225</code> -- Sea level atmospheric density (kg/m&sup3;)</li>
             <li><code>SCALE_HEIGHT = 8.5</code> -- Earth's atmospheric scale height (km)</li>
-            <li><code>DRAG_AREA = 0.011</code> -- Exposed cross-sectional area of the Orion capsule base ($km^2$)</li>
+            <li><code>DRAG_AREA = 0.011</code> -- Exposed cross-sectional area of the Orion capsule base (km&sup2;)</li>
         </ul>
         <blockquote>Atmospheric Density Equation:<br><code>&rho; = &rho;0 * e^(-altitude / H_scale)</code><br><br>
         Drag Force Equation:<br><code>F_d = 0.5 * &rho; * v&sup2; * C_d * A</code></blockquote>
