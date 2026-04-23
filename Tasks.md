@@ -88,7 +88,7 @@
 - [ ] 🧊 **Restore Load Flight Log**: Re-enable log playback once stability issues are resolved.
 - [ ] 🧊 **Refine Auto Camera Tracking**: Automated pans currently disabled.
 ## 🏆 Completed Ready to Archive
-- [x] 🏆 **Docs: Recover Stripped Comments**: Extracted the missing physics/math constants and explanations into a dedicated `docs/physics-math-reference.md` file, officially linked in `index.html` to keep the source clean.
+- [x] 🪂 **Docs: Restore Educational Wiki Mechanics**: Transitioned the raw physics constraints (Orbital Velocity, Gimbaling, Reefing) into a dedicated `docs/physics.html` live wiki, mapping explicit anchor URLs down into the `index.html` integration loop.
 - [x] 🏆 **UI/Simulation: AI Syntax Corruption Hotfix**: Sliced off duplicated HTML closing tags and restored the `mccAutoCountdown` global variable to prevent a fatal ReferenceError from killing the animation loop.
 - [x] 🏆 **XR: Standalone Headset Verification**: Successfully hand-patched WebXR bindings and completed a flawless end-to-end flight test in the native Meta Quest 3s browser before the Art Show.
 - [x] 🏆 **Mechanics: Atmospheric Drag & Parachutes**: Implemented exponential density drag math and multi-stage chute deployment (Drogues @ 7.3km, Mains @ 3km).

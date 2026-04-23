@@ -2,6 +2,16 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-04-22 18:30] - v1.9.9.2: Educational Wiki & Re-entry Physics Breakdown
+### 📝 Summary
+Reintegrated the core educational constraints of the physics engine into a dedicated live documentation Wiki (`docs/physics.html`), explicitly linking orbital dynamics and re-entry mathematics to the `index.html` runtime via inline anchor tags. 
+
+### 🛠️ Work Done
+- **Standalone Interactive Wiki**: Extracted the raw math documentation from the salvaged `index_Rescue_V04.html` and deployed a clean, styled HTML Wiki.
+- **Center of Gravity Gimbal Lift**: Officially documented the offset CoG lift mechanics ($L/D = 0.25$) that allow players to bank the Orion capsule to shallow out descents and survive G-forces.
+- **Parachute Reefing Math**: Explicitly documented the linear interpolation algorithms that simulate parachute reefing. This crucial mechanism prevents the drogue chutes from snapping open instantaneously, completely neutralizing the catastrophic deceleration G-spikes that plagued earlier builds.
+- **Codebase Indexing**: Embedded hyper-targeted URL anchor links back into the live `index.html` engine codebase blocks.
+
 ## [2026-04-10 13:00] - Community Growth Strategy & 11th-Hour Bug Fixes
 ### 📝 Summary
 Formulated an organic community growth plan to share the simulation with space and STEM communities, while simultaneously recovering from critical AI-hallucinated syntax breakages just hours before deployment. 
