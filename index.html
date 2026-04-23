@@ -10,9 +10,13 @@
         
         #ui-layer {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+            pointer-events: none; display: flex; justify-content: space-between;
             padding: 20px; box-sizing: border-box; z-index: 10; overflow: hidden;
         }
+
+        .desktop-top-left { position: absolute; top: 20px; left: 20px; max-height: calc(50% - 30px); margin-bottom: 0 !important; }
+        .desktop-bottom-left { position: absolute; bottom: 20px; left: 20px; max-height: calc(50% - 30px); margin-bottom: 0 !important; }
+        .desktop-bottom-right { position: absolute; bottom: 20px; right: 20px; max-height: calc(100% - 40px); margin-bottom: 0 !important; }
 
         #plasma-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -25,7 +29,7 @@
             padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);
             pointer-events: auto; width: 360px; max-width: 90vw; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
             margin-bottom: 10px; transition: border-color 0.3s; z-index: 20;
-            max-height: calc(50vh - 30px); overflow-y: auto;
+            max-height: 100%; overflow-y: auto; min-height: 0;
         }
         .panel::-webkit-scrollbar { width: 6px; }
         .panel::-webkit-scrollbar-track { background: transparent; }
@@ -100,8 +104,8 @@
         #zoom-indicator { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); color: #00ffff; font-size: 1.08rem; font-weight: bold; text-shadow: 0 0 5px #000; pointer-events: auto; cursor: help; }
 
         @media (max-width: 600px) {
-            #ui-layer { padding: 10px; overflow-y: auto; pointer-events: none; transform: scale(0.85); transform-origin: top left; width: 117.6%; height: 117.6%; flex-direction: column !important; }
-            .panel { padding: 8px; width: 100%; box-sizing: border-box; }
+            #ui-layer { padding: 10px; overflow-y: auto; pointer-events: none; transform: scale(0.85); transform-origin: top left; width: 117.6%; height: 117.6%; flex-direction: column !important; justify-content: flex-start; }
+            .panel { padding: 8px; width: 100%; box-sizing: border-box; position: relative !important; max-height: none !important; top: auto !important; bottom: auto !important; left: auto !important; right: auto !important; margin-bottom: 15px !important; overflow: visible !important; }
             h1 { font-size: 0.85rem; margin-bottom: 5px; }
             p { font-size: 0.7rem; margin: 2px 0; }
             .controls { gap: 8px; margin-top: 12px; }
@@ -115,8 +119,8 @@
         @keyframes flash-red-bg { 0% { background: rgba(255, 0, 0, 0); } 50% { background: rgba(255, 0, 0, 0.4); } 100% { background: rgba(255, 0, 0, 0); } }
 
         @media (max-height: 500px) and (orientation: landscape) {
-            #ui-layer { flex-direction: row; align-items: flex-start; }
-            .panel { width: 45vw; max-height: 85vh; overflow-y: auto; margin-bottom: 0; }
+            #ui-layer { flex-direction: row; align-items: flex-start; justify-content: space-around; overflow-y: auto; }
+            .panel { position: relative !important; max-height: none !important; width: 45vw; top: auto !important; bottom: auto !important; left: auto !important; right: auto !important; margin-bottom: 10px !important; overflow: visible !important; }
             #zoom-indicator { bottom: 20px; }
         }
 
@@ -127,8 +131,7 @@
 <body>
     <div id="plasma-overlay"></div>
     <div id="ui-layer">
-        <div style="display: flex; justify-content: space-between; width: 100%;">
-            <div class="panel" title="Real-time flight data. All units are accurate to real-world physics.">
+        <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -150,15 +153,12 @@
                     <button id="btn-abort" class="danger-btn" title="Emergency stop. Resets spacecraft back to Earth.">ABORT / RESTART</button>
                 </div>
             </div>
-            <div></div>
-        </div>
 
         <div id="zoom-indicator" title="Current camera zoom level. Use your mouse scroll wheel to zoom in and out.">FOV: 70&deg; (1.0x Zoom)</div>
         <div id="crosshair-view"></div>
         <div id="target-popup"><strong id="target-name">TARGET</strong><br>Dist: <span id="target-dist">0 km</span><br><span id="target-hint"></span></div>
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
-            <div class="panel" title="Your mission checklist. Follow the steps to safely reach the Moon.">
+        <div class="panel desktop-bottom-left" title="Your mission checklist. Follow the steps to safely reach the Moon.">
                 <h1 title="Track your progress through the mission phases">Mission Itinerary</h1>
                 <ul class="checklist">
                     <li id="itin-tli" class="active" title="Trans-Lunar Injection: The engine burn required to reach the Moon.">[ ] TLI Burn (Target: <span id="tli-est-time">145.0</span>s)</li>
@@ -172,7 +172,7 @@
                 </div>
             </div>
 
-            <div class="panel" title="Ship control systems. Engage the autopilot or control the burn manually.">
+        <div class="panel desktop-bottom-right" title="Ship control systems. Engage the autopilot or control the burn manually.">
                 <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
                 <div style="min-height: 3.5rem; display: flex; flex-direction: column; justify-content: center;">
                     <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite; margin: 0; text-align: center;">[SEQUENCE RUNNING]</p>
@@ -221,7 +221,6 @@
                     <button id="btn-lift-down" class="danger-btn" onmousedown="liftDown=true" onmouseup="liftDown=false" ontouchstart="liftDown=true" ontouchend="liftDown=false" title="Roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (STEEPEN)</button>
                 </div>
             </div>
-        </div>
     </div>
 
     <script>
