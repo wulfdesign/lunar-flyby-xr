@@ -620,6 +620,9 @@
                 isReentry = true; 
                 let dragCd = 1.5; 
                 
+                // --- PARACHUTE REEFING SEQUENCE ---
+                // Incremental canopy deployment preventing fatal snap G-forces. 
+                // See context: /docs/physics.html#parachute-reefing
                 if (altE < 7.3 && altE >= 5.0) { let factor = (7.3 - altE) / 2.3; dragCd = 1.5 + (factor * 48.5); } 
                 else if (altE < 5.0 && altE >= 3.0) { dragCd = 50.0; } 
                 else if (altE < 3.0 && altE >= 2.0) { let factor = (3.0 - altE) / 1.0; dragCd = 50.0 + (factor * 100.0); } 
@@ -631,6 +634,7 @@
                 dragAccMag = ((0.5 * density * v_ms * v_ms * dragCd * 10.5) / 8000) / 1000; 
                 
                 // AERODYNAMIC LIFT CALCULATION (L/D Ratio ~ 0.25)
+                // Offset CoG Gimbal system. See context: /docs/physics.html#aerodynamic-lift
                 if (liftUp || liftDown) { liftAccMag = dragAccMag * 0.25; }
             }
 

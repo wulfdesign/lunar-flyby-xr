@@ -50,6 +50,13 @@
         </ul>
         <blockquote>Atmospheric Density Equation:<br><code>&rho; = &rho;0 * e^(-altitude / H_scale)</code><br><br>
         Drag Force Equation:<br><code>F_d = 0.5 * &rho; * v&sup2; * C_d * A</code></blockquote>
+        
+        <h3 id="aerodynamic-lift" style="margin-top:20px; font-size:1.1rem;">Capsule Gimbaling & L/D Ratio (The Engineering Fix)</h3>
+        <p>Because hitting the atmosphere generates terrifying G-forces regardless of a perfect trajectory, Apollo and Artemis capsules utilize an offset <strong>Center of Gravity (CoG)</strong>. This offset causes the blunt heatshield to fly at an angle, acting like a wing and generating <em>Aerodynamic Lift</em> with a Lift/Drag (L/D) ratio of roughly <strong>0.25</strong>.</p>
+        <p>By rotating the capsule structure (banking), the pilot can point this lift vector UP (reducing G-forces and shallowing the descent) or DOWN (pulling the craft deeper into the atmosphere to scrub speed faster).</p>
+        
+        <h3 id="parachute-reefing" style="margin-top:20px; font-size:1.1rem;">Parachute Reefing (Snap G-Force Prevention)</h3>
+        <p>During early development, deploying the drogue parachutes at 7.3km caused the <code>C_d</code> parameter to instantly jump to 50.0. The instantaneous "snap constraint" decelerated the capsule so brutally that the G-spikes killed the virtual astronauts. The real-world engineering fix coded into the math is <strong>Parachute Reefing</strong>. Instead of snapping open fully, restraint lines hold the canopy partially closed, allowing it to inflate gradually. The math replicates this via a linear interpolation function, gently sliding the <code>C_d</code> variable to full deployment over several vertical kilometers.</p>
     </div>
 
     <div id="zero-allocation" class="section">
