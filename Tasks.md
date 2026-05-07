@@ -20,8 +20,6 @@
 - [ ] 🧪 **UI: Mobile View (Portrait & Landscape)**: Fixed native CSS Grid proportions. Navigation panel now explicitly takes 57% width and stretches to fill the grid. Note: "Desktop Site" is still the recommended viewing mode.
 
 ## 🛠️ Current Work
-- [ ] 🔥🔥🔥 **Media: Quest 3s Offload**: Offload 4K screenshots and flight video from the Quest 3s validation flight.
-- [ ] 🔥🔥🔥 **Media: Stitch & Edit**: Edit and stitch the final mission video for promotional use.
 - [ ] 🛠️ **Media: Update README Visuals**: Insert the Quest 3s screenshots and stitched video into the README XR section once offloaded.
 - [ ] 🛠️ **Docs: Mobile XR Instructions**: Write detailed step-by-step setup instructions for the Mobile XR / Quest 3s section in the README (explaining how to set up the floating browser window workaround).
 - [ ] 🛠️ **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively, removing the need for a separate floating browser window to operate the flyby (V2.0 priority).

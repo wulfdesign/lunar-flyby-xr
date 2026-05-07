@@ -2,6 +2,15 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-05-07 15:20] - Gameplay Timelapse & Seattle Indies Expo Prep
+### 📝 Summary
+Successfully completed the full Lunar Flyby mission ahead of the real-life Artemis II launch, including a precision Earth return, atmospheric reentry, and splashdown. The raw 17-minute flight footage was offloaded, stitched, and condensed into a 2-minute 8x timelapse gameplay walkthrough for promotional release on YouTube.
+
+### 🛠️ Work Done
+- **Media Post-Production**: Completed video editing for the full trajectory timelapse, demonstrating the live Newtonian N-body physics engine.
+- **Social Media Pack**: Drafted YouTube, LinkedIn, and Facebook promotional copy incorporating the live demo links and relevant hashtags (`#LunarFlybyXR`, `#ArtemisII`).
+- **Event Submissions**: Preparing the project for submission to the Seattle Indies Expo, leveraging the new gameplay walkthrough video. Also exploring a potential presentation for AI Tinkerers.
+
 ## [2026-04-22 20:30] - v1.9.9.6: Mobile Grid Ratios & Production Promotion
 ### 📝 Summary
 Finalized proportional CSS grid boundaries for mobile UI testing. Deployed `v1.9.9.6` to production under root `index.html`. Explicitly retained `v1.9.9.1` in the new `/dev` directory as a fallback stable XR release, and introduced the "Request Desktop Site" workaround logic into official documentation for mobile users.
