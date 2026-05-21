@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/Lunar-Flyby-XR_Logo.jpg" width="800" alt="Lunar Flyby XR Logo">
+</p>
+
 # **Artemis: The Free Return (WebXR Orbital Sandbox)**
 
 **A browser-based, educational gravity and orbital dynamics simulator built with Three.js and WebXR.**
@@ -101,7 +105,11 @@ The simulation runs successfully on mobile browsers, but **must remain locked to
 </p>
 
 ### 🥽 WebXR (Meta Quest & Standalone VR)
-*Artemis: The Free Return* was fundamentally built for immersion. Before treating exhibit guests at the Greenwood Art Show, we executed a flawless standalone flight test directly inside the **Meta Quest 3s** headset using its native XR browser. 
+
+![Mobile XR Flight Test](images/Lunar-Flyby-XR_Mobile-XR-Combined_Screenshot.jpg)
+*Executing a flawless standalone flight test directly inside the Meta Quest 3s using the native XR browser.*
+
+*Artemis: The Free Return* was fundamentally built for immersion. Before treating exhibit guests at the Greenwood Art Show, we executed a flawless standalone flight test directly inside the **Meta Quest 3s** headset using its native XR browser.
 
 Once launched, simply click the "ENTER VR FLYBY" button to step inside the capsule. We were able to ride through atmospheric re-entry, drogue parachute deployment, and successful ocean splashdown from the commander's seat!
 
