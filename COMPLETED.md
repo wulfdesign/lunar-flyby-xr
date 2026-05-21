@@ -8,3 +8,4 @@
 - [x] 🏆 **Physics Engine Rewrite**: Velocity Verlet for stable long-term orbits. (Verified 2026-03-31)
 - [x] 🏆 **Reset View**: Button to snap camera back to prograde heading. (Verified 2026-03-31)
 - [x] 🏆 **Initial Project Collation**: 18 versions parsed and committed. (Verified 2026-03-31)
+- [x] 🏆 **Docs: README UX Restructure**: Prioritized the narrative hook, created a Mission Gallery grid, and converted HTML tags to pure Markdown to ensure local IDE compatibility. (Verified 2026-05-21)

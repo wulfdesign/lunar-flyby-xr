@@ -2,6 +2,16 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-05-21 15:15] - Documentation UX & README Restructure
+### 📝 Summary
+Executed a comprehensive layout restructuring of the repository README to prioritize narrative hook and visual engagement. Implemented a dedicated "Mission Gallery" and shifted the YouTube timelapse below the core features list to improve the user onboarding flow.
+
+### 🛠️ Work Done
+- **Layout Restructure**: Moved "The Vision" and "Features" to the top of the README, directly under a newly drafted narrative hook designed to increase click-through rates on the live demo.
+- **Mission Gallery**: Condensed the four scattered environment screenshots into a clean 2x2 pure Markdown table grid to reduce vertical scrolling.
+- **Mobile Assets**: Converted the mobile device screenshots into a 4-column Markdown table, resolving an issue where raw HTML `<img>` tags were failing to render in local IDE previewers like Notepad++.
+- **Embedded Video UI**: Swapped the standard YouTube hyperlink for a hyperlinked high-resolution YouTube thumbnail image to simulate an embedded video player layout natively inside GitHub markdown.
+
 ## [2026-05-21 14:20] - Promo Integration & Events Update
 ### 📝 Summary
 Integrated the gameplay timelapse video directly into the `README.md` to help pitch the experience for upcoming exhibitions and expos. Unfortunately had to drop out of the scheduled presentation for Seattle AI Tinkerers due to a sudden flu, but looking forward to rescheduling or presenting at another event soon.
