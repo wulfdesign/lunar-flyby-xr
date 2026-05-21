@@ -10,7 +10,14 @@
 
 ---
 
-### **🎥 [Watch the 8x Gameplay Timelapse](https://youtu.be/bdHbIKcqRBs)**
+### **🎥 Watch the 8x Gameplay Timelapse**
+
+<p align="center">
+  <a href="https://youtu.be/bdHbIKcqRBs">
+    <img src="https://img.youtube.com/vi/bdHbIKcqRBs/maxresdefault.jpg" alt="Lunar Flyby XR Gameplay Timelapse" width="800">
+  </a>
+</p>
+
 *Inspired by the success of the historic Artemis II mission, this 2-minute timelapse condenses a full 17-minute flight from Trans-Lunar Injection to a precision splashdown on Earth. This isn't a scripted animation—the simulation is powered by real-time Newtonian N-body orbital mechanics and aerodynamic reentry physics built entirely in vanilla JavaScript and Three.js.*
 
 > 🎤 **Exhibitions & Events:** I recently submitted this experience to the Seattle Indies Expo (SIX) and am actively exploring other tech/indie gaming events! If you're organizing an event and want a live WebXR physics simulation on the floor, reach out!
