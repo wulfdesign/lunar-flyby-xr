@@ -20,7 +20,7 @@
 - [ ] 🧪 **UI: Mobile View (Portrait & Landscape)**: Fixed native CSS Grid proportions. Navigation panel now explicitly takes 57% width and stretches to fill the grid. Note: "Desktop Site" is still the recommended viewing mode.
 
 ## 🛠️ Current Work
-- [ ] 🛠️ **Media: Update README Visuals**: Insert the Quest 3s screenshots and stitched video into the README XR section once offloaded.
+- [x] 🏆 **Media: Update README Visuals**: Insert the Quest 3s screenshots and stitched video into the README XR section once offloaded.
 - [ ] 🛠️ **Docs: Mobile XR Instructions**: Write detailed step-by-step setup instructions for the Mobile XR / Quest 3s section in the README (explaining how to set up the floating browser window workaround).
 - [ ] 🛠️ **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively, removing the need for a separate floating browser window to operate the flyby (V2.0 priority).
 - [ ] 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial `MISSION_LEAD_ANGLE` moon-moving cheat with realistic TLI parameters (ejection angle, transit time) to calculate leading-edge interception of a naturally orbiting Moon.
