@@ -6,6 +6,15 @@
 
 *(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
 
+---
+
+### **🎥 [Watch the 8x Gameplay Timelapse](https://youtu.be/bdHbIKcqRBs)**
+*Inspired by the success of the historic Artemis II mission, this 2-minute timelapse condenses a full 17-minute flight from Trans-Lunar Injection to a precision splashdown on Earth. This isn't a scripted animation—the simulation is powered by real-time Newtonian N-body orbital mechanics and aerodynamic reentry physics built entirely in vanilla JavaScript and Three.js.*
+
+> 🎤 **Exhibitions & Events:** I am currently preparing to showcase this experience at the Seattle Indies Expo and exploring other tech/indie gaming events! If you're organizing an event and want a live WebXR physics simulation on the floor, reach out!
+
+---
+
 ![LEO Orbit TMI Burn Start](images/Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png)
 *Initial Burn toward the Moon from Low Earth Orbit.*
 

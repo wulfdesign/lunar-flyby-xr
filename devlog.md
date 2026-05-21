@@ -2,6 +2,14 @@
 
 > **Instructions:** Always append new devlog entries to the top of this file, below this header.
 
+## [2026-05-21 14:20] - Promo Integration & Events Update
+### 📝 Summary
+Integrated the gameplay timelapse video directly into the `README.md` to help pitch the experience for upcoming exhibitions and expos. Unfortunately had to drop out of the scheduled presentation for Seattle AI Tinkerers due to a sudden flu, but looking forward to rescheduling or presenting at another event soon.
+
+### 🛠️ Work Done
+- **Documentation**: Embedded the `https://youtu.be/bdHbIKcqRBs` timelapse link directly at the top of the README repository alongside a descriptive blurb detailing the project's physics engine and Artemis II inspiration.
+- **Event Outreach**: Added an explicit call-to-action in the README targeting tech/indie gaming event organizers.
+
 ## [2026-05-07 15:20] - Gameplay Timelapse & Seattle Indies Expo Prep
 ### 📝 Summary
 Successfully completed the full Lunar Flyby mission ahead of the real-life Artemis II launch, including a precision Earth return, atmospheric reentry, and splashdown. The raw 17-minute flight footage was offloaded, stitched, and condensed into a 2-minute 8x timelapse gameplay walkthrough for promotional release on YouTube.
