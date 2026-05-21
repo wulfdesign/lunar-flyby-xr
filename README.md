@@ -4,47 +4,13 @@
 
 **A browser-based, educational gravity and orbital dynamics simulator built with Three.js and WebXR.**
 
+> Step into the commander's seat of a spacecraft in Low Earth Orbit. Calculate your Trans-Lunar Injection, coast across the cislunar void to gravitationally slingshot around the Moon, and make final trajectory adjustments to thread the needle on a fiery atmospheric reentry—all powered by real-time Newtonian N-body physics. Will you survive the free return?
+
 ### **🚀 [Launch Live Experience](https://wulfdesign.github.io/lunar-flyby-xr/)**
 
 *(No installation required. Works in modern browsers and WebXR-compatible VR headsets.)*
 
 ---
-
-### **🎥 Watch the 8x Gameplay Timelapse**
-
-<p align="center">
-  <a href="https://youtu.be/bdHbIKcqRBs">
-    <img src="https://img.youtube.com/vi/bdHbIKcqRBs/maxresdefault.jpg" alt="Lunar Flyby XR Gameplay Timelapse" width="800">
-  </a>
-</p>
-
-*Inspired by the success of the historic Artemis II mission, this 2-minute timelapse condenses a full 17-minute flight from Trans-Lunar Injection to a precision splashdown on Earth. This isn't a scripted animation—the simulation is powered by real-time Newtonian N-body orbital mechanics and aerodynamic reentry physics built entirely in vanilla JavaScript and Three.js.*
-
-> 🎤 **Exhibitions & Events:** I recently submitted this experience to the Seattle Indies Expo (SIX) and am actively exploring other tech/indie gaming events! If you're organizing an event and want a live WebXR physics simulation on the floor, reach out!
-
----
-
-![LEO Orbit TMI Burn Start](images/Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png)
-*Initial Burn toward the Moon from Low Earth Orbit.*
-
-![At the Moon](images/Lunar-Flyby-XR_Screenshot_2026-03-31_002_At-Moon.png)
-*Arriving at the Moon after a 3-day cislunar coast.*
-
-![Earth, Sun, and Moon](images/Lunar-Flyby-XR_Screenshot_2026-04-07_001_Earth-Sun-Moon.png)
-*Aligning the Earth, Sun, and Moon during the flyby.*
-
-![Earth Return](images/Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)
-*Approaching Earth on the return trajectory.*
-
-> **🚀 Current Stable Release (v1.9.9.6):** Fully refactored the core HUD UI layout architecture into geometric corner Quadrants, optimizing the interface for squashed laptop un-maximized window frames so all text and telemetry scale flawlessly. 
-> - **[Play Last Known Tested XR Version: v1.9.9.1](dev/index_v1.9.9.1.html)**
->
-> 🧪 **Bleeding Edge Dev Sandboxes:**
-> - [v1.9.9.2 (Educational Physics Reintegration)](dev/index_v1.9.9.2.html)
->
-> > [!WARNING]
-> > **Mobile Users:** The v1.9.9.6 layout engine is currently optimized for Desktop and VR viewports. To experience the optimal UI layout on iOS/Android, please select **"Request Desktop Site"** in your mobile browser settings. Native responsive mobile support is currently actively tracked in the developer backlog.
-
 
 ## **🚀 The Vision**
 
@@ -64,6 +30,31 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 * **Time Warp System:** Accelerate time up to 7,200x to cross the 3-day cislunar gap, with automated safety lockouts near gravitational bodies.  
 * **WebXR Support:** Instantly jump into an immersive VR headset view directly from the browser (Tested on Quest 3 via PC Link).  
 * **Flight Data Logging:** Export your mission telemetry to a .json file for post-flight analysis, including max G-force, minimum lunar distance, and parachute deployment timestamps.
+
+---
+
+## **📸 Mission Gallery**
+
+| | |
+| :---: | :---: |
+| ![LEO Orbit TMI Burn Start](images/Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png)<br>*Initial Burn toward the Moon from Low Earth Orbit.* | ![At the Moon](images/Lunar-Flyby-XR_Screenshot_2026-03-31_002_At-Moon.png)<br>*Arriving at the Moon after a 3-day cislunar coast.* |
+| ![Earth, Sun, and Moon](images/Lunar-Flyby-XR_Screenshot_2026-04-07_001_Earth-Sun-Moon.png)<br>*Aligning the Earth, Sun, and Moon during the flyby.* | ![Earth Return](images/Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png)<br>*Approaching Earth on the return trajectory.* |
+
+---
+
+### **🎥 Watch the 8x Gameplay Timelapse**
+
+<p align="center">
+  <a href="https://youtu.be/bdHbIKcqRBs">
+    <img src="https://img.youtube.com/vi/bdHbIKcqRBs/maxresdefault.jpg" alt="Lunar Flyby XR Gameplay Timelapse" width="800">
+  </a>
+</p>
+
+*Inspired by the success of the historic Artemis II mission, this 2-minute timelapse condenses a full 17-minute flight from Trans-Lunar Injection to a precision splashdown on Earth. This isn't a scripted animation—the simulation is powered by real-time Newtonian N-body orbital mechanics and aerodynamic reentry physics built entirely in vanilla JavaScript and Three.js.*
+
+> 🎤 **Exhibitions & Events:** I recently submitted this experience to the Seattle Indies Expo (SIX) and am actively exploring other tech/indie gaming events! If you're organizing an event and want a live WebXR physics simulation on the floor, reach out!
+
+---
 
 ## **🛠️ Tech Stack & Architecture**
 
@@ -99,15 +90,21 @@ This project is currently completely self-contained in a single file for maximum
 1. Clone or download this repository.  
 2. Double-click `index.html` to open it in any modern web browser (or run via a local server to bypass file-protocol CORS restrictions).  
 
+> **🚀 Current Stable Release (v1.9.9.6):** Fully refactored the core HUD UI layout architecture into geometric corner Quadrants, optimizing the interface for squashed laptop un-maximized window frames so all text and telemetry scale flawlessly. 
+> - **[Play Last Known Tested XR Version: v1.9.9.1](dev/index_v1.9.9.1.html)**
+>
+> 🧪 **Bleeding Edge Dev Sandboxes:**
+> - [v1.9.9.2 (Educational Physics Reintegration)](dev/index_v1.9.9.2.html)
+
 ### 📱 Mobile Devices
 The simulation runs successfully on mobile browsers, but **must remain locked to Portrait Mode**. We recently achieved a full lunar flyby entirely on a mobile device! Rotating to landscape stretches the HUD bounds and will cause buttons to permanently overlap.
 
-<p align="center">
-  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg" width="23%" title="At the Moon" alt="Mobile View at the Moon"/>
-  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_002_Sun-Earth-Moon.jpg" width="23%" title="Sun Earth Moon Alignment" alt="Mobile Sun Earth Moon"/>
-  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_003_Moon-Com-Blackout.jpg" width="23%" title="Lunar Comms Blackout" alt="Mobile Lunar Comms Blackout"/>
-  <img src="images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_004_Sun-Moon-Earth.jpg" width="23%" title="Sun Moon Earth Return" alt="Mobile Earth Return"/>
-</p>
+> > [!WARNING]
+> > **Mobile Users:** The v1.9.9.6 layout engine is currently optimized for Desktop and VR viewports. To experience the optimal UI layout on iOS/Android, please select **"Request Desktop Site"** in your mobile browser settings. Native responsive mobile support is currently actively tracked in the developer backlog.
+
+| | | | |
+| :---: | :---: | :---: | :---: |
+| ![Mobile View at the Moon](images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_001_At-Moon.jpg) | ![Mobile Sun Earth Moon](images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_002_Sun-Earth-Moon.jpg) | ![Mobile Lunar Comms Blackout](images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_003_Moon-Com-Blackout.jpg) | ![Mobile Earth Return](images/Lunar-Flyby-XR_Screenshot_Mobile_2026-04-08_004_Sun-Moon-Earth.jpg) |
 
 ### 🥽 WebXR (Meta Quest & Standalone VR)
 
