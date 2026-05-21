@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="images/Lunar-Flyby-XR_Logo.jpg" width="800" alt="Lunar Flyby XR Logo">
-</p>
+![Lunar Flyby XR Logo](images/Lunar-Flyby-XR_Logo.jpg)
 
 # **Artemis: The Free Return (WebXR Orbital Sandbox)**
 
