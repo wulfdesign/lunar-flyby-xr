@@ -1,18 +1,37 @@
-# Internal Archive & Rescue Files
-lunar-flyby-xr_RescuedChatLog+code_NeedsCollating.txt
-artemis_flight_log*.json
+﻿# 🛡️ Lunar Flyby XR - Extreme Protection
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Private/Unreleased Plans
+# Private Sanctuary
 private/
+/private/
+working/
 
-# OS Files
+# Logs & Debug
+logs/
+debug/
+*.log
+*.tmp
+*.bak
+
+# OS/IDE files
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Screenshots
+# Project Artifacts
+archive/
 screenshots/
+images/
+
+# Sensitive Files
+*.pdf
+*.docx
+*.doc
+*.secret.*
+*.key
+
+# Environment
+.env
+.env.*
