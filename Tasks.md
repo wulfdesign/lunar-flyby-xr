@@ -1,4 +1,4 @@
-﻿# 📋 Tasks & Upgrades - Lunar Flyby XR
+# 📋 Tasks & Upgrades - Lunar Flyby XR
 
 **⚠️ CRITICAL INSTRUCTION FOR AI AGENTS ⚠️**
 DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wulf) has explicitly verified the output. Move finished tasks to 🧪 (Ready for QA) first. Use your Attribution Mark (🐈/🦞).
@@ -9,11 +9,12 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.0 (Aligned 📋)
+**Version:** v2.1.1 (Federated Memory Ingestion & OpenSpace Alignment 🚀🧠🌕🌌)
 
 ---
 
-## 🧪 Symbiot Alignment (The Great Sync)
+## 🧪 Waiting for QA (Ready for QA 🧪)
+* [ ] 🧪 🔥🔥🔥 **Retrospective Federated Memory Ingestion:** Crystallized 4 foundational concepts (`newtonian_velocity_verlet_orbital_engine`, `aerodynamic_reentry_corridor_and_lift_vectoring`, `openspace_microlauncher_citizen_science_architecture`, `indiedev_educational_space_outreach_framework`) into `C:/AI/memory/concepts/*.md` and verified D3 memory graph linking. 🧪 🐈
 * [x] 🛠️ 🔥🔥🔥 **Alignment Ritual:** Standardize documentation and substrate to official Symbiot Alchemical standards. 🏆 🐈
 * [ ] 🏗️ 🔥 **Documentation:** Update root README.md to reflect Symbiot integration. 🐈
 
