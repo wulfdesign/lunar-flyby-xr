@@ -172,16 +172,18 @@ def create_poster():
         font_moon = font_cta
 
     moon_phases = "🌕🌖🌗🌘🌑🌒🌓🌔🌕"
-    cta_title = "Sling-shot around the Moon LIVE!"
-    cta_sub1 = "Try the live realtime interactive simulation on laptop or in VR headset"
+    cta_title = "EXPERIENCE THE SLING-SHOT AROUND THE MOON LIVE!"
+    cta_sub1 = "Try the realtime interactive simulation on laptop, mobile or in XR headset"
     cta_url = "https://wulfdesign.github.io/lunar-flyby-xr/"
+
+    font_cta_head = ImageFont.truetype('arialbd.ttf', 36) if 'arialbd.ttf' in str(font_brand) else font_cta
 
     # Calculate center bounding boxes
     bbox_m = draw.textbbox((0, 0), moon_phases, font=font_moon)
     draw.text((w // 2 - (bbox_m[2] - bbox_m[0]) // 2, 2355), moon_phases, font=font_moon, fill=(255, 255, 255))
 
-    bbox_t = draw.textbbox((0, 0), cta_title, font=font_cta)
-    draw.text((w // 2 - (bbox_t[2] - bbox_t[0]) // 2, 2410), cta_title, font=font_cta, fill=(255, 255, 255))
+    bbox_t = draw.textbbox((0, 0), cta_title, font=font_cta_head)
+    draw.text((w // 2 - (bbox_t[2] - bbox_t[0]) // 2, 2410), cta_title, font=font_cta_head, fill=(255, 255, 255))
 
     bbox_s = draw.textbbox((0, 0), cta_sub1, font=font_cta_sub)
     draw.text((w // 2 - (bbox_s[2] - bbox_s[0]) // 2, 2475), cta_sub1, font=font_cta_sub, fill=(255, 180, 0))
