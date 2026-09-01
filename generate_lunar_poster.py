@@ -166,19 +166,28 @@ def create_poster():
     draw.text((w - 350, 2585), "DIRECT TO LAUNCH", font=font_qr_sub, fill=(255, 180, 0))
 
     # Center Aligned Text
-    cta_title = "🎮 EXPERIENCE IT LIVE !"
+    try:
+        font_moon = ImageFont.truetype('seguiemj.ttf', 38)
+    except:
+        font_moon = font_cta
+
+    moon_phases = "🌕🌖🌗🌘🌑🌒🌓🌔🌕"
+    cta_title = "Sling-shot around the Moon LIVE!"
     cta_sub1 = "Try the live realtime interactive simulation on laptop or in VR headset"
     cta_url = "https://wulfdesign.github.io/lunar-flyby-xr/"
 
     # Calculate center bounding boxes
+    bbox_m = draw.textbbox((0, 0), moon_phases, font=font_moon)
+    draw.text((w // 2 - (bbox_m[2] - bbox_m[0]) // 2, 2355), moon_phases, font=font_moon, fill=(255, 255, 255))
+
     bbox_t = draw.textbbox((0, 0), cta_title, font=font_cta)
-    draw.text((w // 2 - (bbox_t[2] - bbox_t[0]) // 2, 2375), cta_title, font=font_cta, fill=(255, 255, 255))
+    draw.text((w // 2 - (bbox_t[2] - bbox_t[0]) // 2, 2410), cta_title, font=font_cta, fill=(255, 255, 255))
 
     bbox_s = draw.textbbox((0, 0), cta_sub1, font=font_cta_sub)
-    draw.text((w // 2 - (bbox_s[2] - bbox_s[0]) // 2, 2445), cta_sub1, font=font_cta_sub, fill=(255, 180, 0))
+    draw.text((w // 2 - (bbox_s[2] - bbox_s[0]) // 2, 2475), cta_sub1, font=font_cta_sub, fill=(255, 180, 0))
 
     bbox_u = draw.textbbox((0, 0), cta_url, font=font_cta)
-    draw.text((w // 2 - (bbox_u[2] - bbox_u[0]) // 2, 2515), cta_url, font=font_cta, fill=(0, 229, 255))
+    draw.text((w // 2 - (bbox_u[2] - bbox_u[0]) // 2, 2535), cta_url, font=font_cta, fill=(0, 229, 255))
 
     # Save output
     out_dir = os.path.join(script_dir, 'print')
