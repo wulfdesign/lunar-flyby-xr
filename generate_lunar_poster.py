@@ -172,7 +172,7 @@ def create_poster():
         font_moon = font_cta
 
     moon_phases = "🌕🌖🌗🌘🌑🌒🌓🌔🌕"
-    cta_title = "EXPERIENCE A SLING-SHOT AROUND THE MOON LIVE!"
+    cta_title = "EXPERIENCE THE SLING-SHOT AROUND THE MOON LIVE!"
     cta_sub1 = "Try the realtime interactive simulation on laptop, mobile or in XR headset"
     cta_url = "https://wulfdesign.github.io/lunar-flyby-xr/"
 
