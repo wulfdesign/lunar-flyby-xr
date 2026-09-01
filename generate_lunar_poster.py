@@ -167,7 +167,7 @@ def create_poster():
 
     # Center Aligned Text
     cta_title = "🎮 EXPERIENCE IT LIVE !"
-    cta_sub1 = "Try the live interactive simulation on laptop or in VR headset with creator Larry James."
+    cta_sub1 = "Try the live realtime interactive simulation on laptop or in VR headset"
     cta_url = "https://wulfdesign.github.io/lunar-flyby-xr/"
 
     # Calculate center bounding boxes
