@@ -141,15 +141,44 @@ def create_poster():
         draw.text((cx - 100, 2195), val, font=font_spec_val, fill=(255, 255, 255))
         draw.text((cx - 100, 2250), lbl, font=font_spec_lbl, fill=(0, 229, 255))
 
-    # Bottom CTA Box
-    draw.rectangle([(120, 2350), (w - 120, 2600)], fill=(8, 28, 55), outline=(0, 229, 255), width=4)
-    draw.text((160, 2380), "🎮 EXPERIENCE IT LIVE AT SLICE 2026!", font=font_cta, fill=(255, 255, 255))
-    draw.text((160, 2445), "Live interactive physics simulation on laptop & VR headset with creator Larry James.", font=font_cta_sub, fill=(255, 180, 0))
-    draw.text((160, 2505), "https://wulfdesign.github.io/lunar-flyby-xr/", font=font_cta_sub, fill=(0, 229, 255))
+    # Bottom CTA Box (Dual QR Codes & Centered CTA)
+    draw.rectangle([(120, 2340), (w - 120, 2640)], fill=(8, 28, 55), outline=(0, 229, 255), width=4)
+    
+    font_qr_title = ImageFont.truetype('arialbd.ttf', 24) if 'arialbd.ttf' in str(font_brand) else font_brand
+    font_qr_sub = ImageFont.truetype('arialbd.ttf', 20) if 'arialbd.ttf' in str(font_brand) else font_brand
 
-    # QR Code placeholder
-    draw.rectangle([(w - 380, 2375), (w - 160, 2575)], fill=(255, 255, 255), outline=(0, 229, 255), width=3)
-    draw.text((w - 365, 2450), "SCAN TO LAUNCH\nwulfdesign.github.io", font=ImageFont.truetype('arialbd.ttf', 18) if 'arialbd.ttf' in str(font_brand) else font_brand, fill=(0, 0, 0))
+    # Left QR: GitHub Repo
+    qr_repo_path = os.path.join(script_dir, 'print', 'qr_github_repo.png')
+    if os.path.exists(qr_repo_path):
+        qr_repo_img = Image.open(qr_repo_path).convert('RGB').resize((180, 180))
+        img.paste(qr_repo_img, (160, 2395))
+        draw.rectangle([(160, 2395), (340, 2575)], outline=(0, 229, 255), width=3)
+    draw.text((160, 2360), "GITHUB REPO", font=font_qr_title, fill=(0, 229, 255))
+    draw.text((165, 2585), "SCAN FOR CODE", font=font_qr_sub, fill=(240, 245, 255))
+
+    # Right QR: Orbital Launch
+    qr_launch_path = os.path.join(script_dir, 'print', 'qr_orbital_launch.png')
+    if os.path.exists(qr_launch_path):
+        qr_launch_img = Image.open(qr_launch_path).convert('RGB').resize((180, 180))
+        img.paste(qr_launch_img, (w - 340, 2395))
+        draw.rectangle([(w - 340, 2395), (w - 160, 2575)], outline=(255, 180, 0), width=3)
+    draw.text((w - 355, 2360), "ORBITAL LAUNCH", font=font_qr_title, fill=(255, 180, 0))
+    draw.text((w - 350, 2585), "DIRECT TO LAUNCH", font=font_qr_sub, fill=(255, 180, 0))
+
+    # Center Aligned Text
+    cta_title = "🎮 EXPERIENCE IT LIVE !"
+    cta_sub1 = "Try the live interactive simulation on laptop or in VR headset with creator Larry James."
+    cta_url = "https://wulfdesign.github.io/lunar-flyby-xr/"
+
+    # Calculate center bounding boxes
+    bbox_t = draw.textbbox((0, 0), cta_title, font=font_cta)
+    draw.text((w // 2 - (bbox_t[2] - bbox_t[0]) // 2, 2375), cta_title, font=font_cta, fill=(255, 255, 255))
+
+    bbox_s = draw.textbbox((0, 0), cta_sub1, font=font_cta_sub)
+    draw.text((w // 2 - (bbox_s[2] - bbox_s[0]) // 2, 2445), cta_sub1, font=font_cta_sub, fill=(255, 180, 0))
+
+    bbox_u = draw.textbbox((0, 0), cta_url, font=font_cta)
+    draw.text((w // 2 - (bbox_u[2] - bbox_u[0]) // 2, 2515), cta_url, font=font_cta, fill=(0, 229, 255))
 
     # Save output
     out_dir = os.path.join(script_dir, 'print')
