@@ -1,9 +1,11 @@
-﻿# 🛡️ Lunar Flyby XR - Extreme Protection
+# 🛡️ Lunar Flyby XR - Extreme Protection
 
 # Private Sanctuary
 private/
 /private/
 working/
+print/
+/print/
 
 # Logs & Debug
 logs/
