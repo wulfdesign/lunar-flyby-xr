@@ -8,6 +8,18 @@
 
 ---
 
+### **[2026-09-08 16:15] - v2.1.2: FilmFreeway Public Project Link & Director's Statement Integration 🚀🌕🎬✨**
+
+📝 **Summary**
+1. **FilmFreeway Public Link Integration:**
+   - Linked the newly created live public FilmFreeway project page ([https://filmfreeway.com/Lunar-Flyby-XR](https://filmfreeway.com/Lunar-Flyby-XR)) directly into `README.md`.
+2. **Director's Cut Overview & Sizzle:**
+   - Integrated the high-voltage Director's Cut synopsis featuring the authentic 111-second TLI burn, the Pale Blue Dot radio blackout reflection, and the 2° atmospheric reentry keyhole at 25,000 mph.
+3. **Director Biography & Statement:**
+   - Authored and codified the comprehensive Director Biography (crediting UpLiftVR Studios, Wulf Design Studios, & VRMakerDome) and the raw, heartfelt Director's Statement chronicling the journey from *dearMoon* to WebXR open access. 🌕 🚀 🎬 🥽 🧙‍♂️ 🐈 ✨
+
+---
+
 ### **[2026-08-14 15:26] - v2.1.1: Federated Memory Ingestion & OpenSpace Alignment 🚀🧠🌕🌌**
 
 📝 **Summary**

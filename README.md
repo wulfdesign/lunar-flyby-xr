@@ -144,25 +144,41 @@ If you use this project for your own research, education, or as a base for your 
 * [x] **True MCC Trajectory Alignment:** Replaced static delta-v bumps with an iterative targeting solver to perfectly calculate Earth entry angle.
 * [x] **Orbital Traffic Checkpoints:** Added HUD warnings for crossing ISS, Starlink, and GPS orbital planes.
 
-## **👨‍🚀 About the Creator**
+## **🌌 Overview & Director's Cut**
 
-**Larry James (WulfDesignStudios / UpLiftVR Studios)** is an indie VR developer, filmmaker, and space enthusiast with a passion for using immersive technology to make complex science accessible and awe-inspiring.
+> *"What does it truly feel like to leave Earth behind? Pointing toward the second star to the left, take the controls of Artemis II in Low Earth Orbit and unleash 111 seconds of thunderous Trans-Lunar Injection burn to drift across the silent cislunar void. With most of your propellant spent, the only thing standing between you and the cold oblivion of deep space are a few critical midcourse corrections to thread the needle for a gravitational slingshot around the Moon and safely return to Earth.
+> 
+> Experience the awe of deep space as the Moon swells to fill your entire field of view—and feel your stomach drop as its colossal gravity well grabs your ship on close approach, hurtling you around the lunar far side. As Earth vanishes behind the cratered horizon and total radio blackout falls, you realize that everything humanity has ever been is hundreds of thousands of miles away... and you can only hope the math is right to sling you back toward the only home we've ever known at 25,000 mph.
+> 
+> With unscripted Newtonian physics, final trajectory adjustments, and active aerodynamic lift-banking standing between you and disaster, you must thread a razor-thin 2-degree reentry keyhole through scorching atmospheric plasma. Far more than just a simulation, it becomes an awe-inspiring, heart-pounding WebXR journey among the stars."*
 
-### **🌑 Featured Project: High Desert Eclipse**
+---
 
-One of Larry's most impactful works is **"High Desert Eclipse,"** a 360-degree VR documentary capturing the majestic 2017 total solar eclipse from a remote hilltop in the Oregon high desert.
+## **👨‍🚀 Director Biography**
 
-* **For Educators & Schools:** This experience is a powerful tool for Earth and Space science. It captures the eerie transition from day to twilight, the 360-degree "sunrise" on the horizon, and the breathtaking solar corona.
-* **Watch for Free:** The 4K 360-degree timelapse is available on YouTube. **Tip:** For the best quality, especially in a VR headset, set the playback speed to **0.25x**. This allows the 4K stream to buffer smoothly and lets you soak in the subtle environmental changes.
-  * [📺 Watch: High Desert Eclipse (YouTube)](https://youtu.be/fzcFw_33iC8)
-* **Immersive Edition:** A full-length version is available for the **Meta Quest** (via App Lab) and on [upliftvr.itch.io](https://upliftvr.itch.io/). It's a perfect addition to classroom VR kits to bring a "once-in-a-lifetime" celestial event to students anywhere.
+**Larry James** is an independent VR director, creative technologist, and systems architect based in Seattle, Washington. As the founder of UpLiftVR Studios, Wulf Design Studios, & VRMakerDome, he harnesses spatial computing, browser-native WebXR, and real-time physics to make complex science and cosmic wonder universally accessible.
 
-### **🚀 The Vision Behind Artemis: The Free Return**
+With over two decades of systems engineering experience, Larry fuses technical rigor with deeply humanistic storytelling. His previous works include ***High Desert Eclipse***, an acclaimed 4K 360° total solar eclipse documentary on the Meta Quest Store, and ***Maiden Flight***, a whimsical aerial VR installation showcased at the SIFF VR-Zone, praised by the *Seattle Times* and featured on *KING 5 Evening Magazine*.
 
-This project represents a "lifetime vision finally fulfilled." Inspired by a proposal for the (now canceled) *dearMoon* project, it leverages the latest in WebXR and AI-assisted development to create a prototype that is "quicker and more accessible than ever before in history."
+Inspired by the historic NASA Artemis missions and a lifelong passion for space exploration, Larry created ***Artemis: The Free Return*** as a solo developer to prove that humanity's greatest orbital voyages don't require billion-dollar budgets to experience—just curiosity and an open web browser. His work bridges interactive aerospace science, festival curation, and indie creative coding.
 
-Larry's goal is to inspire the next generation of space explorers and to remind those who have seen a total eclipse of the magic—and for those who haven't, to provide the impetus to get into the path of the next one.
+---
 
-* [🎥 Evening Magazine Feature (UpLiftVR)](https://www.youtube.com/watch?v=Xh0l8hA9y0c)
-* [🎬 FilmFreeway: Larry James](https://filmfreeway.com/LarryJames)
-* [🔗 LinkedIn: WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
+## **📜 Director's Statement**
+
+> *"For as long as I can remember, I have looked up at the Moon and dreamed of what it feels like to leave Earth behind. When the private dearMoon lunar mission was canceled, I felt a deep ache—not just for myself, but for the millions of dreamers who yearn to experience deep space. I realized that if the doors to commercial lunar flight were closing, I had to open a new one through code.
+> 
+> I built 'Artemis: The Free Return' to place everyday people in the commander's seat. I refused to put the spacecraft on pre-baked animation rails; the universe doesn't have rails. By calculating dynamic Newtonian gravity and active aerodynamic drag in real time, the simulation honors the true danger, math, and silent awe of cislunar flight. When you watch our fragile blue world vanish behind the lunar limb, my hope is that you feel both the terror of the void and the profound realization that we are all travelers on the same small island in the dark."*
+
+---
+
+### **🌑 Featured Works & Festival Links**
+
+* 🎬 **[FilmFreeway: Artemis (Lunar Flyby XR) Project Page](https://filmfreeway.com/Lunar-Flyby-XR)**
+* 🎬 **[FilmFreeway: Larry James Creator Profile](https://filmfreeway.com/LarryJames)**
+* 🚀 **[Launch Live WebXR Experience](https://wulfdesign.github.io/lunar-flyby-xr/)**
+* 🎥 **[Watch 8x Gameplay Timelapse (YouTube)](https://youtu.be/bdHbIKcqRBs)**
+* ☀️ **[Watch: High Desert Eclipse (YouTube 360)](https://youtu.be/fzcFw_33iC8)**
+* 🎥 **[KING 5 Evening Magazine Feature (UpLiftVR)](https://www.youtube.com/watch?v=Xh0l8hA9y0c)**
+* 🔗 **[LinkedIn: WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)**
+* 🎮 **[Itch.io: UpLiftVR](https://upliftvr.itch.io)**
