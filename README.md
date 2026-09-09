@@ -176,6 +176,7 @@ Inspired by the historic NASA Artemis missions and a lifelong passion for space 
 
 * 🎬 **[FilmFreeway: Artemis (Lunar Flyby XR) Project Page](https://filmfreeway.com/Lunar-Flyby-XR)**
 * 🎬 **[FilmFreeway: Larry James Creator Profile](https://filmfreeway.com/LarryJames)**
+* 🥽 **[FilmFreeway: KremFest XR 2026 Official Selection Submission](https://filmfreeway.com/kremfest)**
 * 🚀 **[Launch Live WebXR Experience](https://wulfdesign.github.io/lunar-flyby-xr/)**
 * 🎥 **[Watch 8x Gameplay Timelapse (YouTube)](https://youtu.be/bdHbIKcqRBs)**
 * ☀️ **[Watch: High Desert Eclipse (YouTube 360)](https://youtu.be/fzcFw_33iC8)**
