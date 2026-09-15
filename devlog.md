@@ -6,6 +6,17 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-15 15:35] - v2.1.4: Festival Floor Roadmap — Cinematic Auto-Ramp, Splashdown Guidance & Agency Reticle 🚀🌕🎬🥽✨**
+
+📝 **Summary**
+1. **Festival Nightclub Floor Calibration Roadmap:**
+   - Codified the necessity of a hands-off "Film Mode" tailored for noisy, dark festival venues where verbal piloting tutorials are impractical.
+   - Designed the **Cinematic Auto-Ramp Engine** to smoothly accelerate simulation warp back to cruising speed after mid-course correction burns.
+   - Designed **Automated Re-Entry Flight Guidance** to guarantee safe corridor capture and successful splashdown on public attendee runs.
+   - Designed the **Interactive Agency Reticle Mode**: optional manual trajectory alignment with neutral grey target and dynamic Red-to-Green reticle feedback, granting attendees authentic re-entry piloting agency.
+2. **Tasks & Milestone Synchronization:**
+   - Ingested 3 critical showcase polish tasks into `Tasks.md` and synchronized roadmap across KremFest XR private operational ledgers. Bumped version to `v2.1.4`. 🚀 🌕 🎬 🥽 🐈 ✨
+
 ---
 
 ### **[2026-09-08 17:45] - v2.1.3: KremFest XR 2026 Submission & Festival Links Alignment 🚀🌕🥽🎬✨**

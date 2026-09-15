@@ -9,7 +9,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.3 (FilmFreeway Public Project & KremFest XR 2026 Active 🚀🌕🎬🥽✨)
+**Version:** v2.1.4 (Festival Cinematic Auto-Ramp, Splashdown Guidance & Agency Reticle Roadmap 🚀🌕🎬🥽✨)
 
 ---
 
@@ -24,6 +24,9 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🧠 🔥 **QA: Mobile View**: Fixed native CSS Grid proportions. 🧪
 
 ## 🛠️ Current Work
+* [ ] 🏗️ 🔥🔥🔥 **Cinematic Auto-Ramp Engine ("Film Mode"):** Make simulation experience flow seamlessly like a cinematic short film. Automatically ramp simulation warp/time-dilation smoothly back up to cruising speed after mid-course correction burns, eliminating the need for complex manual throttle/warp adjustments in a loud, dark nightclub environment. 🛠️ 🎬 🚀 🐈
+* [ ] 🏗️ 🔥🔥🔥 **Automated Re-Entry Flight Guidance (Guaranteed Splashdown):** Implement automatic incoming trajectory correction and angle-of-attack stabilization on Earth approach so the spacecraft reliably hits the safe entry corridor and lands successfully on festival showcase runs without frustrating aborts or atmospheric skip-outs. 🛠️ 🌊 🛰️ 🐈
+* [ ] 🏗️ 🔥🔥🔥 **Interactive Trajectory Alignment Reticle & Manual Burn Option (Atmospheric Re-entry Agency):** Provide an optional toggle where auto mid-course correction can be disengaged to give the attendee visceral piloting agency during atmospheric re-entry. Render target corridor vector in neutral grey, with the spacecraft trajectory reticle glowing **RED** when misaligned and dynamically snapping to **GREEN** only when pointed directly on target, authorizing the correction burn. 🛠️ 🎯 🎮 🥽 🐈
 * [ ] 🏗️ 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial MISSION_LEAD_ANGLE with realistic TLI parameters. 🛠️
 * [ ] 🏗️ 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files. 🛠️
 * [ ] 🏗️ 🔥🔥 **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively. 🛠️
