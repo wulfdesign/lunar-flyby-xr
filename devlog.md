@@ -6,6 +6,25 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 21:25] - v2.1.15: Lunar Flyby 30x/60x Green Cruise, 300x/600x Yellow Advisory & High Precision Flyby Integration 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Lunar Flyby Safe Warp Envelope Recalibration (`distM <= 12,000 km`):**
+   - Responded to pilot feedback that $10\times$ was excessively sluggish during the near-lunar perilune flyby transit.
+   - Recalibrated lunar encounter tiers within $12,000\text{ km}$:
+     - `maxSafeWarp = 60`: $1\times$, $10\times$, $30\times$, and $60\times$ are now Tier 1 **GREEN** (Safe).
+     - `maxAdvisoryWarp = 600`: $300\times$ and $600\times$ are now Tier 2 **YELLOW** (Advisory, accessible with single-click and honored by Auto-Warp via `userSelectedWarp`).
+     - Speeds $> 600\times$ ($1800\times$, $3600\times$, $7200\times$) are strictly Tier 3 **RED** (Danger / Locked Out).
+2. **Auto-Warp Lunar Flyby Cruise:**
+   - Auto-Warp now automatically maintains a smooth, brisk $60\times$ cruise around the Moon instead of crawling at $10\times$, while allowing pilots to click $30\times$ (Green) or push to $300\times$/$600\times$ (Yellow) at will.
+3. **High-Precision Numerical Step Size Expansion:**
+   - Expanded the fine-grain integration step size (`stepSize = 0.01s`) to cover the entire lunar encounter envelope (`distM < 12000 km`), preventing energy drift and ensuring mathematical perfection across $30\times$, $60\times$, $300\times$, and $600\times$ warps.
+4. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.15"` in `dev/index.html`.
+   - Bumped `SERVER_VERSION = "2.1.15"` in `server.py`. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 21:00] - v2.1.14: Sim Flight Time Telemetry, Inbound Auto-Warp Downshift, 10x Descent Warp & 30s Chute Observation Windows 🩹🧪🌕⏱️🪂🌊🥽**
 
 📝 **Summary**
