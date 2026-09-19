@@ -9,11 +9,12 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.5 (KremFest-XR Festival Calibration — Dev Sandbox Segregation, Auto-Warp 3-Tier Safety & Re-Entry Bank Guidance 🚀🌕🎬🥽✨)
+**Version:** v2.1.6 (Dev Viewport Render Fix, Offline Vendor Assets & Dev Launcher Batch 🚀🌕🎬🥽✨)
 
 ---
 
 ## 🧪 Waiting for QA (Ready for QA 🧪)
+* [ ] 🧪 🔥🔥🔥 **Dev Viewport Fix & 100% Offline Asset Suite (v2.1.6):** Resolved `isReentry` global scoping reference error restoring WebGL render loop in `dev/index.html`. Ingested local offline copies of `three.min.js`, `earth-blue-marble.jpg`, and `moon_1024.jpg` with automatic CDN fallback. Created `start_dev_server.bat` and updated `server.py --dev` for dedicated zero-friction local sandbox launching. 🧪 🥽 ⚡ 🐈
 * [ ] 🧪 🔥🔥🔥 **Dev/Public Sandbox Segregation & LKG Hardware Snapshots (v2.1.5):** Kept public root `index.html` pristine, initialized `snapshots/` archive with Last Known Good hardware profiles (Quest 3 WebXR, Desktop, Mobile), and isolated festival transmutations in `dev/index.html`. 🧪 🥽 📦 🐈
 * [ ] 🧪 🔥🔥🔥 **Auto Warp Engine & 3-Tier Safety Gradient (v2.1.5):** Added Auto Warp toggle (default ON) beside Track Target. Implemented dynamic 3-tier safety coloring (Green Safe, Solid Yellow Advisory, Red Extreme Confirm). Auto Warp and Skip to Action clamp strictly to maximum Green safe speed for active gravity well. 🧪 ⚡ 🟢 🟡 🔴 🐈
 * [ ] 🧪 🔥🔥🔥 **Automated Atmospheric Re-Entry Guidance (v2.1.5):** When in re-entry (<122km), autopilot commands attitude vectoring via offset CoG gimbal / roll trim. Autopilot pulses blue glow and Bank Up/Down buttons illuminate dynamically when actuated. 🧪 🌊 🛰️ 🐈

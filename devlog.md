@@ -6,6 +6,22 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 17:30] - v2.1.6: Dev Viewport Render Fix, 100% Offline Asset Suite & Dev Launcher Batch 🩹🧪🌕🥽**
+
+📝 **Summary**
+1. **Viewport Blank Canvas Root Cause Diagnosed & Healed:**
+   - Diagnosed runtime `ReferenceError: isReentry is not defined` inside `dev/index.html`'s `renderer.setAnimationLoop`. The variable was scoped only inside `updatePhysics()`, causing an unhandled exception every frame that prevented `renderer.render(scene, camera)` from executing.
+   - Promoted `isReentry` to top-level flight state, updated `resetMission()`, and verified 60 consecutive animation frames rendering cleanly in simulated runtime.
+2. **100% Offline Asset Suite with CDN Fallback:**
+   - Ingested local offline copies of `three.min.js` into `dev/vendor/three.min.js` (603 KB).
+   - Ingested local offline high-res Earth (`dev/textures/earth-blue-marble.jpg`, 1.46 MB) and Moon (`dev/textures/moon_1024.jpg`, 238 KB) textures.
+   - Implemented dual-stage loader: tries local offline files first for instant zero-latency festival floor execution, with seamless CDN fallback if local files are absent.
+3. **Dedicated Dev Launcher Batch (`start_dev_server.bat`):**
+   - Created `start_dev_server.bat` to launch `python server.py --dev` with one click.
+   - Updated `server.py` with `--dev` flag support, direct browser opening of `http://localhost:3550/dev/index.html`, and updated CLI banner detailing Laptop, Quest 3, and Baseline URLs. 🩹 🧪 🌕 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 17:15] - v2.1.5: Transmutation Complete — Dev Sandbox Features Live for QA Testing 🛠️🧪🌕🥽**
 
 📝 **Summary**

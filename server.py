@@ -8,8 +8,10 @@ import socketserver
 import socket
 import webbrowser
 import os
+import sys
 
 PORT = 3550
+SERVER_VERSION = "2.1.6"
 
 def get_local_ip():
     try:
@@ -24,21 +26,24 @@ def get_local_ip():
 def run_server():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     local_ip = get_local_ip()
+    is_dev = "--dev" in sys.argv
+    launch_path = "/dev/index.html" if is_dev else "/index.html"
     
-    print("=" * 65)
-    print("🚀 ARTEMIS: THE FREE RETURN — LOCAL WEBXR DEMO SERVER")
-    print("=" * 65)
-    print(f"💻 Laptop Localhost URL:    http://localhost:{PORT}")
-    print(f"🥽 Meta Quest Headset URL:  http://{local_ip}:{PORT}")
-    print(f"🌐 Cloud Production URL:    https://wulfdesign.github.io/lunar-flyby-xr/")
-    print("=" * 65)
+    print("=" * 68)
+    print(f"🚀 ARTEMIS: THE FREE RETURN — {'DEV SANDBOX' if is_dev else 'LOCAL DEMO'} (v{SERVER_VERSION})")
+    print("=" * 68)
+    print(f"💻 Dev Sandbox (Laptop):   http://localhost:{PORT}/dev/index.html")
+    print(f"🥽 Dev Sandbox (Quest 3):  http://{local_ip}:{PORT}/dev/index.html")
+    print(f"🏛️ Public Baseline:        http://localhost:{PORT}/index.html")
+    print(f"🌐 Cloud Production:       https://wulfdesign.github.io/lunar-flyby-xr/")
+    print("=" * 68)
     print("👉 Open the Headset URL in the Meta Quest Browser to launch WebXR!")
     print("Press Ctrl+C to stop the server.")
-    print("=" * 65)
+    print("=" * 68)
     
-    # Auto launch laptop browser
+    # Auto launch browser
     try:
-        webbrowser.open(f"http://localhost:{PORT}/index.html")
+        webbrowser.open(f"http://localhost:{PORT}{launch_path}")
     except Exception:
         pass
     
