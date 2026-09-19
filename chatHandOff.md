@@ -1,10 +1,10 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.17)
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.18)
 > *Artemis: The Free Return | Real-Time Newtonian Cislunar Physics & WebXR*
 
 **Date:** 2026-09-18  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Hermes  
-**Status:** **DEEP SPACE 7.2KX CRUISE, 300X LUNAR APPROACH, 60X PERILUNE SIZZLE SHOT & AUTO DESCENT 10X RAMP LIVE IN DEV** 🚀⏱️🌕🪂🌊🥽✨
+**Status:** **TIGHTER LUNAR TRANSIT & EARLIER OUTBOUND/DEPARTURE WARP ACCELERATION LIVE IN DEV** 🚀⏱️🌕✨
 
 ---
 
@@ -28,16 +28,17 @@
 - **Lunar Flyby 30x/60x Green Cruise, 300x/600x Yellow Advisory & High Precision Flyby Integration (v2.1.15):** Recalibrated lunar flyby speed tiers within 12,000 km to set `maxSafeWarp = 60` (30x and 60x Green) and `maxAdvisoryWarp = 600` (300x and 600x Yellow), while locking out speeds above 600x. Auto-Warp cruises through lunar flyby at 60x without dragging at 10x. Expanded high-precision numerical integration (`stepSize = 0.01`) across `distM < 12,000 km`.
 - **Continuous 1s Ease-In/Out Warp Transitions & 10x Green Atmospheric Descent Schedule (v2.1.16):** Engineered continuous cubic ease-in/ease-out time warp transitions (`smoothWarp = warpTransitionStart + (warpTransitionTarget - warpTransitionStart) * ease`), eliminating all instantaneous speed jumps (10x -> 1x, 1x -> 10x, and between all speed tiers) by smoothly gliding simulation rate across 1.0 full second per tier. Promoted 10x to Tier 1 Green (Safe) across all settled atmospheric descent zones (35 km -> 8.5 km, 7.3 km -> 3.4 km under drogues, and 3.0 km -> 0.35 km under mains), allowing Auto-Warp and pilots to bypass the 7.5-minute parachute crawl in ~50 seconds. Calibrated precise 1x observation windows right before drogue deployment (8.5 km -> 7.3 km), main deployment (3.4 km -> 3.0 km), and final touchdown (<= 0.35 km).
 - **Deep Space 7.2kx Cruise, 300x Lunar Approach, 60x Perilune Sizzle Shot & Auto Descent 10x Ramp (v2.1.17):** Squeezed overall flight simulation duration down to 15-20 minutes. Re-enabled 7.2kx (`7200x`) Tier 1 Green cruise in deep space corridors (outbound `altE > 60,000 km` & `distM > 100,000 km`; inbound `altE > 150,000 km` & `distM > 100,000 km`) while keeping it strictly locked out outside deep space. Promoted lunar approach and departure (6,000 km to 25,000 km) to 300x Green, preserving the close-pass "sizzle shot" envelope (<= 6,000 km) at 60x. Removed obsolete render loop `shiftWarp(1)` override under mains ($altE < 3.0\text{ km}$), enabling 10x down to 350 meters. Unlocked Auto-Warp throughout atmospheric descent so the spacecraft automatically ramps up to 10x Green during settled glide and parachute drift without requiring pilot intervention.
+- **Tighter Lunar Approach & Earlier Outbound/Departure Warp Acceleration (v2.1.18):** Calibrated faster speed ramps across outbound climb and lunar transit while leaving pristine Earth approach and re-entry/touchdown untouched. Outbound climb from LEO now accelerates to 1.8kx at 10,000 km (was 20,000 km), 3.6kx at 22,000 km (was 36,300 km), and 7.2kx at 45,000 km (was 60,000 km). Lunar approach now holds higher speeds significantly closer to the Moon: 3.6kx held down to 42,000 km (was 100,000 km), 1.8kx held down to 22,000 km (was 66,000 km), and 600x held down to 12,000 km (was 25,000 km), while protecting the 60x sizzle shot at $\le 5,500\text{ km}$. On lunar departure, speed ramps up much earlier: 300x at 5,000 km, 600x at 10,000 km, 1.8kx at 22,000 km, 3.6kx at 42,000 km, and 7.2kx at 70,000 km. Shaves ~2–3 minutes off the flight for a tight, exhilarating 16–17 minute mission!
 
 ## 📍 Active File Anchors
-- `dev/index.html` -> Active development sandbox (v2.1.17)
+- `dev/index.html` -> Active development sandbox (v2.1.18)
 - `start_dev_server.bat` -> Dedicated dev launcher batch file
-- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.17)
+- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.18)
 - `dev/vendor/three.min.js` -> Local offline Three.js r128 library
 - `dev/textures/` -> Local high-resolution Earth and Moon maps
 - `index.html` -> Pristine public production baseline (promoted only upon passing QA)
 - `snapshots/` -> Hardware-specific LKG backups (Quest 3 WebXR, Desktop, Mobile)
-- `Tasks.md` -> Tasks ledger at v2.1.16 (Features moved to Ready for QA 🧪)
+- `Tasks.md` -> Tasks ledger at v2.1.18 (Features moved to Ready for QA 🧪)
 - `devlog.md` -> Devlog at v2.1.16
 - `chatHandOff.md` -> Active handoff capsule at v2.1.16
 - `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` -> Permanent memory substrate concept note

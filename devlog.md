@@ -6,6 +6,43 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 22:42] - v2.1.18: Tighter Lunar Approach & Earlier Outbound/Departure Warp Acceleration 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Target Mission Flight Time Precision (~16–17 minutes):**
+   - Responded to pilot feedback from empirical flight run (`Artemis_FlightLog_2026-09-19T05-37-30.json`, total sim time: 19:17.3, ~13–14m to atmosphere, ~19m splashdown).
+   - Calibrated tighter transitions around the lunar encounter and earlier outbound acceleration to shave an additional ~2–3 minutes while preserving the pristine Earth re-entry profile.
+2. **Outbound Climb Acceleration Acceleration:**
+   - Spacecraft now accelerates to intermediate and high cruising speeds much sooner after TLI burn cutoff:
+     - $1,200\text{ km}$: $300\times$ Green.
+     - $4,000\text{ km}$: $600\times$ Green.
+     - $10,000\text{ km}$: $1800\times$ (1.8kx) Green (was 20,000 km).
+     - $22,000\text{ km}$: $3600\times$ (3.6kx) Green (was 36,300 km).
+     - $45,000\text{ km}$ (and $\text{distM} > 70,000\text{ km}$): $7200\times$ (7.2kx) Green (was 60,000 km).
+3. **Outbound Lunar Approach Speed Retention:**
+   - Spacecraft holds high speeds significantly closer to the Moon before stepping down:
+     - $\text{distM} > 70,000\text{ km}$: $7200\times$ (7.2kx) Green (was 100,000 km).
+     - $70,000 \rightarrow 42,000\text{ km}$: $3600\times$ (3.6kx) Green (was stepped down at 100,000 km).
+     - $42,000 \rightarrow 22,000\text{ km}$: $1800\times$ (1.8kx) Green (was stepped down at 66,000 km).
+     - $22,000 \rightarrow 12,000\text{ km}$: $600\times$ Green (was stepped down at 25,000 km).
+     - $12,000 \rightarrow 5,500\text{ km}$: $300\times$ Green.
+     - $\le 5,500\text{ km}$: $60\times$ Green (Cinematic perilune sizzle shot protected).
+4. **Lunar Departure Accelerated Ramp-Up:**
+   - Spacecraft accelerates out of the Moon's gravity well much sooner on the return leg:
+     - $\le 5,000\text{ km}$: $60\times$ Green.
+     - $5,000 \rightarrow 10,000\text{ km}$: $300\times$ Green (was locked at 60x).
+     - $10,000 \rightarrow 22,000\text{ km}$: $600\times$ Green (was 300x).
+     - $22,000 \rightarrow 42,000\text{ km}$: $1800\times$ Green (was 600x).
+     - $42,000 \rightarrow 70,000\text{ km}$: $3600\times$ Green (was 600x/1800x).
+     - $> 70,000\text{ km}$: $7200\times$ Green deep space corridor.
+5. **Earth Return & Atmospheric Descent Baseline:**
+   - Preserved all Earth return inbound safety tiers, re-entry corridor, 10x settled descent auto-ramp, and chute deployment observation windows unchanged.
+6. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.18"` in `dev/index.html`.
+   - Bumped `SERVER_VERSION = "2.1.18"` in `server.py`. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 22:15] - v2.1.17: Deep Space 7.2kx Cruise, 300x Lunar Approach, 60x Perilune Sizzle Shot & Auto Descent 10x Ramp 🩹🧪🌕⏱️🪂🌊🥽**
 
 📝 **Summary**

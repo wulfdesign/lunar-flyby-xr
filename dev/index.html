@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.17-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.18-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -298,7 +298,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.17";
+        const SIM_VERSION = "2.1.18";
 
         /**
          * Dynamic Flight Computer Timers & Operational Calibration
@@ -1408,10 +1408,11 @@
 
                 // 3-TIER WARP SAFETY CALCULATIONS
                 if (isReturningHome) {
-                    if (distM <= 6000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; } // Sizzle shot really close perilune flyby: 60x!
-                    else if (distM <= 25000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; } // Departing Moon: 300x!
-                    else if (distM <= 66000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
-                    else if (distM <= 100000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                    if (distM <= 5000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; } // Sizzle shot really close perilune flyby: 60x!
+                    else if (distM <= 10000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; } // Leaving Moon: bump up to 300x sooner!
+                    else if (distM <= 22000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; } // Leaving Moon: bump up to 600x sooner!
+                    else if (distM <= 42000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; } // Leaving Moon: bump up to 1.8kx sooner!
+                    else if (distM <= 70000) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; } // Leaving Moon: bump up to 3.6kx sooner!
                     else if (altE <= 0.35) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Final touchdown (<350m): locked 1x
                     else if (altE <= 3.0) { maxSafeWarp = 10; maxAdvisoryWarp = 10; } // Under mains (3.0km -> 0.35km): 10x Green safe!
                     else if (altE <= 3.4) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Mains deploy window (3.4km -> 3.0km): locked 1x
@@ -1426,21 +1427,22 @@
                     else if (altE <= 50000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
                     else if (altE <= 100000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
                     else if (altE <= 150000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
-                    else if (altE > 150000 && distM > 100000) { maxSafeWarp = 7200; maxAdvisoryWarp = 7200; } // Deep Space corridor: 7.2kx!
+                    else if (altE > 150000 && distM > 70000) { maxSafeWarp = 7200; maxAdvisoryWarp = 7200; } // Deep Space corridor: 7.2kx!
                     else { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
                 } else {
                     // OUTBOUND FLIGHT (Earth Parking Orbit -> TLI Burn -> Cislunar Outbound -> Lunar Approach)
-                    if (distM <= 6000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; } // Sizzle shot really close approach (<6000km): 60x!
-                    else if (distM <= 25000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; } // Coming into the Moon: 300x!
-                    else if (distM <= 66000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
-                    else if (distM <= 100000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
-                    else if (altE > 60000 && distM > 100000) { maxSafeWarp = 7200; maxAdvisoryWarp = 7200; } // Deep Space corridor: 7.2kx!
-                    else if (altE > 36300) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
+                    if (distM <= 5500) { maxSafeWarp = 60; maxAdvisoryWarp = 600; } // Sizzle shot really close approach (<=5500km): 60x!
+                    else if (distM <= 12000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; } // Swift approach to Moon: 300x!
+                    else if (distM <= 22000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; } // Keep 600x closer to the Moon!
+                    else if (distM <= 42000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; } // Keep 1.8kx closer to the Moon!
+                    else if (distM <= 70000) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; } // Keep 3.6kx closer to the Moon!
+                    else if (altE > 45000 && distM > 70000) { maxSafeWarp = 7200; maxAdvisoryWarp = 7200; } // Deep Space corridor: 7.2kx!
+                    else if (altE > 22000) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; } // Accelerate to 3.6kx sooner!
                     else if (telemetry && telemetry.isTliCoast) {
-                        // Leaving Earth orbit after TLI burn: smoothly accelerate as altitude increases!
-                        if (altE > 20000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
-                        else if (altE > 8000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
-                        else if (altE > 2000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
+                        // Leaving Earth orbit after TLI burn: ramp up to 1.8k sooner!
+                        if (altE > 10000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                        else if (altE > 4000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
+                        else if (altE > 1200) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
                         else { maxSafeWarp = 60; maxAdvisoryWarp = 300; }
                     } else {
                         // Earth Parking Orbit before / during TLI burn: 1x, 10x, 30x all safe!
