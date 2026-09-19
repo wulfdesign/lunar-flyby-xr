@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.13-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.14-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -180,6 +180,7 @@
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Mission Elapsed Time: Total duration since the simulation began.">MET:</span> <span id="met-time">00:00:00:00</span></p>
+                <p><span class="tooltip" title="Real-world elapsed duration of this simulation run. Track your speedrun and best mission times!">Sim Flight Time:</span> <span id="sim-flight-time" class="nominal">00:00.0</span></p>
                 <hr style="border-color: #00ffff; opacity: 0.3;">
                 <p><span class="tooltip" title="Altitude above Earth's sea level.">Alt (Earth):</span> <span id="alt-earth">400 km</span></p>
                 <p><span class="tooltip" title="Distance from the Moon's surface.">Dist (Moon):</span> <span id="dist-moon">380,000 km</span></p>
@@ -297,7 +298,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.13";
+        const SIM_VERSION = "2.1.14";
 
         /**
          * Dynamic Flight Computer Timers & Operational Calibration
@@ -307,11 +308,21 @@
             tliApproachSlowdown: 25.0,    // Pre-TLI window threshold (seconds)
             tliAutoBurnWindow: 3.0,       // Ignition threshold before TLI window (seconds)
             mccCountdownManual: 60.0,     // Full manual review countdown timer for trajectory alignment (seconds)
-            mccAutoAlignDelay: 6.0,       // Fast-track auto-align countdown when Autopilot / Auto-Warp is active (reduced to 6s)
-            postBurnRampDelay: 6.0,       // Observation hold after any burn before Auto-Warp accelerates back to cruising speed (reduced to 6s)
+            mccAutoAlignDelay: 10.0,      // Fast-track auto-align countdown when Autopilot / Auto-Warp is active (10s for smooth transition)
+            postBurnRampDelay: 6.0,       // Observation hold after any burn before Auto-Warp accelerates back to cruising speed (6s)
             warpStepInterval: 1.0         // Time interval between gear steps during automatic deceleration/acceleration (seconds)
         };
         window.FLIGHT_TIMERS = FLIGHT_TIMERS;
+
+        let simFlightStartTime = Date.now();
+        let simFlightSeconds = 0;
+
+        function formatSimFlightTime(totalSec) {
+            let m = Math.floor(totalSec / 60);
+            let s = Math.floor(totalSec % 60);
+            let ms = Math.floor((totalSec % 1) * 10);
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms}`;
+        }
 
         const ALLOW_7200X_IN_SYSTEM = false; 
 
@@ -627,6 +638,7 @@
             shipPos = new THREE.Vector3(startRadius * Math.cos(startShipAngle), 0, startRadius * Math.sin(startShipAngle));
             shipVel = new THREE.Vector3(vOrbit * -Math.sin(startShipAngle), 0, vOrbit * Math.cos(startShipAngle));
             fuel = maxFuel; isBurning = false; isReentry = false; timeWarp = 1; autoPilotEngaged = true; autoFastForward = false; metSeconds = 0; actualBurnTime = 0; initialTargetBurnTime = 0; autoBurnActive = false; burnEndTime = -999; currentGForce = 0; maxGForce = 0; globalMaxAlt = 0; globalMinMoonDist = Infinity;
+            simFlightStartTime = Date.now(); simFlightSeconds = 0;
             liftUp = false; liftDown = false;
             capsuleBankAngle = 0; commandedTargetBank = 0; reentrySweetSpotReached = false;
             isHoldingLiftUp = false; isHoldingLiftDown = false;
@@ -692,7 +704,10 @@
             }
 
             flightLog.push({ 
-                version: SIM_VERSION, timestamp_real: new Date().toISOString(), met: metSeconds, met_formatted: formatTime(metSeconds),
+                version: SIM_VERSION, timestamp_real: new Date().toISOString(),
+                sim_flight_time: formatSimFlightTime(simFlightSeconds),
+                sim_flight_seconds: Number(simFlightSeconds.toFixed(1)),
+                met: metSeconds, met_formatted: formatTime(metSeconds),
                 event: eventMsg, altitude_km: r.toFixed(2), velocity_kms: v.toFixed(3),
                 vx: shipVel.x.toFixed(5), vy: shipVel.y.toFixed(5), vz: shipVel.z.toFixed(5),
                 gforce: currentGForce.toFixed(2), max_gforce: maxGForce.toFixed(2), min_moon_dist_km: globalMinMoonDist === Infinity ? "N/A" : globalMinMoonDist.toFixed(2),
@@ -1014,7 +1029,8 @@
                     milestoneLatches.splashdown = true;
                     let impactV = currentVelMag * 1000;
                     let isSafe = impactV < 15 && maxGForce < 15;
-                    logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G)`, { magEarth: accelData.magEarth, magMoon: accelData.magMoon });
+                    logEvent(`MISSION END: ${isSafe ? 'SPLASHDOWN' : 'FATAL IMPACT'} (V: ${impactV.toFixed(1)} m/s, MaxG: ${maxGForce.toFixed(1)}G, Sim Time: ${formatSimFlightTime(simFlightSeconds)})`, { magEarth: accelData.magEarth, magMoon: accelData.magMoon, simFlightTime: formatSimFlightTime(simFlightSeconds), simFlightSeconds: simFlightSeconds.toFixed(1) });
+                    safeSetText('nav-status', `MISSION COMPLETE: ${isSafe ? 'PACIFIC SPLASHDOWN' : 'FATAL IMPACT'} [${formatSimFlightTime(simFlightSeconds)}]`, isSafe ? "nominal solid-green" : "danger");
                 }
             } else {
                 let nextAccelData = getAcceleration(shipPos, _nextAccel); _nextThrustAcc.set(0,0,0);
@@ -1044,10 +1060,17 @@
             earth.rotation.y += 0.0000727 * dt;
 
             if (isReturningHome && !cinematicActive && !playbackActive) {
-                if (altE <= 200 && (timeWarp > 1 || targetWarp > 1)) {
+                let is1xMandatory = (altE > 35 && altE <= 200) || 
+                                    (altE > 7.3 && altE <= 12.5) || 
+                                    (altE > 3.0 && altE <= 4.3) || 
+                                    (altE <= 0.45);
+                if (is1xMandatory && (timeWarp > 1 || targetWarp > 1)) {
                     userSelectedWarp = null;
                     shiftWarp(1);
-                    showNavMsg("CRITICAL: ENTRY INTERFACE APPROACH - WARP LOCKED 1x", 4000, "flash-danger");
+                    if (altE > 35 && altE <= 200) showNavMsg("CRITICAL: ENTRY INTERFACE APPROACH - WARP LOCKED 1x", 3000, "flash-danger");
+                    else if (altE > 7.3 && altE <= 12.5) showNavMsg("DROGUE APPROACH: 30s WINDOW — WARP LOCKED 1x", 2500, "nominal");
+                    else if (altE > 3.0 && altE <= 4.3) showNavMsg("MAIN CHUTE APPROACH: 30s WINDOW — WARP LOCKED 1x", 2500, "nominal");
+                    else if (altE <= 0.45) showNavMsg("FINAL APPROACH: 30s TO SPLASHDOWN — WARP LOCKED 1x", 3000, "solid-green");
                 }
             }
 
@@ -1062,8 +1085,13 @@
         renderer.setAnimationLoop(() => {
             try {
                 const dt_real = Math.min(clock.getDelta(), 0.1); let simSecondsToProcess = dt_real * timeWarp;
+                simFlightSeconds = (Date.now() - simFlightStartTime) / 1000;
+                safeSetText('sim-flight-time', formatSimFlightTime(simFlightSeconds));
+
                 _moonPos.copy(moon.position).divideScalar(renderScale); let distM = shipPos.distanceTo(_moonPos) - radMoon;
+                let altE_cur = shipPos.length() - radEarth;
                 let stepSize = 0.5; if (distM < 60000) stepSize = 0.1; if (distM < 5000) stepSize = 0.01; 
+                if (isReentry || altE_cur < 122) stepSize = 0.01;
                 let steps = Math.max(1, Math.min(10000, Math.ceil(simSecondsToProcess / stepSize))); let dt_step = simSecondsToProcess / steps;
                 let telemetry = null;
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
@@ -1242,17 +1270,21 @@
                             if (btnDown) btnDown.classList.remove('active-actuator');
                         } else {
                             // Hypersonic Entry Phase: G-limiting and skip prevention with deadband damping
-                            if (currentGForce > 6.0 || gamma < -7.0) {
+                            let needsGLimiting = (currentGForce > 6.0);
+                            let currentVelKms = shipVel.length();
+                            let needsSteepRecovery = (gamma < -7.0 && currentVelKms > 4.0 && currentGForce > 3.0);
+
+                            if (needsGLimiting || needsSteepRecovery) {
                                 // G-Limiting / Steep Entry: Bank to generate positive aerodynamic lift (Lift Up)
                                 let gExcess = Math.max(0, currentGForce - 6.0);
-                                let angleExcess = Math.max(0, -7.0 - gamma);
+                                let angleExcess = needsSteepRecovery ? Math.max(0, -7.0 - gamma) : 0;
                                 commandedTargetBank = Math.min(75, 20 + (gExcess * 7) + (angleExcess * 10));
-                            } else if (altE > 65 && gamma > -5.0) {
+                            } else if (altE > 65 && gamma > -5.0 && currentVelKms > 5.0) {
                                 // Skip-Out Risk: High altitude (>65km) and very shallow angle. Inverted lift (Lift Down)
                                 let shallowExcess = gamma - (-5.0);
                                 commandedTargetBank = Math.max(-45, -15 - (shallowExcess * 10));
                             } else {
-                                // Nominal Corridor Deadband (-5.0° to -7.0° and G <= 6.0G): Hold stable gentle trim
+                                // Nominal Corridor Deadband / Coasting: Hold stable gentle trim
                                 commandedTargetBank = 0;
                             }
 
@@ -1332,7 +1364,13 @@
 
                 // 3-TIER WARP SAFETY CALCULATIONS
                 if (isReturningHome) {
-                    if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 1; }
+                    if (altE <= 0.45) { maxSafeWarp = 1; maxAdvisoryWarp = 1; }
+                    else if (altE <= 3.0) { maxSafeWarp = 1; maxAdvisoryWarp = 10; } // Under mains: 10x Yellow allowed!
+                    else if (altE <= 4.3) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // 30s window before mains: locked 1x!
+                    else if (altE <= 7.3) { maxSafeWarp = 1; maxAdvisoryWarp = 10; } // Under drogues: 10x Yellow allowed!
+                    else if (altE <= 12.5) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // 30s window before drogues: locked 1x!
+                    else if (altE <= 35) { maxSafeWarp = 1; maxAdvisoryWarp = 10; } // Post-plasma coasting: 10x Yellow allowed!
+                    else if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Hypersonic entry: locked 1x!
                     else if (altE <= 500) { maxSafeWarp = 10; maxAdvisoryWarp = 10; }
                     else if (altE <= 2000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
                     else if (altE <= 6000) { maxSafeWarp = 30; maxAdvisoryWarp = 60; }
@@ -1362,6 +1400,10 @@
                 }
 
                 if (maxSafeWarp !== currentMaxSafeWarp || maxAdvisoryWarp !== currentMaxAdvisoryWarp) {
+                    if (maxSafeWarp < currentMaxSafeWarp) {
+                        // Spacecraft has entered a closer altitude tier -> clear manual override so Auto-Warp downshifts!
+                        userSelectedWarp = null;
+                    }
                     currentMaxSafeWarp = maxSafeWarp;
                     currentMaxAdvisoryWarp = maxAdvisoryWarp;
                     [1, 10, 30, 60, 300, 600, 1800, 3600, 7200].forEach(w => {
@@ -1412,9 +1454,7 @@
                                     shiftWarp(userSelectedWarp);
                                 }
                             } else {
-                                if (targetWarp > maxAdvisoryWarp) {
-                                    shiftWarp(maxSafeWarp);
-                                } else if (targetWarp < maxSafeWarp) {
+                                if (targetWarp !== maxSafeWarp) {
                                     shiftWarp(maxSafeWarp);
                                 }
                             }

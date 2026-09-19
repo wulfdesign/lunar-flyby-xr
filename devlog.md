@@ -6,6 +6,35 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 21:00] - v2.1.14: Sim Flight Time Telemetry, Inbound Auto-Warp Downshift, 10x Descent Warp & 30s Chute Observation Windows 🩹🧪🌕⏱️🪂🌊🥽**
+
+📝 **Summary**
+1. **Live Simulation Flight Time Telemetry Clock (`Sim Flight Time: MM:SS.s`):**
+   - Implemented real-world wall-clock simulation mission timer starting at simulation load/reset (`simFlightStartTime`, `simFlightSeconds`).
+   - Integrated live HUD readout in Telemetry Panel (`#sim-flight-time`) alongside physical Mission MET (MET Days/Hours).
+   - Ingested `sim_flight_time` (formatted `MM:SS.s`) and `sim_flight_seconds` (float) into every flight log event payload (`logEvent`) and the final mission splashdown log in `Artemis_FlightLog_*.json` for mission speedrun and benchmark analysis.
+2. **Inbound Auto-Warp Downshift When Zone Safety Drops:**
+   - Diagnosed issue where spacecraft entering closer Earth return zones remained at 600x / 300x because `userSelectedWarp` was only cleared when exceeding `maxAdvisoryWarp` (Red zone).
+   - Replaced condition with proactive tier entry detection: whenever `maxSafeWarp < currentMaxSafeWarp`, `userSelectedWarp` is cleared (`null`).
+   - Updated Auto-Warp cruise target: if `targetWarp !== maxSafeWarp`, the computer immediately commands smooth stepped downshift to the new safe speed (`shiftWarp(maxSafeWarp)`), automatically stepping $600\times \rightarrow 300\times \rightarrow 60\times$ as altitude decreases.
+3. **Re-entry Coasting Bank Hunting Oscillation Elimination:**
+   - Damped post-peak atmospheric guidance oscillation between 65 km and 35 km during settled deceleration coast.
+   - Guarded steep lift correction with velocity (`currentVelKms > 4.0`) and deceleration (`currentGForce > 3.0`) thresholds, ensuring the autopilot never issues spurious bank-up adjustments while coasting calmly after peak G-load.
+4. **Descent 10x Yellow Warp & 30s 1x Parachute Observation Windows:**
+   - Enabled 10x Yellow advisory warp during atmospheric descent below 35 km, between 7.3 km and 4.3 km, and between 3.0 km and 0.45 km, slashing the 7.5-minute terminal parachute descent to ~45 seconds while retaining full physical stability.
+   - Enforced hard 1x lockouts during critical observation windows:
+     - 30 seconds before Drogue Parachutes (12.5 km down to 7.3 km)
+     - 30 seconds before Main Parachutes (4.3 km down to 3.0 km)
+     - 30 seconds before Splashdown (<= 0.45 km)
+   - Clamped numerical integration step size to `dt = 0.01` whenever `isReentry || altE < 122`, ensuring flawless numerical precision under 10x warp.
+5. **Operational Flight Cadence Calibration:**
+   - Calibrated `mccAutoAlignDelay` to 10.0 seconds in `FLIGHT_TIMERS` to provide ample situational awareness before automated burn alignment kicks in.
+   - Retained `postBurnRampDelay` at 6.0 seconds for smooth, prompt resumption of orbital cruise.
+6. **Version Increments & Source Verification:**
+   - Bumped `SIM_VERSION = "2.1.14"` in `dev/index.html` and `SERVER_VERSION = "2.1.14"` in `server.py`. 🩹 🧪 🌕 ⏱️ 🪂 🌊 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 20:30] - v2.1.13: Re-entry Sweet Spot Latch, Post-Flyby Auto Ramp-Up, 6s Operational Timers & Earlier GEO Deceleration 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**

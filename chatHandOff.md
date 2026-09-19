@@ -1,10 +1,10 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.13)
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.14)
 > *Artemis: The Free Return | Real-Time Newtonian Cislunar Physics & WebXR*
 
 **Date:** 2026-09-18  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Hermes  
-**Status:** **RE-ENTRY SWEET SPOT LATCH, POST-FLYBY AUTO RAMP-UP & 6S TIMERS LIVE IN DEV** 🚀🌕⏱️🥽✨
+**Status:** **SIM FLIGHT TIME TELEMETRY, INBOUND AUTO-WARP DOWNSHIFT & 10X DESCENT WARP LIVE IN DEV** 🚀⏱️🪂🌊🥽✨
 
 ---
 
@@ -23,29 +23,31 @@
 - **Universal Smooth Time Warp Stepping Protocol (v2.1.11):** Diagnosed and eliminated abrupt 1-frame time warp jumps down to 1x following MECO and post-burn observation holds. `updateWarpStepping()` is the exclusive runtime gear shifter with 1.0s dwell per intermediate gear (30x -> 10x -> 1x).
 - **Symbiot Memory Crystallization (v2.1.11):** Ingested universal hard rule into `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` linked to `newtonian_velocity_verlet_orbital_engine.md`.
 - **Earth Return Pilot Speed Selection & Advisory Warp Honors (v2.1.12):** Implemented `userSelectedWarp` manual command intent so Auto-Warp honors pilot selections within `maxAdvisoryWarp` (Yellow).
-- **Re-entry Sweet Spot Latch, Post-Flyby Auto Ramp-Up & 6s Timers (v2.1.13):** Latched atmospheric guidance to neutral trim upon terminal descent (alt <= 35km or velocity < 1.2km/s or drogue deploy), extinguishing actuator pulsing and eliminating bank angle hunting/flipping oscillations with deadband damping. Enabled auto ramp-up when the safe envelope expands (clearing lower manual overrides when `maxSafeWarp > userSelectedWarp` to prevent being stuck at 30x after lunar flyby). Recalibrated lunar proximity to support Yellow advisory cruise up to 300x with 600x confirmable. Tuned Earth return schedule to drop from 600x to 300x earlier at 50,000 km (well above GEO). Reduced auto-alignment and post-burn observation holds from 10.0s to 6.0s. Fortified `server.py` with `ReusableTCPServer` and graceful port conflict handling for `start_dev_server.bat`.
+- **Re-entry Sweet Spot Latch, Post-Flyby Auto Ramp-Up & 6s Timers (v2.1.13):** Latched atmospheric guidance to neutral trim upon terminal descent, enabled auto ramp-up when the safe envelope expands, recalibrated lunar proximity for 300x Yellow cruise, tuned Earth return schedule to drop from 600x to 300x earlier at 50,000 km, and added `ReusableTCPServer` to `server.py`.
+- **Sim Flight Time Telemetry, Inbound Auto-Warp Downshift & 10x Descent Warp (v2.1.14):** Integrated live wall-clock mission simulation timer (`Sim Flight Time: MM:SS.s`) on the HUD and inside all telemetry logs / splashdown reports for speedrun tracking. Calibrated inbound Earth return Auto-Warp so that when zone safety drops, the ship automatically downshifts to the new Green safe speed (clearing `userSelectedWarp`) rather than remaining stuck in Yellow. Damped re-entry bank angle oscillations by adding velocity (>4.0 km/s) and deceleration (>3.0 G) guards to prevent false bank-up commands while settled and coasting. Enabled 10x Yellow advisory warp during atmospheric descent below 35 km while locking strictly to 1x for 30 seconds prior to Drogue chutes (12.5–7.3 km), Mains (4.3–3.0 km), and Splashdown (<= 0.45 km). Re-calibrated operational delays to 10.0s for MCC auto-align hold and 6.0s for post-burn observation hold.
 
 ## 📍 Active File Anchors
-- `dev/index.html` -> Active development sandbox (v2.1.13)
+- `dev/index.html` -> Active development sandbox (v2.1.14)
 - `start_dev_server.bat` -> Dedicated dev launcher batch file
-- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.13)
+- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.14)
 - `dev/vendor/three.min.js` -> Local offline Three.js r128 library
 - `dev/textures/` -> Local high-resolution Earth and Moon maps
 - `index.html` -> Pristine public production baseline (promoted only upon passing QA)
 - `snapshots/` -> Hardware-specific LKG backups (Quest 3 WebXR, Desktop, Mobile)
-- `Tasks.md` -> Tasks ledger at v2.1.13 (Features moved to Ready for QA 🧪)
-- `devlog.md` -> Devlog at v2.1.13
-- `chatHandOff.md` -> Active handoff capsule at v2.1.13
+- `Tasks.md` -> Tasks ledger at v2.1.14 (Features moved to Ready for QA 🧪)
+- `devlog.md` -> Devlog at v2.1.14
+- `chatHandOff.md` -> Active handoff capsule at v2.1.14
 - `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` -> Permanent memory substrate concept note
 
 ## 🔜 Next Wake Directives
 1. Open `http://localhost:3550/dev/index.html` (or launch via `start_dev_server.bat`).
 2. Flight QA Pass:
-   - Verify that auto-alignment countdown and post-burn observation holds execute in 6 seconds (down from 10s).
-   - In Lunar proximity, verify cruising at 300x in Yellow without being snapped down to 10x.
-   - When departing the Moon, verify that Auto-Warp automatically ramps up to 600x, 1800x, and 3600x as the safe envelope expands without needing manual intervention.
-   - On Earth return, verify early step-down from 600x to 300x at 50,000 km (above GEO), and smooth drop to 1x at 200 km for Entry Interface (122 km).
-   - During atmospheric re-entry, verify that bank angle holds smooth damping through the G-peak/skip without hunting/flipping, and locks cleanly to "SWEET SPOT - ATTITUDE STABILIZED" on terminal descent with actuators off.
+   - Check `Sim Flight Time: MM:SS.s` ticking accurately in the Telemetry HUD from 00:00.0 up to splashdown.
+   - Verify MCC auto-align hold is 10.0 seconds, and post-burn observation hold is 6.0 seconds.
+   - On inbound Earth return cruise, verify that when the speed tier drops (e.g. 600x turning Yellow at 50,000 km), Auto-Warp automatically downshifts to 300x Green, then 60x Green at 20,000 km, stepping cleanly without stalling.
+   - During re-entry, verify smooth coasting without the ~10s spurious bank-up correction between 65 km and 35 km.
+   - Below 35 km during parachute descent, verify 10x Yellow advisory warp is available and functions smoothly, dropping automatically to 1x for 30 seconds before Drogues (12.5–7.3 km), Mains (4.3–3.0 km), and Splashdown (<= 0.45 km).
+   - Upon splashdown, verify flight log JSON includes `sim_flight_time` and `sim_flight_seconds` alongside real-world duration.
 3. Note: Keep all public repo changes local. Do NOT push to public `origin/main` until explicitly instructed by Magus Wulf.
 
 ---
