@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.9-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.10-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -296,7 +296,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.9";
+        const SIM_VERSION = "2.1.10";
 
         /**
          * Dynamic Flight Computer Timers & Operational Calibration
@@ -373,6 +373,11 @@
         let currentMaxAdvisoryWarp = -1;
         let mccAutoCountdown = -1;
         let tliAutoCountdown = -1;
+        let isMccBurning = false;
+        let mccBurnRemainingTime = 0;
+        let mccBurnDuration = 4.0;
+        let mccBurnAccel = new THREE.Vector3();
+        let mccFuelRate = 0;
 
         let actualBurnTime = 0;
         let initialTargetBurnTime = 0;
@@ -592,6 +597,7 @@
             isHoldingLiftUp = false; isHoldingLiftDown = false;
             autoWarpEnabled = true;
             activeMCCWaypoint = null; mccAutoCountdown = -1; tliAutoCountdown = -1; autoDecelerateTarget = -1; targetWarp = 1; warpStepTimer = 0;
+            isMccBurning = false; mccBurnRemainingTime = 0; mccBurnAccel.set(0,0,0); mccFuelRate = 0;
             
             for (let key in milestoneLatches) milestoneLatches[key] = false;
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix(); document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
@@ -797,7 +803,7 @@
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
                 if (btn.disabled) return;
-                if (isBurning) { showNavMsg("WARP LOCKED: ENGINE FIRING IN PROGRESS", 3000, "flash-warning"); return; }
+                if (isBurning && w > 30) { showNavMsg("WARP RESTRICTED: MAXIMUM 30x DURING ENGINE BURN", 3000, "flash-warning"); return; }
                 
                 if (w > maxAdvisoryWarp) { 
                     if (pendingDangerWarp !== w) { 
@@ -870,6 +876,13 @@
             if (autoPilotEngaged && !isTliCoast) { if (timeToWindow < FLIGHT_TIMERS.tliAutoBurnWindow && !autoBurnActive) { autoBurnActive = true; initialTargetBurnTime = estimatedBurnTime; } }
             if (autoBurnActive && !isTliCoast) isBurning = true; else if (autoPilotEngaged && isTliCoast && autoBurnActive) { isBurning = false; autoBurnActive = false; }
             if(isBurning && !wasBurning) { 
+                tliAutoCountdown = -999;
+                const mccBtn = document.getElementById('btn-autopilot-mcc');
+                if (mccBtn && !activeMCCWaypoint && !isMccBurning) {
+                    mccBtn.style.display = 'none';
+                    mccBtn.className = '';
+                    mccBtn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
+                }
                 logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) }); 
                 if (timeWarp > 30) { 
                     shiftWarp(30); 
@@ -918,7 +931,28 @@
             }
 
             currentGForce = 0; _thrustAcc.set(0,0,0);
-            if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); fuel -= (massFlowRate * dt); if(fuel < 0) fuel = 0; currentGForce = thrustAccMag / 0.00980665; }
+            if (isMccBurning) {
+                _thrustAcc.copy(mccBurnAccel);
+                fuel = Math.max(0, fuel - mccFuelRate * dt);
+                mccBurnRemainingTime -= dt;
+                currentGForce = mccBurnAccel.length() / 0.00980665;
+                if (mccBurnRemainingTime <= 0) {
+                    isMccBurning = false;
+                    isBurning = false;
+                    burnEndTime = metSeconds;
+                    shiftWarp(1);
+                    updateWarpUI(1);
+                    activeMCCWaypoint = null;
+                    logEvent("MCC CUTOFF: Maneuver Complete. Trajectory Nominal.");
+                    showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL — OBSERVATION HOLD (10s)", 4000, "nominal");
+                }
+            } else if (isBurning && fuel > 0) { 
+                let thrustAccMag = (thrustForce / currentMass); 
+                _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); 
+                fuel -= (massFlowRate * dt); 
+                if(fuel < 0) fuel = 0; 
+                currentGForce = thrustAccMag / 0.00980665; 
+            }
             
             if (isReentry) {
                 // Vector summation for Drag and Lift G-forces
@@ -952,7 +986,12 @@
                 }
             } else {
                 let nextAccelData = getAcceleration(shipPos, _nextAccel); _nextThrustAcc.set(0,0,0);
-                if (isBurning && fuel > 0) { let thrustAccMag = (thrustForce / currentMass); _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); }
+                if (isMccBurning) {
+                    _nextThrustAcc.copy(mccBurnAccel);
+                } else if (isBurning && fuel > 0) { 
+                    let thrustAccMag = (thrustForce / currentMass); 
+                    _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); 
+                }
                 _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
                 if (isReentry && shipVel.length() > 0) { 
                     _tempVec1.copy(shipVel).normalize().multiplyScalar(-dragAccMag); _nextTotalAccel.add(_tempVec1); 
@@ -1010,19 +1049,29 @@
                 updateWarpStepping(dt_real, telemetry);
                 
                 // TLI APPROACH & ALIGNMENT COUNTDOWN
-                if (tliAutoCountdown > 0 && !telemetry.isTliCoast && !isBurning) {
-                    if (timeWarp > 30 || targetWarp > 30) { shiftWarp(30); updateWarpUI(30); }
-                    tliAutoCountdown -= dt_real;
-                    let remaining = Math.max(0, Math.ceil(tliAutoCountdown));
-                    showNavMsg(`AUTO-ALIGNMENT IN ${remaining}s`, 1000, "flash-warning");
-                    const mccBtn = document.getElementById('btn-autopilot-mcc');
-                    if (mccBtn) {
-                        mccBtn.style.display = 'block';
-                        mccBtn.className = "caution-btn pulse-blue-glow";
-                        mccBtn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${remaining}s)`;
-                    }
-                    if (tliAutoCountdown <= 0) {
-                        alignAndIgniteTLI();
+                if (tliAutoCountdown > 0 && !telemetry.isTliCoast) {
+                    if (isBurning) {
+                        tliAutoCountdown = -999;
+                        const mccBtn = document.getElementById('btn-autopilot-mcc');
+                        if (mccBtn) {
+                            mccBtn.style.display = 'none';
+                            mccBtn.className = '';
+                            mccBtn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
+                        }
+                    } else {
+                        if (timeWarp > 30 || targetWarp > 30) { shiftWarp(30); updateWarpUI(30); }
+                        tliAutoCountdown -= dt_real;
+                        let remaining = Math.max(0, Math.ceil(tliAutoCountdown));
+                        showNavMsg(`AUTO-ALIGNMENT IN ${remaining}s`, 1000, "flash-warning");
+                        const mccBtn = document.getElementById('btn-autopilot-mcc');
+                        if (mccBtn) {
+                            mccBtn.style.display = 'block';
+                            mccBtn.className = "caution-btn pulse-blue-glow";
+                            mccBtn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${remaining}s)`;
+                        }
+                        if (tliAutoCountdown <= 0) {
+                            alignAndIgniteTLI();
+                        }
                     }
                 }
 
@@ -1042,9 +1091,9 @@
                     } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) {
                         executeAutopilotBurn();
                     }
-                } else if (tliAutoCountdown <= 0 && tliAutoCountdown !== -1) {
+                } else if ((tliAutoCountdown <= 0 && tliAutoCountdown !== -1) || isBurning) {
                     const mccBtn = document.getElementById('btn-autopilot-mcc');
-                    if (mccBtn && mccAutoCountdown === -1 && !activeMCCWaypoint && !isBurning) {
+                    if (mccBtn && mccAutoCountdown === -1 && !activeMCCWaypoint && !isMccBurning) {
                         mccBtn.style.display = 'none';
                         mccBtn.className = '';
                         mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT";
@@ -1261,14 +1310,23 @@
                     else if (altE <= 150000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
                     else { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
                 } else {
-                    if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 10; }
-                    else if (altE <= 2000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
-                    else if (distM <= 5000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
+                    // OUTBOUND FLIGHT (Earth Parking Orbit -> TLI Burn -> Cislunar Outbound -> Lunar Approach)
+                    if (distM <= 5000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
                     else if (distM <= 20000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
                     else if (distM <= 66000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
                     else if (distM <= 120000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
                     else if (altE > 36300) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
-                    else { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
+                    else if (telemetry && telemetry.isTliCoast) {
+                        // Leaving Earth orbit after TLI burn: smoothly accelerate as altitude increases!
+                        if (altE > 20000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                        else if (altE > 8000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
+                        else if (altE > 2000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
+                        else { maxSafeWarp = 60; maxAdvisoryWarp = 300; }
+                    } else {
+                        // Earth Parking Orbit before / during TLI burn: 1x, 10x, 30x all safe!
+                        maxSafeWarp = 30;
+                        maxAdvisoryWarp = 30;
+                    }
                 }
 
                 if (maxSafeWarp !== currentMaxSafeWarp || maxAdvisoryWarp !== currentMaxAdvisoryWarp) {
@@ -1286,8 +1344,8 @@
                 }
 
                 // AUTO-WARP ENGINE: Controlled automatic ramp-up to maximum Green safe speed
-                const isMccActive = (activeMCCWaypoint !== null);
-                const isApproachingTli = (!telemetry.isTliCoast && (telemetry.timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown || tliAutoCountdown > 0));
+                const isMccActive = (activeMCCWaypoint !== null || isMccBurning);
+                const isApproachingTli = (!telemetry.isTliCoast && (telemetry.timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown || tliAutoCountdown > 0) && !isBurning);
                 const isPostBurnHold = (burnEndTime > 0 && (metSeconds - burnEndTime < FLIGHT_TIMERS.postBurnRampDelay));
 
                 // If post-burn observation hold is active, lock warp to 1x and display hold countdown
@@ -1409,7 +1467,7 @@
                         guideEl.className = "nominal";
                     } else if (isBurning) {
                         let targetDuration = (initialTargetBurnTime > 0 ? initialTargetBurnTime : telemetry.estimatedBurnTime).toFixed(1);
-                        guideEl.textContent = `TLI BURN ACTIVE: ${actualBurnTime.toFixed(1)}s / ${targetDuration}s (${timeWarp}x WARP)`;
+                        guideEl.textContent = isMccBurning ? `MCC BURN ACTIVE: ${(mccBurnDuration - mccBurnRemainingTime).toFixed(1)}s / ${mccBurnDuration.toFixed(1)}s (${timeWarp}x WARP)` : `TLI BURN ACTIVE: ${actualBurnTime.toFixed(1)}s / ${targetDuration}s (${timeWarp}x WARP)`;
                         guideEl.className = "danger";
                     } else if (activeMCCWaypoint) {
                         let remMCC = Math.max(0, Math.ceil(mccAutoCountdown));
@@ -1487,7 +1545,6 @@
             }
             if (!activeMCCWaypoint) return;
             let altE = shipPos.length() - radEarth;
-            let fuelConsumed = 0;
             
             if (isReturningHome) {
                 let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel);
@@ -1510,21 +1567,32 @@
                     dV += step;
                 }
                 
-                shipVel.add(transverseDir.multiplyScalar(dV));
-                let m0 = shipEmptyMass + fuel; fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
-                logEvent(`MCC EXECUTED: Return Trajectory Alignment (+${dV.toFixed(4)} km/s Radial). Target Perigee: 40km. Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
-                showNavMsg(`MCC COMPLETE: TRAJECTORY ALIGNED — OBSERVATION HOLD (10s)`, 4000, "nominal");
+                let m0 = shipEmptyMass + fuel; 
+                let fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel));
+                mccBurnDuration = 4.0;
+                mccBurnRemainingTime = mccBurnDuration;
+                mccBurnAccel.copy(transverseDir).multiplyScalar(dV / mccBurnDuration);
+                mccFuelRate = fuelConsumed / mccBurnDuration;
+                isMccBurning = true;
+                isBurning = true;
+                logEvent(`MCC IGNITION: Return Trajectory Alignment (+${dV.toFixed(4)} km/s Radial over ${mccBurnDuration}s). Target Perigee: 40km. Fuel: ~${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
+                showNavMsg(`MCC IGNITION: TRAJECTORY ALIGNMENT BURN (${mccBurnDuration}s)`, 3000, "solid-green");
                 
             } else {
                 let dV = 0.05;
-                let prograde = shipVel.clone().normalize(); shipVel.add(prograde.multiplyScalar(dV));
-                let m0 = shipEmptyMass + fuel; fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
-                logEvent(`MCC EXECUTED: Trajectory Alignment (+${dV} km/s Prograde). Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
-                showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL — OBSERVATION HOLD (10s)", 4000, "nominal");
+                let prograde = shipVel.clone().normalize();
+                let m0 = shipEmptyMass + fuel; 
+                let fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel));
+                mccBurnDuration = 3.0;
+                mccBurnRemainingTime = mccBurnDuration;
+                mccBurnAccel.copy(prograde).multiplyScalar(dV / mccBurnDuration);
+                mccFuelRate = fuelConsumed / mccBurnDuration;
+                isMccBurning = true;
+                isBurning = true;
+                logEvent(`MCC IGNITION: Trajectory Alignment (+${dV} km/s Prograde over ${mccBurnDuration}s). Fuel: ~${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
+                showNavMsg(`MCC IGNITION: TRAJECTORY ALIGNMENT BURN (${mccBurnDuration}s)`, 3000, "solid-green");
             }
             
-            burnEndTime = metSeconds;
-            activeMCCWaypoint = null;
             mccAutoCountdown = -1;
             autoDecelerateTarget = -1;
             const btn = document.getElementById('btn-autopilot-mcc');

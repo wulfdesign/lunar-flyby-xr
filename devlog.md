@@ -6,6 +6,26 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 19:25] - v2.1.10: 30x Burn Warp Fix, 8s Countdown Hang Resolution, Outbound Progressive Acceleration & Finite Continuous MCC Burns 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **30x Time Warp Restored in LEO & During Burns:**
+   - In Earth parking orbit prior to TLI, configured Tier 1 Green safe warp to 30x (`maxSafeWarp = 30`), eliminating double-click "CONFIRM" modals on 30x.
+   - Refined the warp button listener during active burns (`isBurning`) to clamp strictly at `w > 30`, allowing pilot freedom to switch between 1x, 10x, and 30x during burns without lockout.
+2. **Auto-Align Countdown 8s Hang Resolved:**
+   - Diagnosed root cause of countdown freeze: at 10x/30x warp, `timeToWindow` reached ignition threshold in ~2 real seconds, setting `isBurning = true` and bypassing the countdown decrement block before `tliAutoCountdown` reached zero.
+   - Synchronized Main Engine Start (MES) triggers to immediately clear `tliAutoCountdown = -999` and hide `#btn-autopilot-mcc`, guaranteeing the button never freezes at 8s.
+3. **Outbound Acceleration Healed (No 10x Clamp Leaving Orbit):**
+   - Replaced flawed outbound safety calculation that kept `maxSafeWarp = 10` between 2,000 km and 36,300 km.
+   - Post-TLI craft now progressively accelerates out of Earth's gravity well as altitude increases: 60x in LEO -> 300x at 2,000 km -> 600x at 8,000 km -> 1800x at 20,000 km -> 3600x at Geosync (36,300 km) and into deep space.
+4. **Finite Continuous Mid-Course Correction (MCC) Burns:**
+   - Replaced impulsive single-frame velocity additions (`shipVel.add(...)`) with smooth 3-4 second continuous burns (`isMccBurning`).
+   - Velocity Verlet integrator smoothly accelerates and curves the craft's velocity heading with zero spatial or velocity snapping.
+5. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.10"` and `SERVER_VERSION = "2.1.10"`. Node.js syntax 100% verified. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 19:10] - v2.1.9: Startup Blink Signals, Non-Restricted Burn Cruise, 10s Auto-Align, 1s Button Indicators & Stepped Lunar/Earth Warp Schedules 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**
