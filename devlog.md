@@ -6,6 +6,33 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 19:48] - v2.1.12: Earth Return Pilot Speed Selection, Advisory Warp Honors & Graduated Safe Tiers 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Pilot Manual Override Intent (`userSelectedWarp`):**
+   - Resolved issue where pilots were blocked from selecting Yellow advisory speeds (e.g. 300x, 30x, 10x) because Auto-Warp forcefully reset `targetWarp = maxSafeWarp` on every frame.
+   - Introduced `userSelectedWarp` state: when a pilot clicks a warp button within current `maxAdvisoryWarp`, Auto-Warp honors their selection and maintains that speed rather than pulling them back down to `maxSafeWarp`.
+   - When the spacecraft descends into a lower altitude zone where `userSelectedWarp > maxAdvisoryWarp` (entering RED danger), Auto-Warp clears the override and safely steps down to the new altitude's `maxSafeWarp`.
+2. **Recalibrated Earth Return Graduated Safety Tiers:**
+   - Eliminated the 2-minute real-time wait at 1x between 1,500 km and 200 km:
+     - Above 150,000 km: 3600x Green.
+     - 75,000 km to 150,000 km: 1800x Green, 3600x Yellow.
+     - 36,300 km to 75,000 km: 600x Green, 1800x Yellow.
+     - 15,000 km to 36,300 km: 300x Green, 600x Yellow (inbound 300x is now Tier 1 Green!).
+     - 5,000 km to 15,000 km: 60x Green, 300x Yellow (300x pilot bump now fully operational!).
+     - 1,500 km to 5,000 km: 30x Green, 60x Yellow (30x cruise enabled, no 10x lock!).
+     - 400 km to 1,500 km: 10x Green, 30x Yellow (10x cruise enabled, no 1x lock!).
+     - 200 km to 400 km: 10x Green, 10x Yellow (fast 1.8s atmospheric approach).
+     - Below 200 km down to 122 km (Entry Interface): 1x Green, 1x locked for re-entry guidance.
+3. **Consolidated Physics & Loop Safety Clamps:**
+   - Excised duplicate, conflicting hardcoded clamps from `updatePhysics` (`altE <= 1500`, `altE <= 5000`, `altE <= 15000`), preserving the critical 1x failsafe lockout strictly at `altE <= 200` km for Entry Interface.
+4. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.12"` in `dev/index.html`.
+   - Bumped `SERVER_VERSION = "2.1.12"` in `server.py`.
+   - Node.js syntax 100% verified clean. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 19:40] - v2.1.11: Universal Smooth Time Warp Stepping Protocol & WebXR Kinetosis Prevention 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**
