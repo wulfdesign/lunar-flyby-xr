@@ -9,7 +9,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.4 (Festival Cinematic Auto-Ramp, Splashdown Guidance & Agency Reticle Roadmap 🚀🌕🎬🥽✨)
+**Version:** v2.1.5 (KremFest-XR Festival Calibration — Dev Sandbox Segregation, Auto-Warp 3-Tier Safety & Re-Entry Bank Guidance 🚀🌕🎬🥽✨)
 
 ---
 
@@ -24,9 +24,10 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🧠 🔥 **QA: Mobile View**: Fixed native CSS Grid proportions. 🧪
 
 ## 🛠️ Current Work
-* [ ] 🏗️ 🔥🔥🔥 **Cinematic Auto-Ramp Engine ("Film Mode"):** Make simulation experience flow seamlessly like a cinematic short film. Automatically ramp simulation warp/time-dilation smoothly back up to cruising speed after mid-course correction burns, eliminating the need for complex manual throttle/warp adjustments in a loud, dark nightclub environment. 🛠️ 🎬 🚀 🐈
-* [ ] 🏗️ 🔥🔥🔥 **Automated Re-Entry Flight Guidance (Guaranteed Splashdown):** Implement automatic incoming trajectory correction and angle-of-attack stabilization on Earth approach so the spacecraft reliably hits the safe entry corridor and lands successfully on festival showcase runs without frustrating aborts or atmospheric skip-outs. 🛠️ 🌊 🛰️ 🐈
-* [ ] 🏗️ 🔥🔥🔥 **Interactive Trajectory Alignment Reticle & Manual Burn Option (Atmospheric Re-entry Agency):** Provide an optional toggle where auto mid-course correction can be disengaged to give the attendee visceral piloting agency during atmospheric re-entry. Render target corridor vector in neutral grey, with the spacecraft trajectory reticle glowing **RED** when misaligned and dynamically snapping to **GREEN** only when pointed directly on target, authorizing the correction burn. 🛠️ 🎯 🎮 🥽 🐈
+* [ ] 🏗️ 🔥🔥🔥 **Dev/Public Sandbox Segregation & LKG Hardware Snapshots (v2.1.5):** Keep public root `index.html` intact, establish `snapshots/` archive with Last Known Good hardware builds (Quest 3 WebXR, Desktop, Mobile), and isolate new festival transmutations inside `dev/index.html`. 🛠️ 🥽 📦 🐈
+* [ ] 🏗️ 🔥🔥🔥 **Auto Warp Engine & 3-Tier Safety Gradient (v2.1.5):** Add Auto Warp button below Autopilot in row 2 beside Track Target. Implement 3-tier dynamic color classification (Green Safe, Solid Yellow Advisory, Red Extreme with Confirm). Auto Warp and Skip to Action clamp strictly to maximum Green safe speed for active gravity well. 🛠️ ⚡ 🟢 🟡 🔴 🐈
+* [ ] 🏗️ 🔥🔥🔥 **Automated Atmospheric Re-Entry Guidance (v2.1.5):** When in re-entry (<122km), autopilot actively commands attitude (bank up for high Gs/steep descent, bank down to prevent skip-out). Autopilot pulses in blue glow and Bank Up/Down buttons illuminate dynamically when actuated. 🛠️ 🌊 🛰️ 🐈
+* [ ] 🏗️ 🔥🔥🔥 **Press-and-Hold Bank Controls & Visual Attitude Gauge (v2.1.5):** Replace button mashing with continuous pointer-hold attitude adjustment. Add tri-color visual gauge above bank buttons showing live attitude, optimal corridor, and autopilot targets. 🛠️ 🎯 🎮 🥽 🐈
 * [ ] 🏗️ 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial MISSION_LEAD_ANGLE with realistic TLI parameters. 🛠️
 * [ ] 🏗️ 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files. 🛠️
 * [ ] 🏗️ 🔥🔥 **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively. 🛠️

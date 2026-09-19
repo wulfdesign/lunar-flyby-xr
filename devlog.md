@@ -6,6 +6,23 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 17:00] - v2.1.5: KremFest-XR Calibration — Dev Sandbox Segregation, Auto-Warp 3-Tier Safety & Re-Entry Bank Guidance 🚀🌕🎬🥽✨**
+
+📝 **Summary**
+1. **Repository Synchronization & Dev Sandbox Segregation:**
+   - Audited Git remotes and confirmed local `projects/lunar-flyby-xr` is 100% synchronized with `origin/main` at commit `811215e`.
+   - Formulated strict dev/public sandbox architecture: root `index.html` remains the pristine public production baseline, while new features are developed and tested exclusively inside `dev/index.html`.
+   - Planned `snapshots/` archive with Last Known Good (LKG) hardware builds (Quest 3 WebXR, Desktop, Mobile).
+2. **Auto-Warp Engine & 3-Tier Safety Gradient:**
+   - Staged Auto Warp toggle button in secondary control row alongside target tracking.
+   - Designed 3-tier color safety system: Green (Safe / Auto-Ramp ceiling), Solid Yellow (Advisory / Instant Click), and Red (Extreme / Requires Confirm).
+3. **Automated Re-Entry Attitude Flight Computer & Bank Controls:**
+   - Designed closed-loop atmospheric guidance (<122km) with blue pulsing autopilot and dynamic bank thruster illumination.
+   - Designed continuous press-and-hold actuation for Bank Up/Down to replace rapid click-mashing.
+   - Designed dynamic tri-color visual bank angle gauge above attitude controls. 🚀 🌕 🎬 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-15 15:35] - v2.1.4: Festival Floor Roadmap — Cinematic Auto-Ramp, Splashdown Guidance & Agency Reticle 🚀🌕🎬🥽✨**
 
 📝 **Summary**
