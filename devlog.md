@@ -6,6 +6,32 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 21:40] - v2.1.16: Continuous 1s Ease-In/Out Warp Transitions & 10x Green Atmospheric Descent Schedule 🩹🧪🌕⏱️🪂🌊🥽**
+
+📝 **Summary**
+1. **Continuous 1.0s Ease-In / Ease-Out Time Warp Transition Curve:**
+   - Responded to pilot observation that time warp speed adjustments (such as $10\times \rightarrow 1\times$ and $1\times \rightarrow 10\times$) felt instantaneous and jerky rather than easing in and out.
+   - Engineered continuous floating-point simulation rate (`smoothWarp`) integrated with cubic Hermite smoothstep ease:
+     $$\text{ease}(p) = 3p^2 - 2p^3, \quad \text{where } p = \min(1.0, \Delta t / \text{interval})$$
+     $$\text{smoothWarp} = \text{warpTransitionStart} + (\text{warpTransitionTarget} - \text{warpTransitionStart}) \cdot \text{ease}(p)$$
+   - Applied `smoothWarp` directly to the animation physics loop (`simSecondsToProcess = dt_real * smoothWarp`), completely eliminating abrupt single-frame speed jerks across all manual clicks and automated gear shifts.
+2. **Atmospheric Descent 10x Green Safe Warp Promotion:**
+   - Promoted $10\times$ to Tier 1 **GREEN** (Safe) during all settled atmospheric descent regimes:
+     - Subsonic post-plasma coast: $35\text{ km} \rightarrow 8.5\text{ km}$ ($10\times$ Green safe).
+     - Under drogue chutes: $7.3\text{ km} \rightarrow 3.4\text{ km}$ ($10\times$ Green safe).
+     - Under main chutes: $3.0\text{ km} \rightarrow 0.35\text{ km}$ ($10\times$ Green safe).
+   - Auto-Warp now automatically maintains a steady $10\times$ descent through the parachute drift, reducing real-world terminal descent from ~7.5 minutes to ~50 seconds.
+3. **Calibrated Failsafe 1x Observation Windows:**
+   - Enforced smooth 1.0-second decelerations down to $1\times$ for critical flight events:
+     - Drogue chute deployment: $8.5\text{ km} \rightarrow 7.3\text{ km}$ (~8s observation window).
+     - Main chute deployment: $3.4\text{ km} \rightarrow 3.0\text{ km}$ (~20s observation window).
+     - Final ocean splashdown: $\le 0.35\text{ km}$ (~18s final touchdown window).
+4. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.16"` in `dev/index.html`.
+   - Bumped `SERVER_VERSION = "2.1.16"` in `server.py`. 🩹 🧪 🌕 ⏱️ 🪂 🌊 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 21:25] - v2.1.15: Lunar Flyby 30x/60x Green Cruise, 300x/600x Yellow Advisory & High Precision Flyby Integration 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**

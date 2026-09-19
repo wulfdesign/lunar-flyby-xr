@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.15-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.16-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -298,7 +298,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.15";
+        const SIM_VERSION = "2.1.16";
 
         /**
          * Dynamic Flight Computer Timers & Operational Calibration
@@ -416,6 +416,9 @@
         let currentTargetObj = null;
 
         let targetWarp = 1;
+        let smoothWarp = 1;
+        let warpTransitionStart = 1;
+        let warpTransitionTarget = 1;
         let warpStepTimer = 0;
         const warpLevels = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200];
         let userSelectedWarp = null;
@@ -449,24 +452,60 @@
         }
 
         function updateWarpStepping(dt, telemetry) {
-            if (timeWarp === targetWarp) {
+            if (timeWarp === targetWarp && Math.abs(smoothWarp - timeWarp) < 0.001) {
+                smoothWarp = timeWarp;
                 document.querySelectorAll('[id^="btn-warp"]').forEach(b => b.classList.remove('target-warp'));
+                warpStepTimer = 0;
+                warpTransitionStart = timeWarp;
+                warpTransitionTarget = timeWarp;
                 return;
             }
-            warpStepTimer += dt;
+
             let stepInterval = (typeof FLIGHT_TIMERS !== 'undefined' && FLIGHT_TIMERS.warpStepInterval) ? FLIGHT_TIMERS.warpStepInterval : 1.0;
-            if (warpStepTimer >= stepInterval) { 
-                let currentIndex = warpLevels.indexOf(timeWarp);
-                if (currentIndex === -1) currentIndex = 0;
-                let targetIndex = warpLevels.indexOf(targetWarp);
-                if (targetIndex === -1) targetIndex = 0;
-                let nextWarp = timeWarp;
-                if (currentIndex < targetIndex) nextWarp = warpLevels[currentIndex + 1];
-                else if (currentIndex > targetIndex) nextWarp = warpLevels[currentIndex - 1];
-                updateWarpUI(nextWarp);
-                updateWarpTargetIndicator();
-                logEvent(`AUTO: Gear shift to ${nextWarp}x`, telemetry);
+
+            // Determine next discrete gear tier towards targetWarp
+            let currentIndex = warpLevels.indexOf(timeWarp);
+            if (currentIndex === -1) currentIndex = 0;
+            let targetIndex = warpLevels.indexOf(targetWarp);
+            if (targetIndex === -1) targetIndex = 0;
+
+            let nextGear = timeWarp;
+            if (currentIndex < targetIndex) nextGear = warpLevels[currentIndex + 1];
+            else if (currentIndex > targetIndex) nextGear = warpLevels[currentIndex - 1];
+
+            // If a new gear transition begins or direction flips, anchor smoothly
+            if (warpTransitionTarget !== nextGear) {
+                warpTransitionStart = smoothWarp;
+                warpTransitionTarget = nextGear;
                 warpStepTimer = 0;
+            }
+
+            warpStepTimer += dt;
+            let progress = Math.min(1.0, warpStepTimer / stepInterval);
+
+            // Smooth cubic ease-in ease-out (smoothstep: 3p^2 - 2p^3)
+            let ease = progress * progress * (3 - 2 * progress);
+            smoothWarp = warpTransitionStart + (warpTransitionTarget - warpTransitionStart) * ease;
+
+            // When the 1.0-second ease into nextGear is complete
+            if (warpStepTimer >= stepInterval) {
+                smoothWarp = nextGear;
+                updateWarpUI(nextGear);
+                updateWarpTargetIndicator();
+                logEvent(`AUTO: Gear shift to ${nextGear}x`, telemetry);
+                warpStepTimer = 0;
+                warpTransitionStart = nextGear;
+
+                if (nextGear !== targetWarp) {
+                    let newCurIdx = warpLevels.indexOf(nextGear);
+                    let newTargetIdx = warpLevels.indexOf(targetWarp);
+                    let subsequentGear = nextGear;
+                    if (newCurIdx < newTargetIdx) subsequentGear = warpLevels[newCurIdx + 1];
+                    else if (newCurIdx > newTargetIdx) subsequentGear = warpLevels[newCurIdx - 1];
+                    warpTransitionTarget = subsequentGear;
+                } else {
+                    warpTransitionTarget = nextGear;
+                }
             }
         }
 
@@ -643,7 +682,7 @@
             capsuleBankAngle = 0; commandedTargetBank = 0; reentrySweetSpotReached = false;
             isHoldingLiftUp = false; isHoldingLiftDown = false;
             autoWarpEnabled = true;
-            activeMCCWaypoint = null; mccAutoCountdown = -1; tliAutoCountdown = -1; autoDecelerateTarget = -1; targetWarp = 1; warpStepTimer = 0; userSelectedWarp = null;
+            activeMCCWaypoint = null; mccAutoCountdown = -1; tliAutoCountdown = -1; autoDecelerateTarget = -1; targetWarp = 1; smoothWarp = 1; warpTransitionStart = 1; warpTransitionTarget = 1; warpStepTimer = 0; userSelectedWarp = null;
             isMccBurning = false; mccBurnRemainingTime = 0; mccBurnAccel.set(0,0,0); mccFuelRate = 0;
             
             for (let key in milestoneLatches) milestoneLatches[key] = false;
@@ -832,6 +871,11 @@
 
         function updateWarpUI(w) {
             timeWarp = w; 
+            if (timeWarp === targetWarp) {
+                smoothWarp = w;
+                warpTransitionStart = w;
+                warpTransitionTarget = w;
+            }
             document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active')); 
             const activeBtn = document.getElementById(`btn-warp-${w}`);
             if (activeBtn) activeBtn.classList.add('active');
@@ -1061,16 +1105,16 @@
 
             if (isReturningHome && !cinematicActive && !playbackActive) {
                 let is1xMandatory = (altE > 35 && altE <= 200) || 
-                                    (altE > 7.3 && altE <= 12.5) || 
-                                    (altE > 3.0 && altE <= 4.3) || 
-                                    (altE <= 0.45);
-                if (is1xMandatory && (timeWarp > 1 || targetWarp > 1)) {
+                                    (altE > 7.3 && altE <= 8.5) || 
+                                    (altE > 3.0 && altE <= 3.4) || 
+                                    (altE <= 0.35);
+                if (is1xMandatory && targetWarp !== 1) {
                     userSelectedWarp = null;
                     shiftWarp(1);
                     if (altE > 35 && altE <= 200) showNavMsg("CRITICAL: ENTRY INTERFACE APPROACH - WARP LOCKED 1x", 3000, "flash-danger");
-                    else if (altE > 7.3 && altE <= 12.5) showNavMsg("DROGUE APPROACH: 30s WINDOW — WARP LOCKED 1x", 2500, "nominal");
-                    else if (altE > 3.0 && altE <= 4.3) showNavMsg("MAIN CHUTE APPROACH: 30s WINDOW — WARP LOCKED 1x", 2500, "nominal");
-                    else if (altE <= 0.45) showNavMsg("FINAL APPROACH: 30s TO SPLASHDOWN — WARP LOCKED 1x", 3000, "solid-green");
+                    else if (altE > 7.3 && altE <= 8.5) showNavMsg("DROGUE APPROACH: 10s WINDOW — WARP LOCKED 1x", 2500, "nominal");
+                    else if (altE > 3.0 && altE <= 3.4) showNavMsg("MAIN CHUTE APPROACH: 15s WINDOW — WARP LOCKED 1x", 2500, "nominal");
+                    else if (altE <= 0.35) showNavMsg("FINAL APPROACH: TOUCHDOWN IMMINENT — WARP LOCKED 1x", 3000, "solid-green");
                 }
             }
 
@@ -1084,7 +1128,7 @@
 
         renderer.setAnimationLoop(() => {
             try {
-                const dt_real = Math.min(clock.getDelta(), 0.1); let simSecondsToProcess = dt_real * timeWarp;
+                const dt_real = Math.min(clock.getDelta(), 0.1); let simSecondsToProcess = dt_real * smoothWarp;
                 simFlightSeconds = (Date.now() - simFlightStartTime) / 1000;
                 safeSetText('sim-flight-time', formatSimFlightTime(simFlightSeconds));
 
@@ -1365,13 +1409,13 @@
                 // 3-TIER WARP SAFETY CALCULATIONS
                 if (isReturningHome) {
                     if (distM <= 12000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; }
-                    else if (altE <= 0.45) { maxSafeWarp = 1; maxAdvisoryWarp = 1; }
-                    else if (altE <= 3.0) { maxSafeWarp = 1; maxAdvisoryWarp = 10; } // Under mains: 10x Yellow allowed!
-                    else if (altE <= 4.3) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // 30s window before mains: locked 1x!
-                    else if (altE <= 7.3) { maxSafeWarp = 1; maxAdvisoryWarp = 10; } // Under drogues: 10x Yellow allowed!
-                    else if (altE <= 12.5) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // 30s window before drogues: locked 1x!
-                    else if (altE <= 35) { maxSafeWarp = 1; maxAdvisoryWarp = 10; } // Post-plasma coasting: 10x Yellow allowed!
-                    else if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Hypersonic entry: locked 1x!
+                    else if (altE <= 0.35) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Final touchdown (<350m): locked 1x
+                    else if (altE <= 3.0) { maxSafeWarp = 10; maxAdvisoryWarp = 10; } // Under mains (3.0km -> 0.35km): 10x Green safe!
+                    else if (altE <= 3.4) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Mains deploy window (3.4km -> 3.0km): locked 1x
+                    else if (altE <= 7.3) { maxSafeWarp = 10; maxAdvisoryWarp = 10; } // Under drogues (7.3km -> 3.4km): 10x Green safe!
+                    else if (altE <= 8.5) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Drogues deploy window (8.5km -> 7.3km): locked 1x
+                    else if (altE <= 35) { maxSafeWarp = 10; maxAdvisoryWarp = 10; } // Post-plasma subsonic coast (35km -> 8.5km): 10x Green safe!
+                    else if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Hypersonic entry (122km -> 35km): locked 1x!
                     else if (altE <= 500) { maxSafeWarp = 10; maxAdvisoryWarp = 10; }
                     else if (altE <= 2000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
                     else if (altE <= 6000) { maxSafeWarp = 30; maxAdvisoryWarp = 60; }
