@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.16-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.17-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -298,7 +298,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.16";
+        const SIM_VERSION = "2.1.17";
 
         /**
          * Dynamic Flight Computer Timers & Operational Calibration
@@ -324,7 +324,7 @@
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms}`;
         }
 
-        const ALLOW_7200X_IN_SYSTEM = false; 
+        const ALLOW_7200X_IN_SYSTEM = true; // Permitted in Deep Space corridor 
 
         const WARP_LIMITS = {
             APPROACH_SOI_DIST: 100000, APPROACH_SOI_WARP: 600,
@@ -1408,7 +1408,10 @@
 
                 // 3-TIER WARP SAFETY CALCULATIONS
                 if (isReturningHome) {
-                    if (distM <= 12000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; }
+                    if (distM <= 6000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; } // Sizzle shot really close perilune flyby: 60x!
+                    else if (distM <= 25000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; } // Departing Moon: 300x!
+                    else if (distM <= 66000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
+                    else if (distM <= 100000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
                     else if (altE <= 0.35) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Final touchdown (<350m): locked 1x
                     else if (altE <= 3.0) { maxSafeWarp = 10; maxAdvisoryWarp = 10; } // Under mains (3.0km -> 0.35km): 10x Green safe!
                     else if (altE <= 3.4) { maxSafeWarp = 1; maxAdvisoryWarp = 1; } // Mains deploy window (3.4km -> 3.0km): locked 1x
@@ -1423,13 +1426,15 @@
                     else if (altE <= 50000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
                     else if (altE <= 100000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
                     else if (altE <= 150000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                    else if (altE > 150000 && distM > 100000) { maxSafeWarp = 7200; maxAdvisoryWarp = 7200; } // Deep Space corridor: 7.2kx!
                     else { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
                 } else {
                     // OUTBOUND FLIGHT (Earth Parking Orbit -> TLI Burn -> Cislunar Outbound -> Lunar Approach)
-                    if (distM <= 12000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; }
-                    else if (distM <= 25000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
+                    if (distM <= 6000) { maxSafeWarp = 60; maxAdvisoryWarp = 600; } // Sizzle shot really close approach (<6000km): 60x!
+                    else if (distM <= 25000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; } // Coming into the Moon: 300x!
                     else if (distM <= 66000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
-                    else if (distM <= 120000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                    else if (distM <= 100000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                    else if (altE > 60000 && distM > 100000) { maxSafeWarp = 7200; maxAdvisoryWarp = 7200; } // Deep Space corridor: 7.2kx!
                     else if (altE > 36300) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
                     else if (telemetry && telemetry.isTliCoast) {
                         // Leaving Earth orbit after TLI burn: smoothly accelerate as altitude increases!
@@ -1478,15 +1483,25 @@
                     }
                 }
 
-                if (autoWarpEnabled && !isReentry && !autoFastForward && !cinematicActive && !playbackActive && !isMccActive && !isApproachingTli && !isPostBurnHold && (timeWarp <= targetWarp)) {
+                if (autoWarpEnabled && !autoFastForward && !cinematicActive && !playbackActive && !isMccActive && !isApproachingTli && !isPostBurnHold && (timeWarp <= targetWarp)) {
                     if (isBurning) {
                         if (timeWarp < 30 || targetWarp < 30) {
                             shiftWarp(30);
                         }
                     } else {
-                        const canCruise = telemetry.isTliCoast || (metSeconds > 10 && altE > 150);
+                        const canCruise = telemetry.isTliCoast || (metSeconds > 10 && altE > 150) || isReturningHome;
                         if (canCruise) {
-                            if (userSelectedWarp !== null) {
+                            let is1xMandatory = isReturningHome && (
+                                (altE > 35 && altE <= 200) || 
+                                (altE > 7.3 && altE <= 8.5) || 
+                                (altE > 3.0 && altE <= 3.4) || 
+                                (altE <= 0.35)
+                            );
+
+                            if (is1xMandatory) {
+                                userSelectedWarp = null;
+                                if (targetWarp !== 1) shiftWarp(1);
+                            } else if (userSelectedWarp !== null) {
                                 if (userSelectedWarp > maxAdvisoryWarp) {
                                     // User selected speed now in Red danger zone for current altitude -> downshift to maxSafeWarp
                                     userSelectedWarp = null;
@@ -1509,10 +1524,14 @@
 
                 const btn7200 = document.getElementById('btn-warp-7200');
                 if (btn7200) {
-                    if (!ALLOW_7200X_IN_SYSTEM && altE < 450000) { 
-                        btn7200.disabled = true; btn7200.title = "7.2kx Warp disabled within Earth-Moon system (Safety Lockout)."; 
-                        if (timeWarp === 7200) shiftWarp(3600); 
-                    } else { btn7200.disabled = false; btn7200.title = "1s = 2 Hours"; }
+                    if (maxAdvisoryWarp < 7200) { 
+                        btn7200.disabled = true; 
+                        btn7200.title = "7.2kx Warp locked outside Deep Space (Safety Lockout)."; 
+                        if (timeWarp === 7200 || targetWarp === 7200) shiftWarp(maxSafeWarp); 
+                    } else { 
+                        btn7200.disabled = false; 
+                        btn7200.title = "1s = 2 Hours (Deep Space Cruise)"; 
+                    }
                 }
 
                 function triggerAlertFlash(elementId) { const el = document.getElementById(elementId); if (el) { el.classList.add('flash-yellow'); setTimeout(() => el.classList.remove('flash-yellow'), 5000); } }
@@ -1547,7 +1566,6 @@
                     safeSetText('nav-status', "TERMINAL VELOCITY DESCENT", "nominal"); 
                     let etaSeconds = altE / Math.max(0.0001, shipVel.length());
                     safeSetText('window-timer', `SPLASHDOWN ETA: ${formatTime(etaSeconds).substring(3)}`, "nominal"); 
-                    if (targetWarp > 1) shiftWarp(1); 
                 } else if (altE < 7.3) { 
                     safeSetText('phase-text', "DROGUE CHUTES DEPLOYED", "caution"); 
                     safeSetText('nav-status', "TARGET MAINS: 3.000 km", "caution"); 

@@ -1,10 +1,10 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.16)
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.17)
 > *Artemis: The Free Return | Real-Time Newtonian Cislunar Physics & WebXR*
 
 **Date:** 2026-09-18  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Hermes  
-**Status:** **CONTINUOUS 1S EASE-IN/OUT WARP TRANSITIONS & 10X GREEN DESCENT LIVE IN DEV** 🚀⏱️🪂🌊🥽✨
+**Status:** **DEEP SPACE 7.2KX CRUISE, 300X LUNAR APPROACH, 60X PERILUNE SIZZLE SHOT & AUTO DESCENT 10X RAMP LIVE IN DEV** 🚀⏱️🌕🪂🌊🥽✨
 
 ---
 
@@ -27,11 +27,12 @@
 - **Sim Flight Time Telemetry, Inbound Auto-Warp Downshift & 10x Descent Warp (v2.1.14):** Integrated live wall-clock mission simulation timer (`Sim Flight Time: MM:SS.s`) on the HUD and inside all telemetry logs / splashdown reports for speedrun tracking. Calibrated inbound Earth return Auto-Warp so that when zone safety drops, the ship automatically downshifts to the new Green safe speed rather than remaining stuck in Yellow. Damped re-entry bank angle oscillations by adding velocity and deceleration guards.
 - **Lunar Flyby 30x/60x Green Cruise, 300x/600x Yellow Advisory & High Precision Flyby Integration (v2.1.15):** Recalibrated lunar flyby speed tiers within 12,000 km to set `maxSafeWarp = 60` (30x and 60x Green) and `maxAdvisoryWarp = 600` (300x and 600x Yellow), while locking out speeds above 600x. Auto-Warp cruises through lunar flyby at 60x without dragging at 10x. Expanded high-precision numerical integration (`stepSize = 0.01`) across `distM < 12,000 km`.
 - **Continuous 1s Ease-In/Out Warp Transitions & 10x Green Atmospheric Descent Schedule (v2.1.16):** Engineered continuous cubic ease-in/ease-out time warp transitions (`smoothWarp = warpTransitionStart + (warpTransitionTarget - warpTransitionStart) * ease`), eliminating all instantaneous speed jumps (10x -> 1x, 1x -> 10x, and between all speed tiers) by smoothly gliding simulation rate across 1.0 full second per tier. Promoted 10x to Tier 1 Green (Safe) across all settled atmospheric descent zones (35 km -> 8.5 km, 7.3 km -> 3.4 km under drogues, and 3.0 km -> 0.35 km under mains), allowing Auto-Warp and pilots to bypass the 7.5-minute parachute crawl in ~50 seconds. Calibrated precise 1x observation windows right before drogue deployment (8.5 km -> 7.3 km), main deployment (3.4 km -> 3.0 km), and final touchdown (<= 0.35 km).
+- **Deep Space 7.2kx Cruise, 300x Lunar Approach, 60x Perilune Sizzle Shot & Auto Descent 10x Ramp (v2.1.17):** Squeezed overall flight simulation duration down to 15-20 minutes. Re-enabled 7.2kx (`7200x`) Tier 1 Green cruise in deep space corridors (outbound `altE > 60,000 km` & `distM > 100,000 km`; inbound `altE > 150,000 km` & `distM > 100,000 km`) while keeping it strictly locked out outside deep space. Promoted lunar approach and departure (6,000 km to 25,000 km) to 300x Green, preserving the close-pass "sizzle shot" envelope (<= 6,000 km) at 60x. Removed obsolete render loop `shiftWarp(1)` override under mains ($altE < 3.0\text{ km}$), enabling 10x down to 350 meters. Unlocked Auto-Warp throughout atmospheric descent so the spacecraft automatically ramps up to 10x Green during settled glide and parachute drift without requiring pilot intervention.
 
 ## 📍 Active File Anchors
-- `dev/index.html` -> Active development sandbox (v2.1.16)
+- `dev/index.html` -> Active development sandbox (v2.1.17)
 - `start_dev_server.bat` -> Dedicated dev launcher batch file
-- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.16)
+- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.17)
 - `dev/vendor/three.min.js` -> Local offline Three.js r128 library
 - `dev/textures/` -> Local high-resolution Earth and Moon maps
 - `index.html` -> Pristine public production baseline (promoted only upon passing QA)

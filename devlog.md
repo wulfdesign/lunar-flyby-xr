@@ -6,6 +6,30 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 22:15] - v2.1.17: Deep Space 7.2kx Cruise, 300x Lunar Approach, 60x Perilune Sizzle Shot & Auto Descent 10x Ramp 🩹🧪🌕⏱️🪂🌊🥽**
+
+📝 **Summary**
+1. **Overall Mission Sim Duration Compression (Target: 15–20 minutes):**
+   - Responded to pilot feedback following flight test log (`Artemis_FlightLog_2026-09-19T05-09-20.json`, total sim time 26:57) that total mission duration was excessive.
+   - Squeezed ~8–10 minutes of redundant real-time waiting across deep space, lunar proximity, and atmospheric parachute descent while strictly protecting all critical observation moments.
+2. **Deep Space 7.2kx (`7200x`) Green Corridor Re-Enabled:**
+   - Permitted 7.2kx ($1\text{s} = 2\text{ hours}$) Tier 1 **GREEN** cruising through deep space corridors:
+     - Outbound: $\text{altE} > 60,000\text{ km}$ and $\text{distM} > 100,000\text{ km}$.
+     - Inbound: $\text{altE} > 150,000\text{ km}$ and $\text{distM} > 100,000\text{ km}$.
+   - Auto-Warp automatically cruises at 7.2kx across the vast cislunar expanse, cutting deep space transit time in half (~40s saved).
+   - `#btn-warp-7200` is dynamically enabled and green within deep space, and strictly disabled (`disabled = true`) outside deep space to prevent orbital integrator distortion near gravity wells.
+3. **Lunar Approach 300x Green Promotion & 60x Sizzle Shot Preservation:**
+   - Promoted lunar approach and departure between $6,000\text{ km}$ and $25,000\text{ km}$ one tier higher to **300x Green** (was 60x), eliminating ~4.5 minutes of slow approach crawl.
+   - Preserved the breathtaking near-surface "sizzle shot" perilune flyby envelope ($\le 6,000\text{ km}$) at **60x Green**, maintaining the cinematic visual majesty of the lunar flyby.
+4. **Atmospheric Descent 10x Auto-Ramp & Main Chute Failsafe Fix:**
+   - Diagnosed root cause of terminal descent delay: line 1550 had an obsolete hardcoded `if (targetWarp > 1) shiftWarp(1)` running continuously when $\text{altE} < 3.0\text{ km}$, which blocked pilots from cruising at 10x under main chutes. Removed this legacy clamp.
+   - Removed `!isReentry` gate from Auto-Warp engine and added `isReturningHome` to cruise qualification: Auto-Warp now automatically ramps up to **10x Green** during settled subsonic descent ($35 \rightarrow 8.5\text{ km}$), under drogues ($7.3 \rightarrow 3.4\text{ km}$), and under mains ($3.0 \rightarrow 0.35\text{ km}$), and automatically downshifts smoothly to 1x during the calibrated 10–15s chute deployment and touchdown windows.
+5. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.17"` in `dev/index.html`.
+   - Bumped `SERVER_VERSION = "2.1.17"` in `server.py`. 🩹 🧪 🌕 ⏱️ 🪂 🌊 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 21:40] - v2.1.16: Continuous 1s Ease-In/Out Warp Transitions & 10x Green Atmospheric Descent Schedule 🩹🧪🌕⏱️🪂🌊🥽**
 
 📝 **Summary**
