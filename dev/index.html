@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.8-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.9-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -75,11 +75,11 @@
         button:hover:not(:disabled) { background: #00ffff; color: #000; box-shadow: 0 0 10px #00ffff;}
         button:active:not(:disabled) { transform: scale(0.95); }
         button:disabled { opacity: 0.3; cursor: not-allowed; border-color: #555 !important; color: #555 !important; background: rgba(0,0,0,0.5) !important; }
-        button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; border-color: #00ffff !important; box-shadow: 0 0 10px #00ffff !important; animation: none !important;}
+        button.active { color: #000000 !important; font-weight: bold; background: #00ffff !important; border-color: #00ffff !important; box-shadow: 0 0 10px #00ffff !important; }
         
         button.danger-btn { border-color: #ff4444 !important; color: #ff4444 !important; background: rgba(255, 68, 68, 0.1) !important; }
         button.danger-btn:hover:not(:disabled) { background: #ff4444 !important; color: #000 !important; box-shadow: 0 0 10px #ff4444 !important;}
-        button.danger-btn.active { background: #aa0000 !important; color: #fff !important; border-color: #ff4444 !important; box-shadow: inset 0 0 10px #000 !important; animation: none !important; }
+        button.danger-btn.active { background: #aa0000 !important; color: #fff !important; border-color: #ff4444 !important; box-shadow: inset 0 0 10px #000 !important; }
 
         button.caution-btn { animation: flash-btn-yellow 1s infinite !important; border-color: #ffff44 !important; color: #ffff44 !important; }
         
@@ -88,8 +88,21 @@
         button.sort-safe-btn.active { background: #ffff44 !important; color: #000 !important; border-color: #ffff44 !important; box-shadow: 0 0 10px #ffff44 !important; }
 
         button.safe-btn { border-color: #44ff44 !important; color: #44ff44 !important; background: rgba(68, 255, 68, 0.1) !important; }
-        button.safe-btn.active { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44 !important; border-color: #44ff44 !important; animation: none !important;}
+        button.safe-btn.active { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44 !important; border-color: #44ff44 !important; }
         button.safe-btn:hover:not(:disabled) { background: #44ff44 !important; color: #000 !important; box-shadow: 0 0 10px #44ff44 !important;}
+
+        @keyframes blink-btn-blue {
+            0% { background: rgba(0, 255, 255, 0.15); color: #00ffff; border-color: #00ffff; box-shadow: 0 0 8px #00ffff; }
+            50% { background: #00ffff; color: #000; border-color: #00ffff; box-shadow: 0 0 22px #00ffff; }
+            100% { background: rgba(0, 255, 255, 0.15); color: #00ffff; border-color: #00ffff; box-shadow: 0 0 8px #00ffff; }
+        }
+        @keyframes blink-btn-green {
+            0% { background: rgba(68, 255, 68, 0.15); color: #44ff44; border-color: #44ff44; box-shadow: 0 0 8px #44ff44; }
+            50% { background: #44ff44; color: #000; border-color: #44ff44; box-shadow: 0 0 22px #44ff44; }
+            100% { background: rgba(68, 255, 68, 0.15); color: #44ff44; border-color: #44ff44; box-shadow: 0 0 8px #44ff44; }
+        }
+        button.blink-blue { animation: blink-btn-blue 0.8s infinite !important; }
+        button.blink-green { animation: blink-btn-green 0.8s infinite !important; }
 
         @keyframes pulse-blue-glow {
             0% { box-shadow: 0 0 8px #00ffff; border-color: #00ffff !important; background: rgba(0, 255, 255, 0.3) !important; color: #00ffff !important; }
@@ -216,9 +229,9 @@
                 
                 <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically execute trajectory maneuvers.">Autopilot:</span> <span id="autopilot-status" class="nominal">ENGAGED</span></p>
                 <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
-                    <button id="btn-toggle-auto" class="active pulse-blue-glow" title="Arm / Disarm automated Trans-Lunar Injection (TLI) burn sequencer.">AUTOPILOT ON</button>
+                    <button id="btn-toggle-auto" class="active blink-blue" title="Arm / Disarm automated Trans-Lunar Injection (TLI) burn sequencer.">AUTOPILOT ON</button>
                     <button id="btn-skip-window" title="Warps time forward toward the next burn window.">SKIP TO ACTION</button>
-                    <button id="btn-auto-warp" class="active safe-btn flash-green" title="Automatically ramps simulation speed back up to cruising warp after burns and transitions (Clamped to safe speeds).">AUTO WARP: ON</button>
+                    <button id="btn-auto-warp" class="active safe-btn blink-green" title="Automatically ramps simulation speed back up to cruising warp after burns and transitions (Clamped to safe speeds).">AUTO WARP: ON</button>
                     <button id="btn-track-target" title="Automatically keep the current target centered in view.">TRACK TARGET: OFF</button>
                 </div>
                 <hr style="border-color: #00ffff; opacity: 0.3; margin-top: 15px;">
@@ -283,17 +296,17 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.8";
+        const SIM_VERSION = "2.1.9";
 
         /**
          * Dynamic Flight Computer Timers & Operational Calibration
          * All values in seconds. Exposed globally for future settings modal and runtime tuning.
          */
         const FLIGHT_TIMERS = {
-            tliApproachSlowdown: 20.0,    // Pre-TLI window threshold to drop warp to 1x (seconds)
+            tliApproachSlowdown: 25.0,    // Pre-TLI window threshold (seconds)
             tliAutoBurnWindow: 3.0,       // Ignition threshold before TLI window (seconds)
             mccCountdownManual: 60.0,     // Full manual review countdown timer for trajectory alignment (seconds)
-            mccAutoAlignDelay: 4.0,       // Fast-track auto-align countdown when Autopilot / Auto-Warp is active (seconds)
+            mccAutoAlignDelay: 10.0,      // Fast-track auto-align countdown when Autopilot / Auto-Warp is active (seconds)
             postBurnRampDelay: 10.0,      // Observation hold after any burn before Auto-Warp accelerates back to cruising speed (seconds)
             warpStepInterval: 1.0         // Time interval between gear steps during automatic deceleration/acceleration (seconds)
         };
@@ -586,18 +599,18 @@
             
             const autoBtn = document.getElementById('btn-toggle-auto'); 
             if (autoBtn) {
-                autoBtn.className = "active pulse-blue-glow"; 
+                autoBtn.className = "active blink-blue"; 
                 autoBtn.textContent = "AUTOPILOT ON"; 
-                setTimeout(() => { if (!isReentry && autoPilotEngaged) autoBtn.classList.remove('pulse-blue-glow'); }, 5000);
+                setTimeout(() => { if (!isReentry && autoPilotEngaged) autoBtn.classList.remove('blink-blue'); }, 5000);
             }
             document.getElementById('autopilot-status').textContent = "ENGAGED"; 
             document.getElementById('autopilot-status').className = "nominal";
 
             const autoWarpBtn = document.getElementById('btn-auto-warp');
             if (autoWarpBtn) {
-                autoWarpBtn.className = "active safe-btn flash-green";
+                autoWarpBtn.className = "active safe-btn blink-green";
                 autoWarpBtn.textContent = "AUTO WARP: ON";
-                setTimeout(() => autoWarpBtn.classList.remove('flash-green'), 5000);
+                setTimeout(() => autoWarpBtn.classList.remove('blink-green'), 5000);
             }
 
             const btnMcc = document.getElementById('btn-autopilot-mcc');
@@ -761,7 +774,10 @@
         bindBankButton('btn-lift-down', false);
 
         function updateWarpUI(w) {
-            timeWarp = w; document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active')); if(document.getElementById(`btn-warp-${targetWarp}`)) document.getElementById(`btn-warp-${targetWarp}`).classList.add('active');
+            timeWarp = w; 
+            document.querySelectorAll('[id^="btn-warp"]').forEach(btn => btn.classList.remove('active')); 
+            const activeBtn = document.getElementById(`btn-warp-${w}`);
+            if (activeBtn) activeBtn.classList.add('active');
             const warpTextEl = document.getElementById('warp-text');
             if(warpTextEl) {
                 let speedLabel = w + "x"; if(w === 1) speedLabel = "1x (Realtime)"; if(w === 30) speedLabel = "30x (Steady)"; if(w === 60) speedLabel = "60x (1m/s)"; if(w === 300) speedLabel = "300x (5m/s)"; if(w === 600) speedLabel = "600x (10m/s)"; if(w === 1800) speedLabel = "1.8kx (Fast)"; if(w === 3600) speedLabel = "3.6kx (Cruise)"; if(w === 7200) speedLabel = "7.2kx (Maximum)";
@@ -781,7 +797,7 @@
             const btn = document.getElementById(`btn-warp-${w}`);
             if (btn) btn.addEventListener('click', () => {
                 if (btn.disabled) return;
-                if (isBurning && w > 30) { showNavMsg("WARP CLAMPED: MAX 30x DURING ENGINE BURNS", 3000, "flash-warning"); return; }
+                if (isBurning) { showNavMsg("WARP LOCKED: ENGINE FIRING IN PROGRESS", 3000, "flash-warning"); return; }
                 
                 if (w > maxAdvisoryWarp) { 
                     if (pendingDangerWarp !== w) { 
@@ -834,10 +850,10 @@
             
             if(!isTliCoast && timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown) { 
                 if (autoFastForward) autoFastForward = false; 
-                if (timeWarp > 1 || targetWarp > 1) { 
-                    shiftWarp(1); 
-                    updateWarpUI(1); 
-                    showNavMsg("APPROACHING TLI WINDOW — DECELERATING TO 1x", 3000, "caution"); 
+                if (timeWarp > 30 || targetWarp > 30) { 
+                    shiftWarp(30); 
+                    updateWarpUI(30); 
+                    showNavMsg("APPROACHING TLI WINDOW — SPEED CLAMPED TO 30x", 3000, "caution"); 
                 } 
                 if (tliAutoCountdown === -1 && !isBurning) {
                     tliAutoCountdown = (autoPilotEngaged || autoWarpEnabled) ? FLIGHT_TIMERS.mccAutoAlignDelay : FLIGHT_TIMERS.mccCountdownManual;
@@ -855,11 +871,7 @@
             if (autoBurnActive && !isTliCoast) isBurning = true; else if (autoPilotEngaged && isTliCoast && autoBurnActive) { isBurning = false; autoBurnActive = false; }
             if(isBurning && !wasBurning) { 
                 logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) }); 
-                if (autoWarpEnabled && timeWarp < 30) {
-                    shiftWarp(30);
-                    updateWarpUI(30);
-                    showNavMsg("AUTO-WARP: 30x BURN CRUISE ACTIVE", 3000, "solid-green");
-                } else if (timeWarp > 30) { 
+                if (timeWarp > 30) { 
                     shiftWarp(30); 
                     updateWarpUI(30); 
                     showNavMsg("WARP CLAMPED: 30x MAX DURING BURN", 3000, "caution"); 
@@ -960,7 +972,20 @@
             }
             earth.rotation.y += 0.0000727 * dt;
 
-            if (isReturningHome && altE < 5000 && timeWarp > 60 && !cinematicActive && !playbackActive) { shiftWarp(60); showNavMsg("ADVISORY: ATMOSPHERIC APPROACH - REDUCING WARP", 4000, "flash-warning"); }
+            if (isReturningHome && !cinematicActive && !playbackActive) {
+                if (altE <= 200 && (timeWarp > 1 || targetWarp > 1)) {
+                    shiftWarp(1); updateWarpUI(1);
+                    showNavMsg("CRITICAL: ENTRY INTERFACE APPROACH - WARP LOCKED 1x", 4000, "flash-danger");
+                } else if (altE <= 1500 && (timeWarp > 10 || targetWarp > 10)) {
+                    shiftWarp(10);
+                    showNavMsg("WARNING: LOW ALTITUDE INBOUND - REDUCING WARP TO 10x", 4000, "flash-warning");
+                } else if (altE <= 5000 && (timeWarp > 30 || targetWarp > 30)) {
+                    shiftWarp(30);
+                    showNavMsg("ADVISORY: ATMOSPHERIC APPROACH - REDUCING WARP TO 30x", 4000, "flash-warning");
+                } else if (altE <= 15000 && (timeWarp > 60 || targetWarp > 60)) {
+                    shiftWarp(60);
+                }
+            }
 
             return { timeToWindow, isTliCoast, estimatedBurnTime, magEarth: accelData.magEarth, magMoon: accelData.magMoon, flightPathAngle: flightPathAngle };
         }
@@ -986,7 +1011,7 @@
                 
                 // TLI APPROACH & ALIGNMENT COUNTDOWN
                 if (tliAutoCountdown > 0 && !telemetry.isTliCoast && !isBurning) {
-                    if (timeWarp > 1 || targetWarp > 1) { shiftWarp(1); updateWarpUI(1); }
+                    if (timeWarp > 30 || targetWarp > 30) { shiftWarp(30); updateWarpUI(30); }
                     tliAutoCountdown -= dt_real;
                     let remaining = Math.max(0, Math.ceil(tliAutoCountdown));
                     showNavMsg(`AUTO-ALIGNMENT IN ${remaining}s`, 1000, "flash-warning");
@@ -1226,14 +1251,25 @@
                 safeSetText('region-text', region);
 
                 // 3-TIER WARP SAFETY CALCULATIONS
-                maxSafeWarp = 1800;
-                maxAdvisoryWarp = 3600;
-                if (altE <= 150) { maxSafeWarp = 1; maxAdvisoryWarp = 10; }
-                else if (altE <= 2000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
-                else if (distM < WARP_LIMITS.PROXIMITY_DIST) { maxSafeWarp = WARP_LIMITS.PROXIMITY_WARP; maxAdvisoryWarp = 30; }
-                else if (distM < WARP_LIMITS.ENTER_SOI_DIST) { maxSafeWarp = WARP_LIMITS.ENTER_SOI_WARP; maxAdvisoryWarp = 600; }
-                else if (distM < WARP_LIMITS.APPROACH_SOI_DIST) { maxSafeWarp = WARP_LIMITS.APPROACH_SOI_WARP; maxAdvisoryWarp = 1800; }
-                else if (altE > 36300) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
+                if (isReturningHome) {
+                    if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 1; }
+                    else if (altE <= 1500) { maxSafeWarp = 1; maxAdvisoryWarp = 10; }
+                    else if (altE <= 5000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
+                    else if (altE <= 15000) { maxSafeWarp = 30; maxAdvisoryWarp = 60; }
+                    else if (altE <= 36300) { maxSafeWarp = 60; maxAdvisoryWarp = 300; }
+                    else if (altE <= 75000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
+                    else if (altE <= 150000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                    else { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
+                } else {
+                    if (altE <= 200) { maxSafeWarp = 1; maxAdvisoryWarp = 10; }
+                    else if (altE <= 2000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
+                    else if (distM <= 5000) { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
+                    else if (distM <= 20000) { maxSafeWarp = 300; maxAdvisoryWarp = 600; }
+                    else if (distM <= 66000) { maxSafeWarp = 600; maxAdvisoryWarp = 1800; }
+                    else if (distM <= 120000) { maxSafeWarp = 1800; maxAdvisoryWarp = 3600; }
+                    else if (altE > 36300) { maxSafeWarp = 3600; maxAdvisoryWarp = 3600; }
+                    else { maxSafeWarp = 10; maxAdvisoryWarp = 30; }
+                }
 
                 if (maxSafeWarp !== currentMaxSafeWarp || maxAdvisoryWarp !== currentMaxAdvisoryWarp) {
                     currentMaxSafeWarp = maxSafeWarp;
@@ -1273,7 +1309,7 @@
                         }
                     } else {
                         const canCruise = telemetry.isTliCoast || (metSeconds > 10 && altE > 150);
-                        if (canCruise && (timeWarp < maxSafeWarp || targetWarp < maxSafeWarp)) {
+                        if (canCruise && targetWarp !== maxSafeWarp) {
                             shiftWarp(maxSafeWarp);
                         }
                     }

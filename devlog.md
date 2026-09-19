@@ -6,6 +6,36 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 19:10] - v2.1.9: Startup Blink Signals, Non-Restricted Burn Cruise, 10s Auto-Align, 1s Button Indicators & Stepped Lunar/Earth Warp Schedules 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Startup & Reset Button Blink Animations:**
+   - Introduced `@keyframes blink-btn-blue` and `@keyframes blink-btn-green` with high-specificity `.blink-blue` and `.blink-green` utility classes (overriding conflicting `animation: none !important;` on `.active` buttons).
+   - Both `#btn-toggle-auto` (blue) and `#btn-auto-warp` (green) dynamically blink for the first 5.0 seconds on startup and mission reset, confirming immediate active engagement to the pilot.
+2. **Non-Restricted Burn Cruising up to 30x:**
+   - Removed artificial 1x deceleration locks when entering TLI window approach; craft cruises into burn at active user speed up to 30x.
+   - Guarded warp buttons during engine firing (`isBurning`) with clear HUD advisory (`WARP LOCKED: ENGINE FIRING IN PROGRESS`) to maintain numerical stability during thrust vector integration.
+3. **Trajectory Auto-Alignment Countdown Increased to 10 Seconds:**
+   - Adjusted `FLIGHT_TIMERS.mccAutoAlignDelay` to `10.0s` (up from 4.0s), providing ample 10-second review and visual blinking on `#btn-autopilot-mcc` before automated ignition.
+4. **1-Second Intermediate Button Indicator During Gear Shifts:**
+   - Fixed warp stepping UI to target `#btn-warp-${w}` rather than the final destination button, ensuring each intermediate gear (10x, 30x, 60x, 300x, 600x, 1800x, 3600x) displays the active `.active` class for its full 1.0s running duration.
+5. **Stepped Lunar Approach Safety Schedule:**
+   - Deep space (>120,000 km): 3.6kx is Green (`safe-btn`).
+   - Lunar Approach (<=120,000 km): 3.6kx turns Yellow (`sort-safe-btn`), 1.8kx remains Green.
+   - Lunar SOI Entry (<=66,000 km): 3.6kx turns Red (`danger-btn`), 1.8kx turns Yellow, 600x remains Green.
+   - Lunar Proximity Approach (<=20,000 km): 1.8kx turns Red, 600x turns Yellow, 300x remains Green.
+   - Close Proximity Flyby (<=5,000 km down to perilune): 10x is Green, 30x is Yellow, 60x+ is Red.
+6. **Earth Return Progressive Deceleration & Failsafe Clamps:**
+   - Resolved atmospheric overspeed by implementing dual-mode safety calculation distinguishing `isReturningHome` from outbound flight.
+   - Graduated step-down profile (3600x -> 1800x at 150k km -> 600x at 75k km -> 60x at 36.3k km -> 30x at 15k km -> 10x at 5k km -> 1x at 1.5k km).
+   - Auto-Warp engine continuously steps down to match `maxSafeWarp`. Hard physics failsafe clamps warp strictly to 1x before atmospheric entry interface (122 km).
+7. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.9"` in `dev/index.html`.
+   - Bumped `SERVER_VERSION = "2.1.9"` in `server.py`.
+   - Updated all task trackers and devlogs with 100% clean Node.js syntax verification. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 18:25] - v2.1.8: Zero Spatial Teleportation, 10x-30x Burn Warps, 3.6kx Deep Space Green Safe Speed, 50/50 Button Symmetry & Persistent Guidance Indicator 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**

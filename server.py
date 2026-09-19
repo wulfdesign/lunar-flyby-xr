@@ -16,7 +16,7 @@ if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
 
 PORT = 3550
-SERVER_VERSION = "2.1.8"
+SERVER_VERSION = "2.1.9"
 
 def get_local_ip():
     try:

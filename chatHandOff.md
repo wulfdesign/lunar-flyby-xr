@@ -1,10 +1,10 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.8)
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.9)
 > *Artemis: The Free Return | Real-Time Newtonian Cislunar Physics & WebXR*
 
 **Date:** 2026-09-18  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Hermes  
-**Status:** **ZERO TELEPORTATION, 10x-30x BURN WARPS, 3.6kx DEEP SPACE CRUISE & 50/50 UI SYMMETRY LIVE IN DEV SANDBOX** 🚀🌕⏱️🥽✨
+**Status:** **STARTUP BLINK SIGNALS, NON-RESTRICTED BURN CRUISE, 10s AUTO-ALIGN, 1s BUTTON INDICATORS & STEPPED WARP SCHEDULES LIVE IN DEV SANDBOX** 🚀🌕⏱️🥽✨
 
 ---
 
@@ -13,36 +13,34 @@
 - **Repository Audit & Remote Verification:** Verified `projects/lunar-flyby-xr` baseline integrity on GitHub (`wulfdesign/lunar-flyby-xr.git`).
 - **Dev Sandbox & Snapshot Architecture:** Established segregation between stable public `index.html` and active development sandbox `dev/index.html`. Created `snapshots/` holding Last Known Good (LKG) hardware builds (Quest 3 WebXR, Desktop, Mobile) and runbook.
 - **100% Offline Asset Suite & Launcher Batch (v2.1.6):** Fully self-contained local copies of Three.js and textures in `dev/vendor/` and `dev/textures/`, with `start_dev_server.bat` zero-friction launcher.
-- **Dynamic Variable Settings (`FLIGHT_TIMERS`, v2.1.7):** Centralized all operational timers (`tliApproachSlowdown: 20s`, `tliAutoBurnWindow: 3s`, `mccCountdownManual: 60s`, `mccAutoAlignDelay: 4s`, `postBurnRampDelay: 10s`, `warpStepInterval: 1s`) exposed globally on `window.FLIGHT_TIMERS` for future settings modal integration.
+- **Dynamic Variable Settings (`FLIGHT_TIMERS`, v2.1.7):** Centralized all operational timers (`tliApproachSlowdown: 25s`, `tliAutoBurnWindow: 3s`, `mccCountdownManual: 60s`, `mccAutoAlignDelay: 10s`, `postBurnRampDelay: 10s`, `warpStepInterval: 1s`) exposed globally on `window.FLIGHT_TIMERS` for future settings modal integration.
 - **Zero Spatial Teleportation Jump (v2.1.8):** Eliminated `shipPos.set(...)` and `shipVel.set(...)` inside `alignAndIgniteTLI()`. Position is never teleported; craft orbits smoothly and fires along its natural prograde trajectory.
-- **10x & 30x Warps Allowed During Engine Burns (v2.1.8):** Burn warp is no longer forced to 1x; user can burn at 1x, 10x, or 30x warp, allowing the 111-second TLI burn to complete in ~3.7s-11s without numerical drift. MECO immediately drops to 1x for the 10-second observation hold.
-- **Deep Space Safe Speed Raised to 3.6kx (v2.1.8):** Outside Geosynchronous orbit (`altE > 36,300 km`), `maxSafeWarp` is raised to 3600x (Tier 1 Green), cutting cislunar traversal time to ~72 seconds while keeping 7.2kx disabled in red.
-- **Autopilot & Auto-Warp Initial Armed State (v2.1.8):** Sim starts with Autopilot ON (`pulse-blue-glow` for 5s) and Auto-Warp ON (`flash-green` for 5s).
-- **Symmetric 2x2 Navigation Grid (50/50 Layout, v2.1.8):** Top 4 navigation buttons formatted into equal-width 50/50 columns across both rows.
-- **Persistent Guidance Indicator Above Manual Burn Override (v2.1.8):** Live HUD element `#burn-guidance-indicator` provides continuous real-time guidance across all flight phases (TLI countdown, burn progress, observation hold, MCC alignment, cislunar cruise, and re-entry).
+- **Startup Button Blink Signals (v2.1.9):** Added high-specificity `.blink-blue` and `.blink-green` keyframes to `#btn-toggle-auto` and `#btn-auto-warp`, visibly pulsing on startup/reset for 5 seconds to signal immediate engagement.
+- **Non-Restricted Burn Cruising (v2.1.9):** Eliminated 1x deceleration on TLI approach; craft cruises into and through engine burns at selected speeds up to 30x. Warp buttons are locked with an advisory during active engine burns (`isBurning`).
+- **10-Second Auto-Alignment Countdown (v2.1.9):** Extended `FLIGHT_TIMERS.mccAutoAlignDelay` to 10 seconds, giving the pilot 10s of visual review before ignition.
+- **1-Second Gear Step Visual Feedback (v2.1.9):** Intermediate buttons (10x, 30x, etc.) display active `.active` highlighting for the full 1.0-second interval during stepping transitions.
+- **Stepped Lunar & Earth Return Warp Schedules (v2.1.9):** Configured distinct safety tier coloring and Auto-Warp stepping for both lunar approach and return descent (3600x -> 1800x -> 600x -> 60x -> 30x -> 10x -> 1x) with failsafe clamps locking to 1x before Entry Interface (122 km).
 
 ## 📍 Active File Anchors
-- `dev/index.html` -> Active development sandbox (v2.1.8)
+- `dev/index.html` -> Active development sandbox (v2.1.9)
 - `start_dev_server.bat` -> Dedicated dev launcher batch file
-- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.8)
+- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.9)
 - `dev/vendor/three.min.js` -> Local offline Three.js r128 library
 - `dev/textures/` -> Local high-resolution Earth and Moon maps
 - `index.html` -> Pristine public production baseline (promoted only upon passing QA)
 - `snapshots/` -> Hardware-specific LKG backups (Quest 3 WebXR, Desktop, Mobile)
-- `Tasks.md` -> Tasks ledger at v2.1.8 (Features moved to Ready for QA 🧪)
-- `devlog.md` -> Devlog at v2.1.8
-- `chatHandOff.md` -> Active handoff capsule at v2.1.8
+- `Tasks.md` -> Tasks ledger at v2.1.9 (Features moved to Ready for QA 🧪)
+- `devlog.md` -> Devlog at v2.1.9
+- `chatHandOff.md` -> Active handoff capsule at v2.1.9
 
 ## 🔜 Next Wake Directives
 1. Open `http://localhost:3550/dev/index.html` (or launch via `start_dev_server.bat`).
-2. Verify Autopilot starts ON (pulsing blue glow for 5s) and Auto-Warp starts ON (flashing green for 5s).
-3. Observe symmetric 2x2 button grid layout (50/50 width on each row).
-4. Watch the `#burn-guidance-indicator` count down toward TLI window.
-5. Confirm that at T- 20s, warp decelerates to 1x, auto-align button blinks, and at window ignition starts smoothly without any spatial teleportation jump.
-6. Verify 10x and 30x warps work seamlessly during the burn, finishing the burn in ~3.7s-11s.
-7. Observe the 10-second observation hold at 1x speed after MECO.
-8. Verify Auto-Warp ramps up to 3.6kx (Green) once past Geosync orbit, crossing to the Moon in ~72 seconds.
-9. Upon explicit QA approval, promote `dev/index.html` to root `index.html`, re-verify locally, and commit & push to GitHub `origin/main`.
+2. Verify Autopilot blinks blue and Auto-Warp blinks green for 5.0 seconds on startup and reset.
+3. Verify spacecraft cruises into and through TLI burn at selected speeds up to 30x without being forced to 1x.
+4. Verify trajectory auto-alignment countdown displays 10 seconds on the blinking `#btn-autopilot-mcc` button.
+5. Verify intermediate warp buttons light up for 1 second during gear acceleration and deceleration.
+6. Observe safety tier colors as craft approaches the Moon and Earth return descent schedule.
+7. Upon explicit QA approval, promote `dev/index.html` to root `index.html`, re-verify locally, and commit & push to GitHub `origin/main`.
 
 ---
 *Perilune slingshot aligned. Re-entry keyhole calibrated for festival showcase.* 🚀🌕🌊🎬🥽✨🐈
