@@ -6,6 +6,33 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 17:55] - v2.1.7: Flight Timers & Gated Auto-Warp / Checkpoint Alignment Architecture 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Root Cause Analysis of Checkpoint Warp Lock:**
+   - Diagnosed runtime conflict during burn approach and waypoint encounters: when `updatePhysics` attempted to decelerate to 1x for TLI window or MCC checkpoints, Auto-Warp was concurrently checking `(metSeconds > 15 && altE > 400)` and re-accelerating the simulation back to maximum cruising warp (up to 1800x/3600x).
+   - Furthermore, `mccAutoCountdown` only decremented if `timeWarp === 1`, causing the countdown to freeze indefinitely at checkpoints while the spacecraft overshot at warp speed.
+2. **Centralized Variable Settings (`FLIGHT_TIMERS`):**
+   - Centralized all operational timers into a single configuration object `FLIGHT_TIMERS` exposed globally on `window.FLIGHT_TIMERS` for real-time tuning and future settings modal integration:
+     - `tliApproachSlowdown: 60.0s`: Pre-TLI window threshold to drop warp to 1x.
+     - `tliAutoBurnWindow: 5.0s`: Ignition lead threshold before window.
+     - `mccCountdownManual: 60.0s`: Full review countdown timer for manual trajectory alignment.
+     - `mccAutoAlignDelay: 4.0s`: Fast-track auto-align countdown when Autopilot / Auto-Warp is active.
+     - `postBurnRampDelay: 10.0s`: Post-burn observation hold at 1x speed before Auto-Warp accelerates.
+     - `warpStepInterval: 1.0s`: Staged gear-shift interval during automatic acceleration/deceleration.
+3. **Gated Auto-Warp Engine with 10s Post-Burn Observation Hold:**
+   - Implemented strict mutual-exclusion guards: Auto-Warp is inhibited whenever approaching TLI (`isApproachingTli`), at any active MCC checkpoint (`isMccActive`), during engine firing (`isBurning`), and during the 10-second post-burn observation hold (`isPostBurnHold`).
+   - Added live HUD status indicator `POST-BURN HOLD: 1x SPEED (Xs)` during the 10-second stabilization window following MECO or MCC maneuvers before smooth gear-by-gear acceleration resumes.
+4. **Fast-Track Trajectory Alignment & Blinking Button UX:**
+   - Trajectory Alignment button (`#btn-autopilot-mcc`) blinks in glowing caution-yellow (`flash-yellow` / `flash-btn-yellow`) when approaching burns or waypoints.
+   - When Auto-Warp or Autopilot is active, countdown fast-tracks to 4.0s (rather than waiting 60s at 1x), automatically commands spacecraft alignment and main engine ignition, and safely transitions into observation hold.
+5. **Version Increments & Verification:**
+   - Bumped `SIM_VERSION` to `2.1.7` in `dev/index.html` title and footer.
+   - Bumped `SERVER_VERSION = "2.1.7"` in `server.py`.
+   - Verified 100% clean JavaScript syntax and simulated state transitions in Node.js. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 17:30] - v2.1.6: Dev Viewport Render Fix, 100% Offline Asset Suite & Dev Launcher Batch 🩹🧪🌕🥽**
 
 📝 **Summary**

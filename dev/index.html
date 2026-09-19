@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.6-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.7-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -282,7 +282,21 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.6";
+        const SIM_VERSION = "2.1.7";
+
+        /**
+         * Dynamic Flight Computer Timers & Operational Calibration
+         * All values in seconds. Exposed globally for future settings modal and runtime tuning.
+         */
+        const FLIGHT_TIMERS = {
+            tliApproachSlowdown: 60.0,    // Pre-TLI window threshold to drop warp to 1x (seconds)
+            tliAutoBurnWindow: 5.0,       // Ignition threshold before TLI window (seconds)
+            mccCountdownManual: 60.0,     // Full manual review countdown timer for trajectory alignment (seconds)
+            mccAutoAlignDelay: 4.0,       // Fast-track auto-align countdown when Autopilot / Auto-Warp is active (seconds)
+            postBurnRampDelay: 10.0,      // Observation hold after any burn before Auto-Warp accelerates back to cruising speed (seconds)
+            warpStepInterval: 1.0         // Time interval between gear steps during automatic deceleration/acceleration (seconds)
+        };
+        window.FLIGHT_TIMERS = FLIGHT_TIMERS;
 
         const ALLOW_7200X_IN_SYSTEM = false; 
 
@@ -344,6 +358,7 @@
         let currentMaxSafeWarp = -1;
         let currentMaxAdvisoryWarp = -1;
         let mccAutoCountdown = -1;
+        let tliAutoCountdown = -1;
 
         let actualBurnTime = 0;
         let initialTargetBurnTime = 0;
@@ -377,7 +392,8 @@
         function updateWarpStepping(dt, telemetry) {
             if (timeWarp === targetWarp) return;
             warpStepTimer += dt;
-            if (warpStepTimer > 0.5) { 
+            let stepInterval = (typeof FLIGHT_TIMERS !== 'undefined' && FLIGHT_TIMERS.warpStepInterval) ? FLIGHT_TIMERS.warpStepInterval : 1.0;
+            if (warpStepTimer >= stepInterval) { 
                 let currentIndex = warpLevels.indexOf(timeWarp);
                 let targetIndex = warpLevels.indexOf(targetWarp);
                 let nextWarp = timeWarp;
@@ -561,6 +577,7 @@
             capsuleBankAngle = 0; commandedTargetBank = 0;
             isHoldingLiftUp = false; isHoldingLiftDown = false;
             autoWarpEnabled = true;
+            activeMCCWaypoint = null; mccAutoCountdown = -1; tliAutoCountdown = -1; autoDecelerateTarget = -1; targetWarp = 1; warpStepTimer = 0;
             
             for (let key in milestoneLatches) milestoneLatches[key] = false;
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix(); document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
@@ -579,6 +596,13 @@
             if (autoWarpBtn) {
                 autoWarpBtn.className = "active safe-btn";
                 autoWarpBtn.textContent = "AUTO WARP: ON";
+            }
+
+            const btnMcc = document.getElementById('btn-autopilot-mcc');
+            if (btnMcc) {
+                btnMcc.style.visibility = 'hidden';
+                btnMcc.className = '';
+                btnMcc.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
             }
 
             const btnUp = document.getElementById('btn-lift-up');
@@ -633,6 +657,14 @@
                 e.target.className = 'active'; 
                 document.getElementById('autopilot-status').textContent = "ENGAGED"; 
                 document.getElementById('autopilot-status').className = "nominal"; 
+                if (tliAutoCountdown > FLIGHT_TIMERS.mccAutoAlignDelay) {
+                    tliAutoCountdown = FLIGHT_TIMERS.mccAutoAlignDelay;
+                    showNavMsg(`AUTOPILOT ARMED: FAST-TRACK TLI IN ${Math.ceil(tliAutoCountdown)}s`, 2000, "solid-green");
+                }
+                if (activeMCCWaypoint && mccAutoCountdown > FLIGHT_TIMERS.mccAutoAlignDelay) {
+                    mccAutoCountdown = FLIGHT_TIMERS.mccAutoAlignDelay;
+                    showNavMsg(`AUTOPILOT ARMED: FAST-TRACK ALIGNMENT IN ${Math.ceil(mccAutoCountdown)}s`, 2000, "solid-green");
+                }
             } else { 
                 e.target.className = 'caution-btn';
                 e.target.classList.remove('pulse-blue-glow');
@@ -650,7 +682,16 @@
                 if (autoWarpEnabled) {
                     e.target.className = "active safe-btn";
                     showNavMsg("AUTO WARP: ENGAGED (MAX GREEN SAFE)", 3000, "solid-green");
-                    if (!isBurning && !isReentry && targetWarp < maxSafeWarp) {
+                    if (tliAutoCountdown > FLIGHT_TIMERS.mccAutoAlignDelay) {
+                        tliAutoCountdown = FLIGHT_TIMERS.mccAutoAlignDelay;
+                    }
+                    if (activeMCCWaypoint && mccAutoCountdown > FLIGHT_TIMERS.mccAutoAlignDelay) {
+                        mccAutoCountdown = FLIGHT_TIMERS.mccAutoAlignDelay;
+                    }
+                    const isMccActive = (activeMCCWaypoint !== null);
+                    const isApproachingTli = (typeof timeToWindow !== 'undefined' && timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown) || (tliAutoCountdown > 0);
+                    const isPostBurnHold = (burnEndTime > 0 && (metSeconds - burnEndTime < FLIGHT_TIMERS.postBurnRampDelay));
+                    if (!isBurning && !isReentry && !isMccActive && !isApproachingTli && !isPostBurnHold && targetWarp < maxSafeWarp) {
                         shiftWarp(maxSafeWarp);
                     }
                 } else {
@@ -776,7 +817,7 @@
             let r = shipPos.length(); let currentVelMag = shipVel.length(); _moonPos.copy(moon.position).divideScalar(renderScale); let distToMoon = shipPos.distanceTo(_moonPos);
 
             let activeWaypoints = isReturningHome ? MISSION_WAYPOINTS_RETURN : MISSION_WAYPOINTS_OUTBOUND;
-            for (let wp of activeWaypoints) { let conditionMet = isReturningHome ? (r <= wp.distance_km) : (r >= wp.distance_km); if (conditionMet && !wp.passed) { wp.passed = true; logEvent(`WAYPOINT REACHED: ${wp.name}`); autoDecelerateTarget = 1; evaluateMCC(wp); } }
+            for (let wp of activeWaypoints) { let conditionMet = isReturningHome ? (r <= wp.distance_km) : (r >= wp.distance_km); if (conditionMet && !wp.passed) { wp.passed = true; logEvent(`WAYPOINT REACHED: ${wp.name}`); evaluateMCC(wp); } }
             
             let currentEnergy = (currentVelMag * currentVelMag) / 2 - (muEarth / r) - (muMoon / Math.max(1, distToMoon));
             let a_transfer = (radEarth + 400 + distMoon) / 2; let targetEnergy = -muEarth / (2 * a_transfer); let isTliCoast = currentEnergy >= targetEnergy; 
@@ -788,13 +829,34 @@
             let shipAngle = Math.atan2(shipPos.z, shipPos.x); if(shipAngle < 0) shipAngle += Math.PI * 2;
             let angleDiff = targetPhaseAngle - shipAngle; if(angleDiff < 0) angleDiff += Math.PI * 2;
             let shipAngularVel = currentVelMag / r; let timeToWindow = angleDiff / Math.max(0.0001, (shipAngularVel - moonAngularVel));
-            if(autoFastForward && timeToWindow < 60 && !isTliCoast) { autoFastForward = false; updateWarpUI(1); }
+            
+            if(!isTliCoast && timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown) { 
+                if (autoFastForward) autoFastForward = false; 
+                if (timeWarp > 1 || targetWarp > 1) { 
+                    shiftWarp(1); 
+                    updateWarpUI(1); 
+                    showNavMsg("APPROACHING TLI WINDOW — DECELERATING TO 1x", 3000, "caution"); 
+                } 
+                if (tliAutoCountdown === -1 && !isBurning) {
+                    tliAutoCountdown = (autoPilotEngaged || autoWarpEnabled) ? FLIGHT_TIMERS.mccAutoAlignDelay : FLIGHT_TIMERS.mccCountdownManual;
+                    const mccBtn = document.getElementById('btn-autopilot-mcc');
+                    if (mccBtn) {
+                        mccBtn.style.visibility = 'visible';
+                        mccBtn.className = 'caution-btn';
+                        mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(tliAutoCountdown)}s)`;
+                    }
+                }
+            }
 
             let wasBurning = isBurning;
-            if (autoPilotEngaged && !isTliCoast) { if (timeToWindow < 5 && !autoBurnActive) { autoBurnActive = true; initialTargetBurnTime = estimatedBurnTime; } }
+            if (autoPilotEngaged && !isTliCoast) { if (timeToWindow < FLIGHT_TIMERS.tliAutoBurnWindow && !autoBurnActive) { autoBurnActive = true; initialTargetBurnTime = estimatedBurnTime; } }
             if (autoBurnActive && !isTliCoast) isBurning = true; else if (autoPilotEngaged && isTliCoast && autoBurnActive) { isBurning = false; autoBurnActive = false; }
             if(isBurning && !wasBurning) { logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) }); if (timeWarp > 1) { updateWarpUI(1); showNavMsg("WARP RESET: ENGINES ACTIVE", 3000, "flash-warning"); } }
-            if(!isBurning && wasBurning) { logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) }); if (isTliCoast) burnEndTime = metSeconds; }
+            if(!isBurning && wasBurning) { 
+                logEvent(isTliCoast ? "Main Engine Cutoff (MECO). Target Energy Reached." : "Manual Engine Cutoff.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) }); 
+                burnEndTime = metSeconds; 
+                showNavMsg("TLI COMPLETE — OBSERVATION HOLD (10s)", 4000, "solid-green");
+            }
             if (isBurning) actualBurnTime += dt;
 
             let currentMass = shipEmptyMass + fuel; let altE = shipPos.length() - radEarth; let accelData = getAcceleration(shipPos, _accel); let magEarth = accelData.magEarth; let magMoon = accelData.magMoon;
@@ -907,18 +969,62 @@
                 
                 updateWarpStepping(dt_real, telemetry);
                 
-                if (mccAutoCountdown > 0 && timeWarp === 1) {
-                    mccAutoCountdown -= dt_real; showNavMsg(`AUTO-CORRECTION IN ${Math.ceil(mccAutoCountdown)}s`, 1000, "flash-warning");
+                // TLI APPROACH & ALIGNMENT COUNTDOWN
+                if (tliAutoCountdown > 0 && !telemetry.isTliCoast && !isBurning) {
+                    if (timeWarp > 1 || targetWarp > 1) { shiftWarp(1); updateWarpUI(1); }
+                    tliAutoCountdown -= dt_real;
+                    let remaining = Math.max(0, Math.ceil(tliAutoCountdown));
+                    showNavMsg(`AUTO-ALIGNMENT IN ${remaining}s`, 1000, "flash-warning");
                     const mccBtn = document.getElementById('btn-autopilot-mcc');
-                    if (mccBtn) { 
-                        mccBtn.className = "caution-btn"; 
-                        mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`; 
+                    if (mccBtn) {
+                        mccBtn.style.visibility = 'visible';
+                        mccBtn.className = "caution-btn";
+                        mccBtn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${remaining}s)`;
                     }
-                } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) { executeAutopilotBurn(); } else { const mccBtn = document.getElementById('btn-autopilot-mcc'); if (mccBtn && mccAutoCountdown === -1) { mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT"; mccBtn.className = "caution-btn"; } }
+                    if (tliAutoCountdown <= 0) {
+                        alignAndIgniteTLI();
+                    }
+                }
+
+                // MCC CHECKPOINT ALIGNMENT COUNTDOWN
+                if (activeMCCWaypoint) {
+                    if (timeWarp > 1 || targetWarp > 1) { shiftWarp(1); updateWarpUI(1); }
+                    if (mccAutoCountdown > 0) {
+                        mccAutoCountdown -= dt_real;
+                        let remaining = Math.max(0, Math.ceil(mccAutoCountdown));
+                        showNavMsg(`AUTO-CORRECTION IN ${remaining}s`, 1000, "flash-warning");
+                        const mccBtn = document.getElementById('btn-autopilot-mcc');
+                        if (mccBtn) { 
+                            mccBtn.style.visibility = 'visible';
+                            mccBtn.className = "caution-btn"; 
+                            mccBtn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${remaining}s)`; 
+                        }
+                    } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) {
+                        executeAutopilotBurn();
+                    }
+                } else if (tliAutoCountdown <= 0 && tliAutoCountdown !== -1) {
+                    const mccBtn = document.getElementById('btn-autopilot-mcc');
+                    if (mccBtn && mccAutoCountdown === -1 && !activeMCCWaypoint && !isBurning) {
+                        mccBtn.style.visibility = 'hidden';
+                        mccBtn.className = '';
+                        mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT";
+                    }
+                }
                 
                 if (typeof targetWarp !== 'undefined' && autoDecelerateTarget > 0 && targetWarp > autoDecelerateTarget) {
                     let now = performance.now();
-                    if (now - lastDecelTime > 1200) { lastDecelTime = now; const gears = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200]; let currentIndex = gears.indexOf(targetWarp); if (currentIndex > 0) { let nextWarp = gears[currentIndex - 1]; shiftWarp(nextWarp); updateWarpUI(timeWarp); triggerAlertFlash(`btn-warp-${nextWarp}`); } }
+                    let stepInterval = (typeof FLIGHT_TIMERS !== 'undefined' && FLIGHT_TIMERS.warpStepInterval ? FLIGHT_TIMERS.warpStepInterval : 1.0) * 1000;
+                    if (now - lastDecelTime > stepInterval) { 
+                        lastDecelTime = now; 
+                        const gears = [1, 10, 30, 60, 300, 600, 1800, 3600, 7200]; 
+                        let currentIndex = gears.indexOf(targetWarp); 
+                        if (currentIndex > 0) { 
+                            let nextWarp = gears[currentIndex - 1]; 
+                            shiftWarp(nextWarp); 
+                            updateWarpUI(timeWarp); 
+                            triggerAlertFlash(`btn-warp-${nextWarp}`); 
+                        } 
+                    }
                 } else if (typeof targetWarp !== 'undefined' && targetWarp <= autoDecelerateTarget) { autoDecelerateTarget = -1; }
 
                 if (isTrackingTarget && currentTargetObj) {
@@ -1127,12 +1233,27 @@
                     });
                 }
 
-                // AUTO-WARP ENGINE: Automatically ramps up to maximum Green safe speed
-                if (autoWarpEnabled && !isBurning && !isReentry && !autoFastForward && !cinematicActive && !playbackActive && autoDecelerateTarget <= 1) {
-                    if (telemetry.isTliCoast || (metSeconds > 15 && altE > 400)) {
-                        if (timeWarp < maxSafeWarp && targetWarp < maxSafeWarp && (metSeconds - burnEndTime > 2.5)) {
-                            shiftWarp(maxSafeWarp);
-                        }
+                // AUTO-WARP ENGINE: Controlled automatic ramp-up to maximum Green safe speed
+                const isMccActive = (activeMCCWaypoint !== null);
+                const isApproachingTli = (!telemetry.isTliCoast && (telemetry.timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown || tliAutoCountdown > 0));
+                const isPostBurnHold = (burnEndTime > 0 && (metSeconds - burnEndTime < FLIGHT_TIMERS.postBurnRampDelay));
+
+                // If post-burn observation hold is active, lock warp to 1x and display hold countdown
+                if (isPostBurnHold) {
+                    if (timeWarp > 1 || targetWarp > 1) {
+                        shiftWarp(1);
+                        updateWarpUI(1);
+                    }
+                    let remainingHold = Math.max(0, Math.ceil(FLIGHT_TIMERS.postBurnRampDelay - (metSeconds - burnEndTime)));
+                    if (remainingHold > 0) {
+                        safeSetText('nav-status', `POST-BURN HOLD: 1x SPEED (${remainingHold}s)`, "nominal");
+                    }
+                }
+
+                if (autoWarpEnabled && !isBurning && !isReentry && !autoFastForward && !cinematicActive && !playbackActive && !isMccActive && !isApproachingTli && !isPostBurnHold && (autoDecelerateTarget <= 1)) {
+                    const canCruise = telemetry.isTliCoast || (metSeconds > 10 && altE > 150);
+                    if (canCruise && (timeWarp < maxSafeWarp || targetWarp < maxSafeWarp)) {
+                        shiftWarp(maxSafeWarp);
                     }
                 }
 
@@ -1209,11 +1330,53 @@
         });
 
         function evaluateMCC(waypoint) {
-            showNavMsg(`MCC REQUIRED: ${waypoint.name.toUpperCase()}`, 5000, "flash-warning"); activeMCCWaypoint = waypoint; mccAutoCountdown = 45; 
-            const btn = document.getElementById('btn-autopilot-mcc'); if (btn) { btn.style.visibility = 'visible'; btn.className = 'caution-btn'; }
+            shiftWarp(1);
+            updateWarpUI(1);
+            activeMCCWaypoint = waypoint;
+            mccAutoCountdown = (autoPilotEngaged || autoWarpEnabled) ? FLIGHT_TIMERS.mccAutoAlignDelay : FLIGHT_TIMERS.mccCountdownManual;
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) {
+                btn.style.visibility = 'visible';
+                btn.className = 'caution-btn';
+                btn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`;
+            }
+            showNavMsg(`CHECKPOINT: ${waypoint.name.toUpperCase()} — TRAJECTORY ALIGNMENT REQUIRED`, 5000, "flash-warning");
+            logEvent(`CHECKPOINT REACHED: ${waypoint.name}`);
+        }
+
+        function alignAndIgniteTLI() {
+            tliAutoCountdown = -999;
+            let targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
+            let shipSpeed = shipVel.length();
+            let r = shipPos.length();
+            let targetShipAngle = (targetPhaseAngle - (FLIGHT_TIMERS.tliAutoBurnWindow * (shipSpeed / r))) % (Math.PI * 2);
+            shipPos.set(r * Math.cos(targetShipAngle), 0, r * Math.sin(targetShipAngle));
+            shipVel.set(shipSpeed * -Math.sin(targetShipAngle), 0, shipSpeed * Math.cos(targetShipAngle));
+            
+            autoPilotEngaged = true;
+            autoBurnActive = true;
+            isBurning = true;
+            const autoBtn = document.getElementById('btn-toggle-auto');
+            if (autoBtn) {
+                autoBtn.textContent = "AUTOPILOT ON";
+                autoBtn.className = "active";
+            }
+            safeSetText('autopilot-status', "ENGAGED", "nominal");
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) {
+                btn.style.visibility = 'hidden';
+                btn.className = '';
+                btn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
+            }
+            logEvent("TLI AUTO-ALIGNMENT COMPLETE: Igniting main propulsion for Trans-Lunar Injection.");
+            showNavMsg("TRAJECTORY ALIGNED — TLI ENGINES IGNITED", 3000, "solid-green");
         }
 
         function executeAutopilotBurn() {
+            if (tliAutoCountdown > 0 || (!milestoneLatches.passedISS && tliAutoCountdown !== -999 && !activeMCCWaypoint)) {
+                alignAndIgniteTLI();
+                return;
+            }
             if (!activeMCCWaypoint) return;
             let altE = shipPos.length() - radEarth;
             let fuelConsumed = 0;
@@ -1242,18 +1405,26 @@
                 shipVel.add(transverseDir.multiplyScalar(dV));
                 let m0 = shipEmptyMass + fuel; fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
                 logEvent(`MCC EXECUTED: Return Trajectory Alignment (+${dV.toFixed(4)} km/s Radial). Target Perigee: 40km. Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
-                showNavMsg(`MCC COMPLETE: TRAJECTORY ALIGNED`);
+                showNavMsg(`MCC COMPLETE: TRAJECTORY ALIGNED — OBSERVATION HOLD (10s)`, 4000, "nominal");
                 
             } else {
                 let dV = 0.05;
                 let prograde = shipVel.clone().normalize(); shipVel.add(prograde.multiplyScalar(dV));
                 let m0 = shipEmptyMass + fuel; fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel)); fuel -= fuelConsumed; if (fuel < 0) fuel = 0;
                 logEvent(`MCC EXECUTED: Trajectory Alignment (+${dV} km/s Prograde). Fuel: -${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
-                showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL");
+                showNavMsg("MCC COMPLETE: TRAJECTORY NOMINAL — OBSERVATION HOLD (10s)", 4000, "nominal");
             }
             
-            activeMCCWaypoint = null; mccAutoCountdown = -1; 
-            const btn = document.getElementById('btn-autopilot-mcc'); if (btn) { btn.style.visibility = 'hidden'; btn.className = ''; }
+            burnEndTime = metSeconds;
+            activeMCCWaypoint = null;
+            mccAutoCountdown = -1;
+            autoDecelerateTarget = -1;
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (btn) {
+                btn.style.visibility = 'hidden';
+                btn.className = '';
+                btn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
+            }
         }
     </script>
 </body>
