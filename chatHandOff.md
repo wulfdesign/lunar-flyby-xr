@@ -1,10 +1,10 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.10)
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.11)
 > *Artemis: The Free Return | Real-Time Newtonian Cislunar Physics & WebXR*
 
 **Date:** 2026-09-18  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Hermes  
-**Status:** **30x BURN WARPS RESTORED, 8s COUNTDOWN HANG RESOLVED, OUTBOUND ACCELERATION HEALED & FINITE MCC BURNS LIVE IN DEV** 🚀🌕⏱️🥽✨
+**Status:** **UNIVERSAL SMOOTH TIME WARP STEPPING PROTOCOL & WEBXR KINETOSIS PREVENTION LIVE IN DEV & CRYSTALLIZED IN MEMORY** 🚀🌕⏱️🥽✨
 
 ---
 
@@ -20,26 +20,28 @@
 - **Auto-Align Countdown 8s Hang Resolved (v2.1.10):** Synchronized Main Engine Start (MES) triggers to immediately clear `tliAutoCountdown = -999` and hide `#btn-autopilot-mcc`, preventing the countdown from freezing when ignition starts before 10 wall-clock seconds elapse.
 - **Outbound Acceleration Healed (v2.1.10):** Fixed outbound safety tier calculations; leaving Earth orbit after TLI now accelerates smoothly (60x -> 300x -> 600x -> 1800x -> 3600x) rather than getting stuck at 10x.
 - **Continuous Finite MCC Burns (v2.1.10):** Replaced impulsive single-frame velocity additions with smooth 3-4 second finite burns integrating acceleration continuously via Velocity Verlet equations.
+- **Universal Smooth Time Warp Stepping Protocol (v2.1.11):** Diagnosed and eliminated abrupt 1-frame time warp jumps down to 1x following MECO and post-burn observation holds. Removed all direct `updateWarpUI()` calls across runtime flight triggers, establishing `updateWarpStepping()` as the exclusive runtime gear shifter with 1.0s dwell per intermediate gear (30x -> 10x -> 1x). Implemented `.target-warp` dashed outline indicators, progression HUD format (`30x [>> 1x]`), and Auto-Warp downshift priority guards.
+- **Symbiot Memory Crystallization (v2.1.11):** Ingested universal hard rule into `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` linked to `newtonian_velocity_verlet_orbital_engine.md` across the Symbiot AI Ecology.
 
 ## 📍 Active File Anchors
-- `dev/index.html` -> Active development sandbox (v2.1.10)
+- `dev/index.html` -> Active development sandbox (v2.1.11)
 - `start_dev_server.bat` -> Dedicated dev launcher batch file
-- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.10)
+- `server.py` -> Zero-dependency demo server with `--dev` support (v2.1.11)
 - `dev/vendor/three.min.js` -> Local offline Three.js r128 library
 - `dev/textures/` -> Local high-resolution Earth and Moon maps
 - `index.html` -> Pristine public production baseline (promoted only upon passing QA)
 - `snapshots/` -> Hardware-specific LKG backups (Quest 3 WebXR, Desktop, Mobile)
-- `Tasks.md` -> Tasks ledger at v2.1.10 (Features moved to Ready for QA 🧪)
-- `devlog.md` -> Devlog at v2.1.10
-- `chatHandOff.md` -> Active handoff capsule at v2.1.10
+- `Tasks.md` -> Tasks ledger at v2.1.11 (Features moved to Ready for QA 🧪)
+- `devlog.md` -> Devlog at v2.1.11
+- `chatHandOff.md` -> Active handoff capsule at v2.1.11
+- `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` -> Permanent memory substrate concept note
 
 ## 🔜 Next Wake Directives
 1. Open `http://localhost:3550/dev/index.html` (or launch via `start_dev_server.bat`).
-2. Verify 30x warp can be activated with a single click in parking orbit and is maintained through the TLI burn.
-3. Verify the auto-align countdown counts down and vanishes cleanly upon ignition (no freeze at 8s).
-4. Verify that leaving Earth orbit after TLI, warp accelerates progressively up to 3.6kx without getting stuck at 10x.
-5. On the return trip, verify Mid-Course Correction executes as a continuous smooth 4-second burn without any trajectory snapping.
-6. Note: Keep all changes local. Do NOT push to public `origin/main` until explicitly requested.
+2. Run a burn at 30x warp and observe MECO: verify that speed steps down smoothly (30x -> 10x -> 1x over 2 seconds) with intermediate button highlights and target dashed outline.
+3. Observe the 10-second post-burn observation hold: verify it stays locked at 1x, then accelerates gear-by-gear (1x -> 10x -> 30x -> 60x -> 300x -> 600x -> 1800x -> 3600x) into deep space.
+4. Verify all downshifts during flight (MCC checkpoints, lunar approach, entry interface) execute through stepped gears without any 1-frame snapping.
+5. Note: Keep all public repo changes local. Do NOT push to public `origin/main` until explicitly instructed by Magus Wulf.
 
 ---
 *Perilune slingshot aligned. Re-entry keyhole calibrated for festival showcase.* 🚀🌕🌊🎬🥽✨🐈
