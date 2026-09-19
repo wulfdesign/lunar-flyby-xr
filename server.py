@@ -11,7 +11,7 @@ import os
 import sys
 
 PORT = 3550
-SERVER_VERSION = "2.1.7"
+SERVER_VERSION = "2.1.8"
 
 def get_local_ip():
     try:

@@ -6,6 +6,32 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 18:25] - v2.1.8: Zero Spatial Teleportation, 10x-30x Burn Warps, 3.6kx Deep Space Green Safe Speed, 50/50 Button Symmetry & Persistent Guidance Indicator 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Zero Spatial Teleportation Fix:**
+   - Diagnosed and excised the unnatural spatial coordinate jump caused by `shipPos.set(...)` and `shipVel.set(...)` inside `alignAndIgniteTLI()`.
+   - The spacecraft now preserves physical momentum and orbital trajectory naturally, igniting its engines seamlessly along its tangential prograde velocity vector without teleportation.
+2. **10x and 30x Warps Allowed During Engine Burns:**
+   - Modified the warp button click handler to clamp `if (isBurning && w > 30)` rather than rejecting all warp clicks during burns.
+   - Updated `updatePhysics()` to prevent resetting warp to 1x at MES (Main Engine Start); burns now cruise at up to 30x warp, allowing the 111-second TLI burn to complete in ~3.7s-11s without sitting through real-time waits.
+   - Upon MECO, warp immediately drops to 1x and locks for the 10-second post-burn observation hold.
+3. **Deep Space Tier 1 Green Safe Speed Raised to 3.6kx (3600x):**
+   - In `renderer.setAnimationLoop`, updated warp safety tiers: outside Geosynchronous Orbit (`altE > 36,300 km`) and prior to Lunar SOI approach (`distM >= 100,000 km`), `maxSafeWarp` and `maxAdvisoryWarp` are elevated to 3600x.
+   - Button 3600x is now classified as Tier 1 Green (`safe-btn`), permitting Auto-Warp to cruise at 3600x across translunar space (~72 seconds total transit time) while 7.2kx remains locked/disabled in red.
+4. **Autopilot & Auto-Warp Initial Armed State with 5s Glow Indicators:**
+   - Configured simulation reset and initial startup with Autopilot ON (`autoPilotEngaged = true`, `#btn-toggle-auto` in `.pulse-blue-glow` for 5s) and Auto-Warp ON (`autoWarpEnabled = true`, `#btn-auto-warp` in `.flash-green` for 5s).
+5. **Symmetric Navigation Button Grid (50/50 Layout):**
+   - Restructured the 4 navigation buttons (`#btn-toggle-auto`, `#btn-skip-window`, `#btn-auto-warp`, `#btn-track-target`) into a unified 2x2 CSS Grid with `grid-template-columns: 1fr 1fr; gap: 8px;`, ensuring perfectly balanced 50/50 width distribution across both rows.
+6. **Persistent Live Guidance Indicator Above Manual Burn Override:**
+   - Restored `#burn-guidance-indicator` directly above `#btn-thrust`, updating every frame with live countdowns (`TLI COUNTDOWN: T- MM:SS`), burn progress (`TLI BURN ACTIVE: Xs / Ys (30x WARP)`), observation hold (`TLI COMPLETE — OBSERVATION HOLD (Xs)`), waypoint alerts, and re-entry attitude guidance.
+7. **Version Increments & Clean Node.js Syntax Verification:**
+   - Bumped `SIM_VERSION = "2.1.8"` in `dev/index.html` (title and script).
+   - Bumped `SERVER_VERSION = "2.1.8"` in `server.py`.
+   - Verified 100% clean JavaScript syntax with zero syntax errors via Node.js runtime parsing. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 17:55] - v2.1.7: Flight Timers & Gated Auto-Warp / Checkpoint Alignment Architecture 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**
