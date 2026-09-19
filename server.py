@@ -10,6 +10,11 @@ import webbrowser
 import os
 import sys
 
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 PORT = 3550
 SERVER_VERSION = "2.1.8"
 
