@@ -16,7 +16,7 @@ if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
 
 PORT = 3550
-SERVER_VERSION = "2.1.12"
+SERVER_VERSION = "2.1.13"
 
 def get_local_ip():
     try:
@@ -59,11 +59,26 @@ def run_server():
         '.gltf': 'model/gltf+json'
     })
     
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\nShutting down demo server.")
+    class ReusableTCPServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
+    try:
+        with ReusableTCPServer(("", PORT), handler) as httpd:
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\nShutting down demo server.")
+    except OSError as e:
+        if getattr(e, 'winerror', None) == 10048 or getattr(e, 'errno', None) == 98 or "10048" in str(e):
+            print("\n" + "=" * 68)
+            print(f"ℹ️  Port {PORT} is already in use by an active server instance.")
+            print(f"👉 The server is ALREADY RUNNING and serving requests at:")
+            print(f"   💻 http://localhost:{PORT}{launch_path}")
+            print(f"   🥽 http://{local_ip}:{PORT}{launch_path}")
+            print(f"   (No additional server instance is needed.)")
+            print("=" * 68)
+        else:
+            raise e
 
 if __name__ == '__main__':
     run_server()

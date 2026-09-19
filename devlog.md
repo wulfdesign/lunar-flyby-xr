@@ -6,6 +6,29 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 20:30] - v2.1.13: Re-entry Sweet Spot Latch, Post-Flyby Auto Ramp-Up, 6s Operational Timers & Earlier GEO Deceleration 🩹🧪🌕⏱️🥽**
+
+📝 **Summary**
+1. **Re-entry Atmospheric Guidance Sweet Spot Latch & Oscillation Damping:**
+   - Diagnosed and resolved the post-skip bank oscillation where the autopilot violently hunted between +78° (Lift Up) and -65° (Lift Down) with no deadband, giving the pilot the sensation of flipping over.
+   - Introduced **Nominal Corridor Deadband** ($-5.0^\circ \le \gamma \le -7.0^\circ$ and $G \le 6.0\text{G}$): spacecraft holds stable wings-level trim ($0^\circ$), with actuators completely extinguished.
+   - Restricted inverted lift (Lift Down) strictly to high-altitude skip risks ($\text{alt}_E > 65\text{ km}$ and $\gamma > -5.0^\circ$). Below $65\text{ km}$, craft is aerodynamically captured and never commands steep inverted dives.
+   - Implemented **Sweet Spot Latch** (`reentrySweetSpotReached`): once entering terminal descent ($\text{alt}_E \le 35\text{ km}$, forward velocity $< 1.2\text{ km/s}$, or drogue chutes deploy), guidance locks to $0^\circ$, extinguishing actuator pulses and eliminating hunting all the way to splashdown.
+2. **Post-Flyby Auto Ramp-Up When Safe Zone Expands:**
+   - Resolved the issue where the spacecraft remained stuck at $30\times$ after departing the Moon because a manual advisory selection was not cleared when the environment opened up.
+   - Implemented rule: if `maxSafeWarp > userSelectedWarp`, Auto-Warp clears `userSelectedWarp = null;` and automatically ramps up to the newly available `maxSafeWarp` (progressing from $300\times \rightarrow 600\times \rightarrow 1800\times \rightarrow 3600\times$).
+3. **Lunar Proximity Safe Envelope Calibration:**
+   - Adjusted lunar proximity ($\text{dist}_M \le 5,000\text{ km}$) so `maxSafeWarp = 10` (Tier 1 Green) and `maxAdvisoryWarp = 300` (Tier 2 Yellow). Pilots can now cruise at $30\times$, $60\times$, or $300\times$ without being forcefully reset to $10\times$. $600\times$ is set to Tier 3 Red (accessible with safety confirmation).
+4. **Earlier Earth Return Deceleration (Approaching GEO):**
+   - Stepped down from $600\times$ to $300\times$ at $50,000\text{ km}$ (well above GEO at $36,300\text{ km}$), preventing high-warp anxiety when entering the inner gravity well.
+   - Stepped down to $60\times$ at $20,000\text{ km}$, $30\times$ at $6,000\text{ km}$, and $10\times$ at $2,000\text{ km}$.
+5. **Operational Flight Timers Tuned to 6.0s:**
+   - Reduced `mccAutoAlignDelay` and `postBurnRampDelay` from $10.0\text{s}$ down to $6.0\text{s}$ in `FLIGHT_TIMERS` for tighter, snappier operational cadence.
+6. **Server Socket Robustness & WinError 10048 Defense:**
+   - Implemented `ReusableTCPServer` (`allow_reuse_address = True`) and graceful `OSError` catching in `server.py`, ensuring clean, informative guidance if `start_dev_server.bat` is launched while port 3550 is occupied. 🩹 🧪 🌕 ⏱️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 19:48] - v2.1.12: Earth Return Pilot Speed Selection, Advisory Warp Honors & Graduated Safe Tiers 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**
