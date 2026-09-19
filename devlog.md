@@ -6,6 +6,22 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-18 17:15] - v2.1.5: Transmutation Complete — Dev Sandbox Features Live for QA Testing 🛠️🧪🌕🥽**
+
+📝 **Summary**
+1. **LKG Hardware Snapshots Archive Instantiated:**
+   - Established `snapshots/` folder with `v2.1.4_baseline_public.html`, `quest3_webxr_lkg_v2.1.4.html`, `desktop_chrome_edge_lkg_v2.1.4.html`, and `mobile_touch_ios_android_lkg_v2.1.4.html` along with `README.md` runbook.
+   - Preserved root public `index.html` with 100% integrity.
+2. **KremFest-XR Features Built in `dev/index.html`:**
+   - **Auto-Warp Engine:** Deployed `#btn-auto-warp` on secondary control row (default ON for hands-off festival floor). Clamped strictly to maximum green safe speed for active gravity well.
+   - **3-Tier Warp Safety System:** Dynamic classification (Green Safe, Solid Yellow Advisory, Red Extreme). Yellow and Green enable instantly on single click; Red enforces two-click confirmation. Skip-to-Action clamped to Green ceiling.
+   - **Atmospheric Re-entry Guidance (Offset CoG Gimbal & Roll Trim):** Linked `/docs/physics.html#aerodynamic-lift` physics. Closed-loop autopilot commands attitude vectoring during atmospheric entry (<122km) to arrest excessive G-loads (<12G) and prevent skip-out.
+   - **Visual Feedback & Press-and-Hold UX:** Pulsing blue glow on autopilot, active actuator glow on commanded bank buttons, continuous pointer-hold attitude adjustment, and dynamic tri-color attitude trim gauge (-90° to +90°).
+3. **Syntax & Quality Assurance:**
+   - Verified zero unclosed HTML tags and 100% clean Node.js syntax pass (`node --check`). Staged for Magus Wulf QA. 🛠️ 🧪 🌕 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-18 17:00] - v2.1.5: KremFest-XR Calibration — Dev Sandbox Segregation, Auto-Warp 3-Tier Safety & Re-Entry Bank Guidance 🚀🌕🎬🥽✨**
 
 📝 **Summary**
