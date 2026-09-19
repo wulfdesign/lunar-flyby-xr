@@ -38,18 +38,21 @@
 - `dev/textures/` -> Local high-resolution Earth and Moon maps
 - `index.html` -> Pristine public production baseline (promoted only upon passing QA)
 - `snapshots/` -> Hardware-specific LKG backups (Quest 3 WebXR, Desktop, Mobile)
-- `Tasks.md` -> Tasks ledger at v2.1.18 (Features moved to Ready for QA 🧪)
-- `devlog.md` -> Devlog at v2.1.16
-- `chatHandOff.md` -> Active handoff capsule at v2.1.16
-- `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` -> Permanent memory substrate concept note
+- `Tasks.md` -> Tasks ledger at v2.1.18 (Features staged in Ready for QA 🧪)
+- `devlog.md` -> Devlog at v2.1.18
+- `chatHandOff.md` -> Active handoff capsule at v2.1.18
+- `C:\AI\memory\concepts\smooth_timewarp_transitions_and_vr_kinetosis_prevention.md` -> Permanent memory substrate concept note (Hermite smoothstep easing)
+- `C:\AI\memory\concepts\cislunar_flight_envelope_and_dynamic_time_warp_scheduling.md` -> Complete cislunar pacing & 3-tier safety envelope memory architecture
+- `.agents/skills/cislunar-flight-engine/SKILL.md` -> Project and ecosystem skill for real-time Newtonian cislunar simulation workflows
 
 ## 🔜 Next Wake Directives
-1. Open `http://localhost:3550/dev/index.html` (or launch via `start_dev_server.bat`).
+1. Open `http://localhost:3550/dev/index.html` (served live on port 3550).
 2. Flight QA Pass:
-   - Verify that shifting between 10x and 1x (and all other gears) smoothly eases in and out over 1.0 second with zero sudden visual snap.
-   - During atmospheric descent below 35 km, observe 10x Green safe warp engaging smoothly during settled descent, easing into 1x for drogue deployment (8.5 km -> 7.3 km), main chute deployment (3.4 km -> 3.0 km), and final touchdown (<= 0.35 km).
-   - In Lunar proximity (within 12,000 km of the Moon), verify that 30x and 60x are Green, 300x and 600x are Yellow, and 1800x/3600x/7200x are Red / locked out.
-3. Note: Keep all public repo changes local. Do NOT push to public `origin/main` until explicitly instructed by Magus Wulf.
+   - Verify fast outbound climb from LEO ($1.8\text{kx}$ at $10\text{k km}$, $3.6\text{kx}$ at $22\text{k km}$, $7.2\text{kx}$ at $45\text{k km}$).
+   - Verify lunar approach speed retention ($3.6\text{kx}$ to $42\text{k km}$, $1.8\text{kx}$ to $22\text{k km}$, $600\times$ to $12\text{k km}$, $300\times$ to $5,500\text{ km}$, and $60\times$ perilune sizzle shot).
+   - Verify rapid lunar departure ($300\times$ at $5\text{k km}$, $600\times$ at $10\text{k km}$, $1.8\text{kx}$ at $22\text{k km}$, $3.6\text{kx}$ at $42\text{k km}$, $7.2\text{kx}$ at $70\text{k km}$).
+   - Verify smooth Earth return (~13–14 min to atmosphere, ~16–17 min total splashdown).
+3. Post-QA Promotion: Use the provided commands in chat to promote `dev/index.html` to root `index.html` and push to GitHub `origin/main`.
 
 ---
-*Perilune slingshot aligned. Re-entry keyhole calibrated for festival showcase.* 🚀🌕🌊🎬🥽✨🐈
+*Perilune slingshot aligned. Memory crystallized. Complete mission wrapup sealed.* 🚀🌕🌊🎬🥽✨🐈
