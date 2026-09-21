@@ -51,6 +51,9 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🏗️ 🔥🔥 **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively. 🛠️
 
 ## 🚀 Mission Roadmap
+* [ ] 🌌 🎪 🔥🔥🔥 **Seattle Space Week (SEA) Preparation**: Festival & exhibition curation for upcoming Space Week in Seattle. Finalize kiosk/booth turnkey hardware configuration, Meta Quest 3 standalone & tethered profiles, visitor QR flow, and presentation collateral.
+* [ ] ✨ 🗺️ 🔥🔥🔥 **Celestial Starfield Integration (PolyZone Real Stars)**: Ingest the real astronomical star catalog from `projects/poly-zone` (Hipparcos/Yale Bright Star coordinates and magnitudes) to replace procedural/random star points with scientifically accurate constellations and Milky Way celestial alignment.
+* [ ] 🌕 📐 🔥🔥🔥 **Lunar Tidal Locking & Surface Orientation**: Correct the Moon's axial rotation and initial orientation to accurately model 1:1 tidal locking with Earth. Ensure the lunar nearside (Mare Tranquillitatis, Oceanus Procellarum) permanently faces Earth, while the heavily cratered farside correctly greets the spacecraft during the circum-lunar free-return perilune pass.
 * [ ] 📚 🌊 **Educational Physics FAQ & Splashdown Hydrodynamics Guide**: Add deep-dive educational FAQ on ocean water impact (20.1 mph / 9 m/s), 12–15G couch attenuation struts, and circum-lunar free-return orbital loops.
 * [ ] 🏗️ 🔥🔥 **Simulation: Re-Entry Heating**: Implement plasma blackout and drag interaction.
 * [ ] 🏗️ 🔥 **Simulation: Splashdown Sequence**: Add lifting-entry bank controls and chutes.
