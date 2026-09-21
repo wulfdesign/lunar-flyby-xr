@@ -6,6 +6,33 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-21 15:55] - v2.1.19: Production Release Promotion & UI Version Indicators 🚀🎪🥽✨**
+
+📝 **Summary**
+1. **Empirical Telemetry Verification (`Artemis_FlightLog_2026-09-21T22-34-08.json`):**
+   - Pilot confirmed the dev version ran flawlessly from launch to splashdown:
+     - **Total Simulation Flight Time:** **16:45.2** (dead-center in the 16–17 minute target window!).
+     - **Minimum Lunar Distance:** **2,452.38 km** perilune pass on the free-return trajectory.
+     - **Re-entry Keyhole & Peak G-Load:** Threaded the atmospheric corridor with peak deceleration of **12.72G**.
+     - **Splashdown:** Touchdown velocity **9.0 m/s** under main chutes at sim time 16:45.2.
+2. **Live UI Version & Release Channel Indicator:**
+   - Added a clean, dedicated telemetry badge right beneath the `Flight Telemetry` HUD header:
+     - In Dev sandbox: displays `Early Access Alpha • v2.1.19-dev`.
+     - In Production release: displays `Early Access Alpha • v2.1.19 (Production)`.
+   - Set dynamically via `SIM_VERSION = "2.1.19"` and `IS_DEV` flag on DOM load.
+3. **Production Sandbox Promotion & Offline Asset Suite:**
+   - Promoted the verified sandbox engine into root production `index.html`.
+   - Ingested 100% offline Three.js r128 (`vendor/three.min.js`) and high-resolution Earth/Moon maps (`textures/`) directly into the root repository with automatic CDN fallback.
+4. **Public-Facing README Merge (KremFest XR 2026 Update):**
+   - Merged the KremFest XR 2026 update notice at the top of root `README.md`.
+   - Placed the complete Early Access KremFest XR 2026 update particulars (autopilot experience, 3-tier safe warp gating, continuous Hermite smoothstep gliding, 10x descent schedule, speedrunning advisory speeds, and v3.0 physical pilot command roadmap) at the end of Features before Mission Gallery.
+   - Preserved all original deep-dive documentation, festival links, and director statements.
+5. **Version Increments:**
+   - Bumped `SIM_VERSION = "2.1.19"` in `dev/index.html` and `index.html`.
+   - Bumped `SERVER_VERSION = "2.1.19"` in `server.py`. 🚀 🎪 🥽 🏆 🐈 ✨
+
+---
+
 ### **[2026-09-18 22:42] - v2.1.18: Tighter Lunar Approach & Earlier Outbound/Departure Warp Acceleration 🩹🧪🌕⏱️🥽**
 
 📝 **Summary**

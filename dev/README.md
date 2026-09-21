@@ -1,4 +1,4 @@
-# **Artemis: The Free Return — KremFest XR 2026 Update (v2.1.18-dev)**
+# **Artemis: The Free Return — KremFest XR 2026 Update (v2.1.19-dev)**
 
 **A real-time, browser-native Newtonian cislunar flight simulator and WebXR exhibition experience.**
 
