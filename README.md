@@ -38,12 +38,12 @@ This isn't a pre-rendered animation; it's a living physics sandbox.
 ### 🎪 **Early Access Alpha: KremFest XR 2026 Update Particulars**
 
 * **Turnkey Festival Autopilot Experience:** Designed for exhibition attendees at KremFest XR 2026 to experience the full free-return mission passively in VR without getting lost in complex avionics menus.
-* **Calibrated ~16–17 Minute Mission Pacing:** Dynamically balances astronomical scale ($800,000\text{ km}$ round trip) with human attention spans, accelerating through deep space at $7,200\times$ while slowing to $60\times$ for the breathtaking perilune "sizzle shot" flyby within $5,500\text{ km}$ of the lunar farside.
+* **Calibrated ~16–17 Minute Mission Pacing:** Dynamically balances astronomical scale (800,000 km round trip) with human attention spans, accelerating through deep space at 7,200x while slowing to 60x for the breathtaking perilune "sizzle shot" flyby within 5,500 km of the lunar farside.
 * **Smart Auto-Warp with 3-Tier Safety Gating:** Automatically engages Tier 1 Green (Safe) speeds, honors Tier 2 Yellow (Advisory) human pilot intent (`userSelectedWarp`), and locks out Tier 3 Red speeds to protect numerical integration fidelity.
-* **Continuous 1.0s Cubic Hermite Smoothstep Gliding:** Every gear change glides smoothly over 1.0 second ($\text{ease} = 3p^2 - 2p^3$), completely eliminating visual velocity shocks and WebXR motion sickness.
-* **10x Parachute Descent Schedule:** Auto-Warp maintains $10\times$ Green during settled post-plasma glide, under drogue chutes, and under main parachutes, smoothly downshifting to $1\times$ for 10–15 second deployment observation holds and touchdown.
-* **Taking the Helm (Disengaging Automation):** Click `AUTO WARP` (or press `W` / click in VR with laser pointer) to take full manual control of all 9 simulation speeds ($1\times$ to $7,200\times$).
-* **Speedrunning the Moon:** Push into Yellow Advisory speeds ($300\times / 600\times$) around the Moon with Auto-Warp ON, or turn Auto-Warp OFF to push into Red and fire your own manual transverse thrusters for Mid-Course Corrections (MCC).
+* **Continuous 1.0s Cubic Hermite Smoothstep Gliding:** Every gear change glides smoothly over 1.0 second (`ease = 3p² - 2p³`), completely eliminating visual velocity shocks and WebXR motion sickness.
+* **10x Parachute Descent Schedule:** Auto-Warp maintains 10x Green during settled post-plasma glide, under drogue chutes, and under main parachutes, smoothly downshifting to 1x for 10–15 second deployment observation holds and touchdown.
+* **Taking the Helm (Disengaging Automation):** Click `AUTO WARP` (or press `W` / click in VR with laser pointer) to take full manual control of all 9 simulation speeds (1x to 7,200x).
+* **Speedrunning the Moon:** Push into Yellow Advisory speeds (300x / 600x) around the Moon with Auto-Warp ON, or turn Auto-Warp OFF to push into Red and fire your own manual transverse thrusters for Mid-Course Corrections (MCC).
 * **Skip to Checkpoint (Experimental):** Fast-forwards toward the next mission milestone (TLI, Moon, Earth Return, Re-entry).
 * **Roadmap to v3.0 (Physical Pilot Command):** In upcoming v3.0 releases, avionics will compute burn vectors while the human commander uses RCS thrusters to orient the spacecraft and manually fire the orbital engines.
 * **Live UI Version & Release Indicator:** Real-time HUD telemetry badge displaying active Early Access Alpha version and release channel (`v2.1.19`).

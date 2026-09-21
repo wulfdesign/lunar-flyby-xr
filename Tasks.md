@@ -51,6 +51,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🏗️ 🔥🔥 **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively. 🛠️
 
 ## 🚀 Mission Roadmap
+* [ ] 📚 🌊 **Educational Physics FAQ & Splashdown Hydrodynamics Guide**: Add deep-dive educational FAQ on ocean water impact (20.1 mph / 9 m/s), 12–15G couch attenuation struts, and circum-lunar free-return orbital loops.
 * [ ] 🏗️ 🔥🔥 **Simulation: Re-Entry Heating**: Implement plasma blackout and drag interaction.
 * [ ] 🏗️ 🔥 **Simulation: Splashdown Sequence**: Add lifting-entry bank controls and chutes.
 
