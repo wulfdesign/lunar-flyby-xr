@@ -9,11 +9,12 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.19 (KremFest XR 2026 Production Release & UI Version Indicators 🚀🎪🥽✨)
+**Version:** v2.1.20 (Direct Browser Play Portal, Early Access Funnel & Dev Feedback Pipeline 🚀🌐📬🪙✨)
 
 ---
 
 ## 🧪 Waiting for QA (Ready for QA 🧪)
+* [ ] 🧪 🔥🔥🔥 **Direct Browser Play Portal, Early Access Funnel & Dev Feedback Pipeline (v2.1.20):** Architect and stage dedicated public mission landing page / launcher allowing visitors to launch the full WebXR simulation directly in-browser with 1 click, capture Early Access Flight Crew email sign-ups for launch notifications and updates, collect general mission feedback, and deliver automated access to the gated bleeding-edge dev sandbox (`/dev/`) with a dedicated co-creation feature request form ("Request for stuff"). Wire the monetization feedback loop: 1) "Best in VR" hardware affiliate banner (Amazon Associates `tag=wulfdesign-20` & Meta Quest Referral `link-015`), 2) Early Access Flight Supporter tier (in-cockpit 3D backer plaque engraving & mission patch downloads), and 3) Wulf Design Studios B2B custom simulation engineering commission inquiry link. 🧪 🚀 🌐 📬 🪙 🥽 🐈 ✨
 * [ ] 🧪 🔥🔥🔥 **KremFest XR 2026 Production Release & Live UI Version Indicators (v2.1.19):** Promoted empirically verified dev sandbox (16:45.2 flight time in `Artemis_FlightLog_2026-09-21T22-34-08.json`, 2,452 km perilune flyby, 12.7G entry peak, 9.0 m/s splashdown) to root production `index.html`. Integrated live Early Access Alpha version and release channel indicator (`v2.1.19-dev` in dev sandbox, `v2.1.19 (Production)` in root release). Ingested 100% offline Three.js r128 and high-res texture assets into root repository. Merged KremFest XR 2026 update announcement and comprehensive festival particulars into public-facing `README.md` while preserving all original deep-dive documentation. Bumped `server.py` to v2.1.19. 🧪 ⚡ ⏱️ 🎪 🥽 🐈
 
 ---
