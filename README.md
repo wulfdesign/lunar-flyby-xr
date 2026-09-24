@@ -143,6 +143,7 @@ If you use this project for your own research, education, or as a base for your 
   * **LinkedIn:** [WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)
   * **YouTube:** [UpLiftVR Studios](https://www.youtube.com/@UpLiftVR)
 * **Clone & Fork:** If you fork or clone this repository, please keep the attribution and license files intact.
+* **License & Community Policy:** This project is provided under the **Wulf Design Studios Source-Visible & WebXR Exhibition License (v1.0)**. It is 100% free for personal web play, educational study, and classroom lecture demonstration. Public museum kiosk installations and commercial distribution require an Institutional Exhibition License. See [LICENSE.md](LICENSE.md) and [📜 Licensing Rationale & Policy](LICENSE_RATIONALE.md).
 
 ## **🗺️ V2.0 Roadmap**
 
@@ -200,3 +201,14 @@ Inspired by the historic NASA Artemis missions and a lifelong passion for space 
 * 🎥 **[KING 5 Evening Magazine Feature (UpLiftVR)](https://www.youtube.com/watch?v=Xh0l8hA9y0c)**
 * 🔗 **[LinkedIn: WulfDesignStudios](https://linkedin.com/in/WulfDesignStudios)**
 * 🎮 **[Itch.io: UpLiftVR](https://upliftvr.itch.io)**
+
+---
+
+## **📜 License**
+
+Copyright (c) 2026 Larry James (Wulf Design Studios / UpLiftVR Studios). All Rights Reserved.  
+Provided under the **Wulf Design Studios Source-Visible & WebXR Exhibition License (v1.0)**.  
+* 🚀 **Play Free Online:** [wulfdesign.github.io/lunar-flyby-xr](https://wulfdesign.github.io/lunar-flyby-xr/)  
+* 📄 **License Terms:** [LICENSE.md](LICENSE.md)  
+* 💡 **Licensing Rationale & Museum Policy:** [LICENSE_RATIONALE.md](LICENSE_RATIONALE.md)  
+* ✉️ **Museum & Institutional Inquiries:** `wulfdesignstudios@gmail.com`

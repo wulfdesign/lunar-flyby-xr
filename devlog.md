@@ -6,6 +6,23 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-24 14:40] - v2.1.23: Source-Visible & WebXR Exhibition License v1.0, 501(c)(3) Museum Protection & PR Rationale 📜🏛️⚖️✨**
+
+📝 **Summary**
+1. **Source-Visible & WebXR Exhibition License Transition (Option 2):**
+   - Transmuted repository licensing from permissive MIT to **Wulf Design Studios Source-Visible & WebXR Exhibition License (v1.0)**.
+   - Retained 100% exclusive copyright to Larry James / Wulf Design Studios & UpLiftVR Studios while keeping the flagship simulation 100% free to play directly on GitHub Pages (`wulfdesign.github.io/lunar-flyby-xr/`).
+2. **Plugging the 501(c)(3) Museum Kiosk Loophole:**
+   - Identified that standard non-commercial licenses (PolyForm Noncommercial, CC-BY-NC) explicitly allow charitable and educational 501(c)(3) institutions (e.g., Museum of Flight, Pacific Science Center) to deploy software for free despite charging $25–$38 visitor admission.
+   - Explicitly reserved public unattended kiosk and ticketed museum exhibition rights, safeguarding the $1,000–$2,500/year Institutional Exhibition License stream.
+3. **High-Fidelity 3D Model & NASA Media Asset Defense:**
+   - Established proprietary asset containment, ensuring that upcoming high-resolution 3D models (Orion, SLS, Lunar Gateway) and commercial asset store meshes cannot be stripped and resold by third parties under permissive open-source terms.
+4. **Symbiot PR Agency Rationale Document (`LICENSE_RATIONALE.md`):**
+   - Authored comprehensive public rationale and FAQ document explaining the transition with warmth, transparency, and pride in indie craftsmanship.
+   - Updated `README.md` attribution and license sections with direct links to `LICENSE.md` and `LICENSE_RATIONALE.md`. 📜 🏛️ ⚖️ 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-24 14:45] - v2.1.21: Modular Mission Pack Plugin Architecture & Seattle Space Week Roadmap 🚀🧩📇🪙✨**
 
 📝 **Summary**

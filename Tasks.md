@@ -9,11 +9,12 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.21 (Modular Mission Pack Plugin Architecture & Seattle Space Week Roadmap 🚀🧩📇🪙✨)
+**Version:** v2.1.23 (Source-Visible & WebXR Exhibition License v1.0, 501(c)(3) Museum Protection & PR Rationale 📜🏛️⚖️✨)
 
 ---
 
 ## 🧪 Waiting for QA (Ready for QA 🧪)
+* [ ] 🧪 🔥🔥🔥 **Source-Visible & WebXR Exhibition License Transition & Museum Kiosk Rider (v2.1.23):** Transitioned repository license from permissive MIT to Wulf Design Studios Source-Visible & WebXR Exhibition License v1.0, plugging the 501(c)(3) museum loophole in standard non-commercial terms to safeguard $1,000–$2,500/year institutional kiosk licenses, protecting upstream 3D models and NASA media assets from unauthorized extraction, preserving 100% free web play on GitHub Pages, authored comprehensive public rationale in `LICENSE_RATIONALE.md`, and updated `README.md` attribution and license sections. 🧪 ⚖️ 🏛️ 📜 🥽 🐈 ✨
 * [ ] 🧪 🔥🔥🔥 **Direct Browser Play Portal, Early Access Funnel & Dev Feedback Pipeline (v2.1.20):** Architect and stage dedicated public mission landing page / launcher allowing visitors to launch the full WebXR simulation directly in-browser with 1 click, capture Early Access Flight Crew email sign-ups for launch notifications and mission updates, collect community feedback, and deliver access to the gated bleeding-edge dev sandbox (`/dev/`) with a dedicated co-creation feature request form ("Request for stuff"). 🧪 🚀 🌐 📬 🥽 🐈 ✨
 * [ ] 🧪 🔥🔥🔥 **KremFest XR 2026 Production Release & Live UI Version Indicators (v2.1.19):** Promoted empirically verified dev sandbox (16:45.2 flight time in `Artemis_FlightLog_2026-09-21T22-34-08.json`, 2,452 km perilune flyby, 12.7G entry peak, 9.0 m/s splashdown) to root production `index.html`. Integrated live Early Access Alpha version and release channel indicator (`v2.1.19-dev` in dev sandbox, `v2.1.19 (Production)` in root release). Ingested 100% offline Three.js r128 and high-res texture assets into root repository. Merged KremFest XR 2026 update announcement and comprehensive festival particulars into public-facing `README.md` while preserving all original deep-dive documentation. Bumped `server.py` to v2.1.19. 🧪 ⚡ ⏱️ 🎪 🥽 🐈
 
