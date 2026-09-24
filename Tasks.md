@@ -9,7 +9,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.20 (Direct Browser Play Portal, Early Access Funnel & Dev Feedback Pipeline 🚀🌐📬🪙✨)
+**Version:** v2.1.21 (Modular Mission Pack Plugin Architecture & Seattle Space Week Roadmap 🚀🧩📇🪙✨)
 
 ---
 
@@ -52,6 +52,14 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🏗️ 🔥🔥 **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively. 🛠️
 
 ## 🚀 Mission Roadmap
+* [ ] 📇 🌐 🔥🔥🔥 **Seattle Space Week Bare-Bones Landing Portal & Digital vCard Link**: Deploy lightweight public landing page (`wulfdesign.github.io/lunar-flyby-xr/`) with 1-click `[ 🚀 Launch Mission in Browser ]` button and digital business card / vCard download (`wulfdesign.github.io/card/`) with scannable QR code for live phone-to-phone contact exchange during Seattle Space Week social mixers, billing Magus Wulf as *"XR Space Simulation & Mission Visualization Creative Technologist"*.
+* [ ] 🧩 🛒 🔥🔥🔥 **Modular Plugin Format & Mission Pack Marketplace (Dev Roadmap)**: Decouple the core Three.js / WebXR physics engine from mission scenario data via a lightweight Plugin API (`registerMissionPack()`). Keep *Artemis: The Free Return* circum-lunar trajectory 100% free on GitHub Pages as the promotional hook. Enable loading and purchasing of modular mission packs via itch.io (`upliftvr.itch.io` / `wulfdesign.itch.io`) or Gumroad:
+  - **Pack 01 (Apollo 11 Historical Descent & Touchdown):** Low lunar orbit descent, landing radar, and manual RCS hover over boulder fields ($7.99).
+  - **Pack 02 (Mars Transit & Aerobraking Corridor):** High-velocity interplanetary cruise and atmospheric skip capture ($9.99).
+  - **Pack 03 (Poly-Zone Deep Space Vector Ops):** Crossover with Poly-Zone Theme Set B (*Battlezone* retro-vector lunar extraction & debris field navigation) ($6.99).
+  - **Pack 04 (Cislunar Orbit Sandbox & Mission Planner):** Custom delta-v burn planner and orbital vector plotter ($4.99).
+  - **All-Mission Flight Pass Bundle:** ($19.99–$24.99).
+* [ ] 💻 📦 🔥🔥 **Lightweight Standalone Desktop Application Wrapper (Tauri vs. Electron)**: Package the WebXR simulation into an ultra-compact (<15MB) standalone Windows `.exe` using Tauri (Rust + OS WebView2), avoiding heavy 150MB+ Electron overhead. Release on itch.io and Steam ($14.99–$19.99) bundled with uncompressed 8K textures, offline 120fps PCVR mode, and built-in mission editor.
 * [ ] 🌌 🎪 🔥🔥🔥 **Seattle Space Week (SEA) Preparation**: Festival & exhibition curation for upcoming Space Week in Seattle. Finalize kiosk/booth turnkey hardware configuration, Meta Quest 3 standalone & tethered profiles, visitor QR flow, and presentation collateral.
 * [ ] ✨ 🗺️ 🔥🔥🔥 **Celestial Starfield Integration (PolyZone Real Stars)**: Ingest the real astronomical star catalog from `projects/poly-zone` (Hipparcos/Yale Bright Star coordinates and magnitudes) to replace procedural/random star points with scientifically accurate constellations and Milky Way celestial alignment.
 * [ ] 🌕 📐 🔥🔥🔥 **Lunar Tidal Locking & Surface Orientation**: Correct the Moon's axial rotation and initial orientation to accurately model 1:1 tidal locking with Earth. Ensure the lunar nearside (Mare Tranquillitatis, Oceanus Procellarum) permanently faces Earth, while the heavily cratered farside correctly greets the spacecraft during the circum-lunar free-return perilune pass.

@@ -6,6 +6,20 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-09-24 14:45] - v2.1.21: Modular Mission Pack Plugin Architecture & Seattle Space Week Roadmap 🚀🧩📇🪙✨**
+
+📝 **Summary**
+1. **Modular Plugin Architecture (Roadmap Staged):**
+   - Decoupled core Three.js / WebXR physics engine from mission scenario data via a lightweight Plugin API (`registerMissionPack()`).
+   - Planned itch.io / Gumroad mission packs ($4.99–$9.99 for Apollo 11 Lunar Descent, Mars Transit & Aerobraking, and Poly-Zone Deep Space Vector Ops crossover) with All-Mission Flight Pass ($19.99–$24.99).
+   - Preserved *Artemis: The Free Return* circum-lunar trajectory as the 100% free perpetual web hook.
+2. **Ultra-Lightweight Standalone Desktop Release (Tauri vs. Electron):**
+   - Staged desktop roadmap utilizing Tauri (Rust + OS WebView2) to achieve an ultra-compact `<15MB` offline installer, avoiding the 150MB+ Electron footprint. Packaged for Steam/itch.io ($14.99–$19.99) with 8K textures and offline PCVR.
+3. **Seattle Space Week Preparation:**
+   - Staged bare-bones public landing portal and digital business card / vCard download (`wulfdesign.github.io/card/`) with scannable QR code for Magus Wulf's networking as *"XR Space Simulation & Mission Visualization Creative Technologist"*. Bumped to `v2.1.21`. 🚀 🧩 📇 🪙 🥽 🐈 ✨
+
+---
+
 ### **[2026-09-24 14:15] - v2.1.20: Direct Play Landing Portal, Early Access Funnel & Dev Feedback Pipeline 🚀🌐📬🪙✨**
 
 📝 **Summary**
