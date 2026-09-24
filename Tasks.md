@@ -56,7 +56,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🧩 🎮 🔥🔥🔥 **Modular Plugin Format & Mission Pack Architecture (Dev Roadmap)**: Decouple the core Three.js / WebXR physics engine from mission scenario data via a lightweight Plugin API (`registerMissionPack()`). Keep *Artemis: The Free Return* circum-lunar trajectory 100% free on GitHub Pages as the flagship experience. Enable modular loading of expandable mission scenarios:
   - **Pack 01 (Apollo 11 Historical Descent & Touchdown):** Low lunar orbit descent, landing radar, and manual RCS hover over boulder fields.
   - **Pack 02 (Mars Transit & Aerobraking Corridor):** High-velocity interplanetary cruise and atmospheric skip capture.
-  - **Pack 03 (Poly-Zone Deep Space Vector Ops):** Crossover with Poly-Zone Theme Set B (*Battlezone* retro-vector lunar extraction & debris field navigation).
+  - **Pack 03 (Lunar Gateway Rendezvous & NRHO Docking):** Near-Rectilinear Halo Orbit approach, station-keeping, relative velocity matching, and docking physics.
   - **Pack 04 (Cislunar Orbit Sandbox & Mission Planner):** Custom delta-v burn planner and orbital vector plotter.
 * [ ] 💻 📦 🔥🔥 **Lightweight Standalone Desktop Application Wrapper (Tauri)**: Package the WebXR simulation into an ultra-compact (<15MB) standalone Windows `.exe` using Tauri (Rust + OS WebView2), avoiding heavy 150MB+ Electron overhead, featuring uncompressed 8K textures, offline 120fps PCVR mode, and built-in mission editor.
 * [ ] 🌌 🎪 🔥🔥🔥 **Seattle Space Week (SEA) Preparation**: Festival & exhibition curation for upcoming Space Week in Seattle. Finalize kiosk/booth turnkey hardware configuration, Meta Quest 3 standalone & tethered profiles, visitor QR flow, and presentation collateral.
