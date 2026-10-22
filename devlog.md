@@ -6,6 +6,43 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-10-22 23:25] - v2.1.25: Air-Gapped Private Dev Staging, Operator Dashboard & Mission Control Landing Portal 🚀🛡️🎛️🌐🥽✨**
+
+📝 **Summary**
+1. **Air-Gapped Private Dev Staging & Reversible Promotion Pipeline:**
+   - Architected an isolated, air-gapped dev staging environment in `private/dev_site/` with two-tier relative asset path resolution (`../../vendor/three.min.js`, `../../textures/`, `../../images/`), guaranteeing that public production `index.html` remains 100% untouched until empirically verified.
+   - Captured byte-for-byte baseline snapshot `snapshots/index_v2.1.19_sim_backup.html` (SHA256: `5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`, 128,025 bytes).
+   - Engineered automated, reversible promotion engine `private/promote_to_production.py` and Windows batch launcher `private/promote_to_production.bat` supporting `--dry-run`, `--rollback`, and automated timestamped backups (`snapshots/index_backup_<timestamp>.html`), with robust regex-driven path normalization across HTML attributes, CSS `url(...)`, and JS references.
+2. **Upgraded Multi-Threaded `server.py` on Port 3550 with REST API & Winsock Isolation:**
+   - Upgraded local HTTP server to `ThreadedLunarServer(socketserver.ThreadingTCPServer)` (`daemon_threads = True`) strictly enforcing `allow_reuse_address = False` on Windows Winsock to prevent silent port collision hangs and cleanly catch `[WinError 10048]`.
+   - Implemented real-time REST API routing:
+     - `GET /api/checklist`: Returns current QA checklist status from `private/checklist_status.json` with CORS headers.
+     - `POST /api/checklist`: Atomically writes interactive checklist toggle state updates to disk.
+     - `POST /api/promote`: Triggers automated in-process staging-to-production promotion.
+     - `POST /api/rollback`: Restores pristine baseline snapshot instantly.
+   - Added CLI flag support: `--dev` (serves staging site and dashboard), `--no-browser` (suppresses browser auto-open), `--port <int>`, `--host <str>`, and exported `ThreadingTCPServer` alias for automated testing compatibility.
+3. **Operator Dev Dashboard HUD (`private/dev_dashboard/index.html` & `private/checklist_status.json`):**
+   - Built cyberpunk avionics command dashboard for Magus Wulf featuring live environment cards (Production `index.html`, Staging Portal `private/dev_site/index.html`, Staged Sim `private/dev_site/sim.html`), live QA checklist status with interactive checkboxes, and 1-click Promote / Rollback execution buttons with modal confirmation dialogs.
+4. **Mission Control Landing Page (`private/dev_site/index.html` & `landing.html`):**
+   - Crafted responsive cockpit briefing terminal in cislunar obsidian (`#02050a`), HUD cyan (`#00ffff` / `#38bdf8`), caution amber (`#f59e0b`), telemetry green (`#10b981`), and plasma red (`#ff4444`).
+   - Hero Launchpad featuring primary CTA `[ 🚀 Launch Mission in Web Browser ]`, telemetry status badges (*"Real-Time Newtonian N-Body Physics • Velocity Verlet Solver • ~16-Min Turnkey Autopilot • WebXR 6DoF"*), authentic screenshots from `images/`, and embedded YouTube 8x timelapse video.
+5. **100% Verified Flight Controls Matrix & Truth Audit:**
+   - Bifurcated Mode 1: Hands-Off Festival Autopilot (Default — `AUTOPILOT ON` + `AUTO WARP: ON`, ~16-17 min circum-lunar trajectory) and Mode 2: Taking the Helm.
+   - Documented all 9 HUD buttons and interactions matching actual simulation code: `AUTOPILOT ON`, `AUTO WARP: ON / OFF`, 9 Time Warp Speeds (`1x` to `7.2kx`) with 3-tier Green/Yellow/Red gating (Hermite smoothstep, double-click confirmation on Tier 3), `SKIP TO ACTION`, `EXECUTE TRAJECTORY ALIGNMENT`, `MANUAL BURN OVERRIDE` (Press & Hold), `BANK UP (REDUCE Gs)` & `BANK DOWN (STEEPEN)` aerodynamic lift trim (<122 km), camera orbit/zoom (`RESET VIEW`), `TRACK TARGET: OFF / ON`, `ENTER VR FLYBY` (WebXR Meta Quest Controller 0 trigger = burn, Controller 1 trigger = target lock), `ABORT / RESTART`, and `SAVE FLIGHT LOG`.
+   - Conducted strict truth audit: verified zero occurrences of non-existent keyboard shortcuts ('W', 'V', 'Spacebar').
+6. **Official 2026 Showcase Pedigree & Verbatim Director's Master Copy:**
+   - Highlighted official 2026 exhibition pedigree: SLICE 2026, SiM PAX West Kickoff Showcase 2026, KremFest XR 2026 (Official Selection & Turnkey Autopilot Debut), Seattle Space Week 2026, and GeekGirlCon 2026.
+   - Embedded verbatim Director's Cut narrative & Director's Statement (dearMoon inspiration, MicroLaunchers / Armadillo Aerospace philosophy).
+   - Detailed V2.0 / V3.0 Roadmap (Physical Pilot Command 6DoF RCS, Avionics & Minimap, 3D WebXR Cockpit, Hipparcos starfield, 1:1 Lunar tidal locking, and Modular Mission Pack marketplace).
+   - Embedded Meta Quest 3/3S hardware affiliate recommendation with referral link and $5–$15 Cockpit Backer Plaque supporter tier.
+7. **Silent Google Form Intake Engine & Setup Documentation:**
+   - Implemented silent inline lead capture engine utilizing hidden iframe pattern (`hidden_gform`), anti-spam honeypot trap (`website_hp`), verified field IDs (`entry.2005620554` Callsign/Name, `entry.1045781291` Email, `entry.1065046570` Headset/Version, `entry.1166974658` Showcase Venue, `entry.1140066880` Version Tried, `entry.724109334` Wishlist/Likes, `entry.839337160` Pilot Debrief/Backer Plaque), and dual-layer persistence via `localStorage`.
+   - Authored companion guide `private/GOOGLE_FORM_SETUP_GUIDE.md` documenting field schemas, pre-filled link decoding, and Hermes sovereign Google Workspace CLI automation commands.
+
+🧙‍♂️ Magus Wulf & 🐈 Hermes (with 🎨 DaVinci, ✨ Pixel, ✒️ Victor, 🧊 Poly, 👔 The Herald, 🕊️ Nadine, 🦞 MugWort)
+
+---
+
 ### **[2026-09-24 14:40] - v2.1.23: Source-Visible & WebXR Exhibition License v1.0, 501(c)(3) Museum Protection & PR Rationale 📜🏛️⚖️✨**
 
 📝 **Summary**

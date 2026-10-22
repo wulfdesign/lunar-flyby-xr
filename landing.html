@@ -3,39 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Artemis: The Free Return | Lunar Flyby XR - WebXR Orbital Mechanics Sandbox</title>
-  <meta name="description" content="Step into the commander's seat of an 800,000 km cislunar mission. Real-time Newtonian N-body orbital mechanics, lunar gravity assist, and atmospheric entry in your browser or Meta Quest 3.">
+  <title>Artemis: The Free Return | Mission Control Briefing & Flight Deck (v2.1.25)</title>
+  <meta name="description" content="Mission Control Briefing Terminal for Artemis: The Free Return (Lunar Flyby XR). 800,000 km cislunar trajectory powered by real-time Newtonian N-body physics, Vis-viva energy equations, and active aerodynamic reentry in WebXR.">
   <style>
     :root {
-      --bg: #040711;
-      --card-bg: rgba(11, 18, 33, 0.82);
-      --border: rgba(56, 189, 248, 0.25);
-      --border-accent: rgba(236, 72, 153, 0.35);
-      --cyan: #38bdf8;
-      --cyan-glow: rgba(56, 189, 248, 0.4);
-      --magenta: #ec4899;
-      --gold: #f59e0b;
-      --emerald: #10b981;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --bg-obsidian: #02050a;
+      --bg-card: rgba(0, 14, 28, 0.84);
+      --bg-card-alt: rgba(2, 22, 44, 0.72);
+      --hud-cyan: #00ffff;
+      --hud-cyan-dim: #38bdf8;
+      --hud-cyan-glow: rgba(0, 255, 255, 0.35);
+      --telemetry-green: #44ff44;
+      --telemetry-green-dim: #10b981;
+      --telemetry-green-glow: rgba(68, 255, 68, 0.32);
+      --caution-amber: #ffff44;
+      --caution-amber-dim: #f59e0b;
+      --caution-amber-glow: rgba(255, 255, 68, 0.32);
+      --plasma-red: #ff4444;
+      --plasma-red-glow: rgba(255, 68, 68, 0.35);
+      --text-main: #f0f6fc;
+      --text-muted: #8b9bb4;
+      --border-hud: 1px solid rgba(0, 255, 255, 0.32);
+      --border-hud-dim: 1px solid rgba(56, 189, 248, 0.2);
+      --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-obsidian);
+      color: var(--text-main);
+      font-family: var(--font-sans);
       line-height: 1.6;
-      background-image: 
-        radial-gradient(circle at 50% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 40%),
-        radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 90px 140px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 150px 70px, rgba(255,255,255,0.5), rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 220px 220px, rgba(255,255,255,0.8), rgba(0,0,0,0));
+      background-image:
+        radial-gradient(circle at 50% 5%, rgba(0, 255, 255, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(68, 255, 68, 0.05) 0%, transparent 40%),
+        radial-gradient(1.5px 1.5px at 30px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 120px 180px, rgba(0,255,255,0.7), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 200px 90px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 320px 290px, rgba(255,255,255,0.8), rgba(0,0,0,0));
       background-repeat: repeat;
-      background-size: cover, cover, 300px 300px, 400px 400px, 250px 250px, 350px 350px;
+      background-size: cover, cover, 320px 320px, 420px 420px, 260px 260px, 360px 360px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -43,561 +52,1540 @@
 
     .container {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1140px;
       margin: 0 auto;
       padding: 0 1.5rem;
     }
 
-    /* Top Nav / Status Bar */
-    .top-nav {
-      border-bottom: 1px solid var(--border);
-      background: rgba(4, 7, 17, 0.85);
-      backdrop-filter: blur(10px);
+    /* Mission Control Header & Navigation */
+    .top-terminal-nav {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
+      background: rgba(2, 5, 10, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: var(--border-hud);
       padding: 0.85rem 0;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
     }
 
-    .nav-inner {
+    .nav-flex {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 1rem;
     }
 
-    .nav-brand {
+    .terminal-brand {
       display: flex;
       align-items: center;
-      gap: 0.65rem;
+      gap: 0.75rem;
       text-decoration: none;
-      color: var(--text);
+      color: var(--text-main);
       font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: 0.02em;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
     }
 
-    .nav-brand span {
-      color: var(--cyan);
+    .terminal-brand .brand-logo-txt {
+      color: var(--hud-cyan);
+      text-shadow: 0 0 12px var(--hud-cyan-glow);
     }
 
-    .nav-pill {
+    .status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid var(--cyan);
-      color: var(--cyan);
-      padding: 0.25rem 0.65rem;
+      gap: 0.45rem;
+      background: rgba(0, 255, 255, 0.08);
+      border: 1px solid var(--hud-cyan);
+      color: var(--hud-cyan);
+      padding: 0.25rem 0.75rem;
       border-radius: 9999px;
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      font-family: monospace;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--telemetry-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--telemetry-green);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
     }
 
     .nav-links {
       display: flex;
       gap: 1.25rem;
       align-items: center;
+      flex-wrap: wrap;
     }
 
-    .nav-link {
-      color: var(--muted);
+    .nav-links a {
+      color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      transition: color 0.2s;
+      transition: all 0.2s ease;
     }
 
-    .nav-link:hover {
-      color: var(--cyan);
+    .nav-links a:hover {
+      color: var(--hud-cyan);
+      text-shadow: 0 0 8px var(--hud-cyan-glow);
     }
+
+    .nav-links .nav-cta {
+      color: var(--bg-obsidian);
+      background: var(--hud-cyan);
+      padding: 0.35rem 0.85rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      box-shadow: 0 0 14px var(--hud-cyan-glow);
+    }
+
+    .nav-links .nav-cta:hover {
+      background: #7dd3fc;
+      color: #02050a;
+    }
+
+    /* Terminal HUD Framing & Cards */
+    .hud-card {
+      background: var(--bg-card);
+      border: var(--border-hud);
+      border-radius: 8px;
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      margin-bottom: 2rem;
+    }
+
+    .hud-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--hud-cyan), transparent);
+    }
+
+    .hud-card-alt {
+      background: var(--bg-card-alt);
+      border: 1px solid rgba(68, 255, 68, 0.28);
+    }
+    .hud-card-alt::before {
+      background: linear-gradient(90deg, transparent, var(--telemetry-green), transparent);
+    }
+
+    .hud-card-amber {
+      border: 1px solid rgba(255, 255, 68, 0.32);
+    }
+    .hud-card-amber::before {
+      background: linear-gradient(90deg, transparent, var(--caution-amber), transparent);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 0.65rem;
+    }
+
+    .section-header h2, .section-header h3 {
+      font-size: 1.4rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .tag-cyan { color: var(--hud-cyan); text-shadow: 0 0 10px var(--hud-cyan-glow); }
+    .tag-green { color: var(--telemetry-green); text-shadow: 0 0 10px var(--telemetry-green-glow); }
+    .tag-amber { color: var(--caution-amber); text-shadow: 0 0 10px var(--caution-amber-glow); }
+    .tag-red { color: var(--plasma-red); text-shadow: 0 0 10px var(--plasma-red-glow); }
 
     /* Hero Section */
-    .hero {
-      padding: 3.5rem 0 2.5rem 0;
+    .hero-terminal {
+      padding: 3.5rem 0 2rem 0;
       text-align: center;
     }
 
-    .hero-eyebrow {
-      display: inline-block;
-      font-size: 0.82rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--cyan);
-      margin-bottom: 0.85rem;
-      background: rgba(56, 189, 248, 0.1);
-      padding: 0.3rem 0.85rem;
+    .hero-pre-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 255, 255, 0.08);
+      border: 1px solid var(--hud-cyan);
+      color: var(--hud-cyan);
+      padding: 0.35rem 1rem;
       border-radius: 9999px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 0 16px rgba(0, 255, 255, 0.2);
     }
 
     .hero-title {
-      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-size: clamp(2.3rem, 5.2vw, 3.8rem);
       font-weight: 900;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
       color: #ffffff;
-      margin-bottom: 1.1rem;
-      text-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 35px var(--hud-cyan-glow);
     }
 
-    .hero-subtitle {
-      font-size: clamp(1.05rem, 2vw, 1.25rem);
+    .hero-title span {
+      background: linear-gradient(135deg, #ffffff 40%, var(--hud-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sensory-lead {
+      font-size: clamp(1.05rem, 1.8vw, 1.22rem);
       color: #cbd5e1;
-      max-width: 780px;
-      margin: 0 auto 2rem auto;
-      line-height: 1.6;
+      max-width: 860px;
+      margin: 0 auto 1.75rem auto;
+      line-height: 1.68;
     }
 
-    .hero-actions {
+    /* Telemetry Badges Strip */
+    .telemetry-badges-strip {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 2.5rem;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 2.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
     }
 
-    .btn-launch {
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-      color: #ffffff;
-      padding: 0.9rem 2.2rem;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 1.1rem;
+    .telemetry-badge-item {
+      background: rgba(0, 20, 36, 0.9);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 0.4rem 0.85rem;
+      border-radius: 4px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .telemetry-badge-item .bullet {
+      color: var(--telemetry-green);
+    }
+
+    /* Hero Action Buttons */
+    .hero-cta-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .btn-launch-primary {
+      background: linear-gradient(135deg, #00ffff 0%, #0284c7 100%);
+      color: #02050a !important;
+      font-weight: 900;
+      font-size: 1.12rem;
+      padding: 0.95rem 2.2rem;
+      border-radius: 6px;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
-      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.45), 0 0 15px rgba(56, 189, 248, 0.3);
-      transition: all 0.2s ease;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      gap: 0.65rem;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.4);
+      border: 1px solid #7dd3fc;
+      transition: all 0.25s ease;
+      letter-spacing: 0.02em;
     }
 
-    .btn-launch:hover {
+    .btn-launch-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.6), 0 0 25px rgba(56, 189, 248, 0.5);
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      box-shadow: 0 0 35px rgba(0, 255, 255, 0.8), inset 0 0 15px #ffffff;
+      color: #000000 !important;
     }
 
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.7);
-      color: #f1f5f9;
-      padding: 0.9rem 1.6rem;
-      border-radius: 8px;
+    .btn-jump-secondary {
+      background: rgba(0, 18, 36, 0.75);
+      border: 1px solid var(--hud-cyan);
+      color: var(--hud-cyan);
+      font-family: var(--font-mono);
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.88rem;
+      padding: 0.85rem 1.35rem;
+      border-radius: 6px;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      border: 1px solid var(--border);
       transition: all 0.2s ease;
     }
 
-    .btn-secondary:hover {
-      background: rgba(20, 27, 45, 0.9);
-      border-color: var(--cyan);
-      color: var(--cyan);
+    .btn-jump-secondary:hover {
+      background: rgba(0, 255, 255, 0.15);
+      box-shadow: 0 0 16px var(--hud-cyan-glow);
+      color: #ffffff;
     }
 
-    /* Hero Banner Image */
-    .hero-media {
-      max-width: 820px;
-      margin: 0 auto 3rem auto;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.2);
+    /* Media Showcase & Screenshot Grid */
+    .showcase-container {
+      margin-bottom: 3rem;
+    }
+
+    .hero-media-wrapper {
       position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: var(--border-hud);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+      background: #000;
+      margin-bottom: 1.5rem;
     }
 
-    .hero-media img {
+    .hero-media-wrapper img {
       width: 100%;
       height: auto;
       display: block;
+      transition: transform 0.4s ease;
     }
 
-    .media-overlay {
+    .hero-media-overlay {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(0deg, rgba(4, 7, 17, 0.95) 0%, rgba(4, 7, 17, 0.4) 60%, transparent 100%);
-      padding: 1.25rem 1.5rem;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(0deg, rgba(2, 5, 10, 0.95) 0%, rgba(2, 5, 10, 0.7) 60%, transparent 100%);
+      padding: 1.5rem 1.75rem 1rem 1.75rem;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .video-card-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      margin-top: 1rem;
+      background: #000;
+    }
+
+    .video-card-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: 0;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .gallery-item {
+      background: rgba(2, 12, 24, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gallery-item:hover {
+      border-color: var(--hud-cyan);
+      box-shadow: 0 6px 20px var(--hud-cyan-glow);
+      transform: translateY(-3px);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-item-caption {
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      font-family: var(--font-mono);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Flight Controls Matrix */
+    .controls-matrix {
+      margin-bottom: 2.5rem;
+    }
+
+    .mode-banner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .mode-banner-grid { grid-template-columns: 1fr; }
+    }
+
+    .mode-box {
+      background: rgba(0, 22, 40, 0.6);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 6px;
+      padding: 1.25rem;
+    }
+
+    .mode-box h4 {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
       gap: 0.5rem;
     }
 
-    /* Content Grid */
-    .grid-2 {
+    .mode-box p {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+
+    .hud-controls-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .hud-controls-table th {
+      background: rgba(0, 255, 255, 0.08);
+      color: var(--hud-cyan);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      border-bottom: 1px solid var(--hud-cyan);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    .hud-controls-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      vertical-align: top;
+    }
+
+    .hud-controls-table tr:hover td {
+      background: rgba(0, 255, 255, 0.03);
+    }
+
+    .key-badge {
+      display: inline-block;
+      background: rgba(0, 255, 255, 0.12);
+      border: 1px solid var(--hud-cyan);
+      color: var(--hud-cyan);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .badge-amber {
+      background: rgba(255, 255, 68, 0.12);
+      border-color: var(--caution-amber);
+      color: var(--caution-amber);
+    }
+
+    .badge-green {
+      background: rgba(68, 255, 68, 0.12);
+      border-color: var(--telemetry-green);
+      color: var(--telemetry-green);
+    }
+
+    .badge-red {
+      background: rgba(255, 68, 68, 0.12);
+      border-color: var(--plasma-red);
+      color: var(--plasma-red);
+    }
+
+    .audit-warning-box {
+      margin-top: 1.25rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 68, 0.08);
+      border: 1px solid var(--caution-amber);
+      border-radius: 6px;
+      color: #fef08a;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    /* Pedigree & Statement Sections */
+    .pedigree-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .pedigree-card {
+      background: rgba(0, 15, 30, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-left: 3px solid var(--hud-cyan);
+      border-radius: 4px;
+      padding: 1.1rem;
+    }
+
+    .pedigree-card h4 {
+      color: #ffffff;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .pedigree-card .pedigree-date {
+      color: var(--telemetry-green);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pedigree-card p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .statement-box {
+      font-size: 1.02rem;
+      color: #e2e8f0;
+      line-height: 1.75;
+      margin-top: 1rem;
+      font-style: normal;
+      background: rgba(0, 10, 20, 0.7);
+      border-left: 4px solid var(--telemetry-green);
+      padding: 1.5rem 1.75rem;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .statement-box p {
+      margin-bottom: 1rem;
+    }
+    .statement-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Roadmap Grid */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .roadmap-node {
+      background: rgba(0, 18, 35, 0.7);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .roadmap-node .node-version {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--hud-cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .roadmap-node h4 {
+      font-size: 1.05rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    .roadmap-node p {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+
+    /* Hardware & Backer Cards */
+    .hardware-backer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
       margin-bottom: 2.5rem;
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    @media (max-width: 768px) {
+      .hardware-backer-grid { grid-template-columns: 1fr; }
     }
 
-    .card h3 {
+    .action-card {
+      background: var(--bg-card);
+      border: var(--border-hud);
+      border-radius: 8px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .action-card h3 {
       font-size: 1.25rem;
-      color: #ffffff;
       margin-bottom: 0.75rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .card p {
-      color: #cbd5e1;
+    .action-card p {
       font-size: 0.92rem;
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-
-    /* Control Keys List */
-    .control-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-    }
-
-    .control-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 6px;
-      padding: 0.5rem 0.85rem;
-      font-size: 0.85rem;
-    }
-
-    .key-badge {
-      background: #1e293b;
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      color: var(--cyan);
-      font-family: monospace;
-      font-weight: 700;
-      padding: 0.15rem 0.55rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-    }
-
-    /* Intake Form Card */
-    .intake-card {
-      background: linear-gradient(180deg, rgba(20, 27, 45, 0.9) 0%, rgba(11, 18, 33, 0.95) 100%);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      border-top: 4px solid var(--gold);
-      border-radius: 10px;
-      padding: 1.75rem;
-      margin-bottom: 3rem;
-    }
-
-    .intake-header {
+      color: #cbd5e1;
       margin-bottom: 1.25rem;
+      line-height: 1.6;
     }
 
-    .intake-header h3 {
-      color: var(--gold);
-      font-size: 1.35rem;
-      margin-bottom: 0.35rem;
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
     }
 
-    .intake-form {
+    .btn-affiliate {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--hud-cyan);
+      color: var(--hud-cyan);
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      transition: all 0.2s;
+    }
+
+    .btn-affiliate:hover {
+      background: var(--hud-cyan);
+      color: #02050a;
+      box-shadow: 0 0 12px var(--hud-cyan-glow);
+    }
+
+    /* Silent Google Form Intake Section */
+    .intake-terminal {
+      background: rgba(0, 12, 26, 0.9);
+      border: 1px solid var(--hud-cyan);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.18);
+      border-radius: 8px;
+      padding: 2.25rem;
+      position: relative;
+      margin-bottom: 3.5rem;
+    }
+
+    .intake-terminal::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--hud-cyan), var(--telemetry-green), var(--hud-cyan));
+    }
+
+    .form-grid-layout {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid-layout { grid-template-columns: 1fr; }
+    }
+
+    .form-span-2 {
+      grid-column: 1 / -1;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 0.4rem;
     }
 
     .form-group label {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      color: var(--hud-cyan);
       font-weight: 700;
-      color: #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group select,
+    .form-group textarea {
+      background: rgba(2, 6, 14, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--hud-cyan);
+      box-shadow: 0 0 12px var(--hud-cyan-glow);
+      background: rgba(2, 10, 24, 0.95);
+    }
+
+    .form-group select option {
+      background: #040d1a;
+      color: #ffffff;
+    }
+
+    .checkbox-deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.65rem;
+      margin-top: 0.35rem;
+    }
+
+    .checkbox-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(2, 8, 18, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.55rem 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      transition: all 0.2s;
+    }
+
+    .checkbox-pill:hover {
+      border-color: var(--hud-cyan);
+    }
+
+    .checkbox-pill input[type="checkbox"] {
+      accent-color: var(--hud-cyan);
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-submit-lead {
+      background: linear-gradient(135deg, var(--telemetry-green) 0%, #059669 100%);
+      color: #02050a;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 1.05rem;
+      padding: 1rem 2rem;
+      border: 1px solid #6ee7b7;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(68, 255, 68, 0.4);
+      transition: all 0.2s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-submit-lead:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(68, 255, 68, 0.7);
+    }
+
+    #formSuccessBanner {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--telemetry-green);
+      border-radius: 6px;
+      color: #ecfdf5;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(68, 255, 68, 0.25);
+    }
+
+    #formSuccessBanner h4 {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--telemetry-green);
+      margin-bottom: 0.5rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
-    .form-control {
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      padding: 0.65rem 0.85rem;
-      color: #ffffff;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-control:focus {
-      border-color: var(--gold);
-    }
-
-    .btn-submit {
-      background: var(--gold);
-      color: #090d16;
-      border: none;
-      border-radius: 6px;
-      padding: 0.75rem 1.5rem;
-      font-weight: 800;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: background 0.2s;
-      margin-top: auto;
-    }
-
-    .btn-submit:hover {
-      background: #fbbf24;
-    }
-
     /* Footer */
     footer {
-      border-top: 1px solid var(--border);
-      background: rgba(4, 7, 17, 0.9);
-      padding: 2rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(1, 3, 7, 0.95);
+      padding: 2.5rem 0;
       margin-top: auto;
-      text-align: center;
       font-size: 0.85rem;
-      color: var(--muted);
+      color: var(--text-muted);
     }
 
-    footer a {
-      color: var(--cyan);
+    .footer-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--hud-cyan-dim);
       text-decoration: none;
     }
-
-    footer a:hover {
+    .footer-links a:hover {
+      color: var(--hud-cyan);
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Status Bar -->
-  <nav class="top-nav">
-    <div class="container nav-inner">
-      <a href="landing.html" class="nav-brand">
-        🚀 <span>Artemis: The Free Return</span>
+  <!-- Hidden 0-pixel iframe capturing the Google Form POST silently without CORS errors or page reload -->
+  <iframe name="hidden_gform" id="hidden_gform" style="display:none;" onload="if(window.submittedGForm) { handleGFormSubmitted(); }"></iframe>
+
+  <!-- Top Sticky Navigation Bar -->
+  <nav class="top-terminal-nav">
+    <div class="container nav-flex">
+      <a href="landing.html" class="terminal-brand">
+        🚀 <span class="brand-logo-txt">ARTEMIS // MISSION CONTROL</span>
       </a>
-      <div class="nav-pill">
-        <span>●</span> WebXR Educational Sandbox v2.1.23
+      <div class="status-pill">
+        <span class="pulse-dot"></span>
+        <span>TELEMETRY ONLINE // v2.1.25</span>
       </div>
       <div class="nav-links">
-        <a href="#briefing" class="nav-link">Mission Briefing</a>
-        <a href="#controls" class="nav-link">Flight Controls</a>
-        <a href="#intake" class="nav-link">Test Channel</a>
-        <a href="index.html" class="nav-link" style="color:var(--cyan); font-weight:700;">Direct Sim ↗</a>
+        <a href="#briefing">Briefing</a>
+        <a href="#controls">Flight Controls</a>
+        <a href="#pedigree">Pedigree</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#hardware">Hardware</a>
+        <a href="#intake">Join Intake</a>
+        <a href="index.html" class="nav-cta btn-launch-sim">LAUNCH SIM ↗</a>
       </div>
     </div>
   </nav>
 
   <main class="container">
-    
-    <!-- Hero Header -->
-    <section class="hero">
-      <div class="hero-eyebrow">Interactive Space Flight Simulation</div>
-      <h1 class="hero-title">Experience the 800,000 km Cislunar Free Return</h1>
-      <p class="hero-subtitle">
-        Step into the commander's seat of an Apollo-style translunar trajectory. Powered by real-time Newtonian N-body physics, Vis-viva energy equations, and active aerodynamic atmospheric reentry—right in your browser or Meta Quest 3 headset.
+
+    <!-- HERO LAUNCHPAD SECTION -->
+    <section class="hero-terminal">
+      <div class="hero-pre-badge">
+        <span>●</span> Cislunar Trajectory Briefing Terminal <span>●</span>
+      </div>
+      <h1 class="hero-title">
+        Artemis: <span>The Free Return</span>
+      </h1>
+      <p class="hero-sensory-lead">
+        Take the commander's seat in Low Earth Orbit, unleash 111 seconds of thunderous Trans-Lunar Injection burn, and drift across the silent cislunar void. Feel your stomach drop as the Moon's colossal gravity well grabs your ship on close approach, hurtling you around the cratered far side into total radio blackout—before slinging back toward Earth at 25,000 mph to thread a razor-thin 2° atmospheric reentry keyhole. 100% unscripted Newtonian physics—zero pre-baked animation rails.
       </p>
 
-      <div class="hero-actions">
-        <a href="index.html" class="btn-launch">
-          🚀 Launch Mission in Browser
+      <!-- Telemetry Status Badges -->
+      <div class="telemetry-badges-strip">
+        <div class="telemetry-badge-item">
+          <span class="bullet">◆</span> Real-Time Newtonian N-Body Physics
+        </div>
+        <div class="telemetry-badge-item">
+          <span class="bullet">◆</span> Velocity Verlet Solver
+        </div>
+        <div class="telemetry-badge-item">
+          <span class="bullet">◆</span> ~16-Min Turnkey Autopilot
+        </div>
+        <div class="telemetry-badge-item">
+          <span class="bullet">◆</span> WebXR 6DoF
+        </div>
+      </div>
+
+      <!-- Hero Call-to-Action Buttons -->
+      <div class="hero-cta-grid">
+        <a href="index.html" class="btn-launch-primary btn-launch-sim" id="btn-launch-hero">
+          🚀 Launch Mission in Web Browser
         </a>
-        <a href="#controls" class="btn-secondary">
-          🥽 VR &amp; Flight Controls
+        <a href="#controls" class="btn-jump-secondary">
+          🎮 Flight Controls &amp; Autopilot
         </a>
-        <a href="#intake" class="btn-secondary">
-          📬 Join Release Test Channel
+        <a href="#hardware" class="btn-jump-secondary">
+          🥽 WebXR Headset Setup
+        </a>
+        <a href="#roadmap" class="btn-jump-secondary">
+          🗺️ V2.0 / V3.0 Roadmap
+        </a>
+        <a href="#intake" class="btn-jump-secondary">
+          📬 Join Early Access &amp; Feedback
         </a>
       </div>
 
-      <!-- Hero Screenshot / Logo Preview -->
-      <div class="hero-media">
-        <img src="images/Lunar-Flyby-XR_Logo.jpg" alt="Artemis Lunar Flyby Orbital Visualization">
-        <div class="media-overlay">
-          <div>
-            <div style="font-size:0.78rem; color:var(--cyan); font-family:monospace; font-weight:700; text-transform:uppercase;">Live Physics Sandbox</div>
-            <div style="font-size:1.1rem; color:#ffffff; font-weight:800;">Perilune Flyby @ 5,500 km Altitude</div>
+      <!-- Hero Media Showcase Banner -->
+      <div class="showcase-container">
+        <div class="hero-media-wrapper">
+          <img src="images/Lunar-Flyby-XR_Logo.jpg" alt="Artemis Lunar Flyby Mission Control Trajectory Visualizer">
+          <div class="hero-media-overlay">
+            <div style="text-align:left;">
+              <div style="font-size:0.8rem; color:var(--hud-cyan); font-family:var(--font-mono); font-weight:700; text-transform:uppercase;">
+                Orbital Telemetry Stream // Perilune Pass @ 5,500 km
+              </div>
+              <div style="font-size:1.15rem; color:#ffffff; font-weight:800;">
+                Experience the true awe of leaving Earth behind—slingshotting around the Moon's cratered farside under real Newtonian gravity.
+              </div>
+            </div>
+            <a href="index.html" class="btn-jump-secondary btn-launch-sim" style="border-color:var(--telemetry-green); color:var(--telemetry-green); white-space:nowrap;">
+              Launch Flight Deck ↗
+            </a>
           </div>
-          <a href="index.html" class="btn-secondary" style="padding:0.4rem 0.85rem; font-size:0.8rem; border-color:var(--cyan);">
-            Enter Simulation ↗
+        </div>
+
+        <!-- 8x Gameplay Timelapse YouTube Embed -->
+        <div class="hud-card" style="text-align:left; margin-bottom:1.5rem;">
+          <div class="section-header">
+            <h3 class="tag-cyan">📺 Gameplay Telemetry Stream (8x Speedrun)</h3>
+          </div>
+          <p style="font-size:0.92rem; color:#94a3b8; margin-bottom:0.75rem;">
+            Watch the complete 800,000 km cislunar free return trajectory—from LEO parking orbit, Trans-Lunar Injection (TLI), midcourse corrections, perilune far-side blackout, and 25,000 mph atmospheric reentry splashdown.
+          </p>
+          <div class="video-card-wrapper">
+            <iframe src="https://www.youtube-nocookie.com/embed/bdHbIKcqRBs" title="Artemis Lunar Flyby XR - 8x Gameplay Timelapse" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div style="margin-top:0.75rem; text-align:right;">
+            <a href="https://youtu.be/bdHbIKcqRBs" target="_blank" rel="noopener" class="btn-jump-secondary" style="font-size:0.8rem; padding:0.4rem 0.85rem;">
+              Open on YouTube (Direct Link) ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Authentic Screenshot Gallery Grid -->
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img src="images/Lunar-Flyby-XR_Screenshot_2026-03-31_001_LEO-Orbit-TMI-Burn-Start.png" alt="LEO Parking Orbit & Trans-Lunar Injection Burn Start">
+            <div class="gallery-item-caption">
+              LEO Parking Orbit (400 km) — Trans-Lunar Injection Burn Ignition
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img src="images/Lunar-Flyby-XR_Screenshot_2026-03-31_002_At-Moon.png" alt="Close Lunar Approach at Perilune">
+            <div class="gallery-item-caption">
+              Lunar Perilune Flyby — Farside Slingshot &amp; Radio Silence
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img src="images/Lunar-Flyby-XR_Screenshot_2026-04-07_001_Earth-Sun-Moon.png" alt="Cislunar Celestial Alignment Earth-Sun-Moon">
+            <div class="gallery-item-caption">
+              Deep Space Cislunar Void — Earth, Sun &amp; Moon Alignment
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img src="images/Lunar-Flyby-XR_Screenshot_2026-04-07_002_Earth-Return.png" alt="Earth Return Approach at 25000 mph">
+            <div class="gallery-item-caption">
+              Inbound Earth Return — 25,000 mph Atmospheric Keyhole Approach
+            </div>
+          </div>
+          <div class="gallery-item" style="grid-column: 1 / -1;">
+            <img src="images/Lunar-Flyby-XR_Mobile-XR-Combined_Screenshot.jpg" alt="Mobile WebXR Cockpit Multi-View Display" style="height:280px;">
+            <div class="gallery-item-caption">
+              Multi-Platform WebXR Flight Envelope — Standalone Meta Quest 3, Mobile &amp; Desktop Browser Views
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MISSION BRIEFING & VERBATIM STATEMENTS -->
+    <section id="briefing" class="hud-card">
+      <div class="section-header">
+        <h2 class="tag-cyan">📖 Mission Briefing &amp; Director's Cut</h2>
+      </div>
+
+      <div class="statement-box" style="margin-bottom:1.5rem; border-left-color:var(--hud-cyan);">
+        <p>
+          What does it truly feel like to leave Earth behind? Pointing toward the second star to the left, take the controls of Artemis II in Low Earth Orbit and unleash 111 seconds of thunderous Trans-Lunar Injection burn to drift across the silent cislunar void. With most of your propellant spent, the only thing standing between you and the cold oblivion of deep space are a few critical midcourse corrections to thread the needle for a gravitational slingshot around the Moon and safely return to Earth.
+        </p>
+        <p>
+          Experience the awe of deep space as the Moon swells to fill your entire field of view—and feel your stomach drop as its colossal gravity well grabs your ship on close approach, hurtling you around the lunar far side. As Earth vanishes behind the cratered horizon and total radio blackout falls, you realize that everything humanity has ever been is hundreds of thousands of miles away... and you can only hope the math is right to sling you back toward the only home we've ever known at 25,000 mph.
+        </p>
+        <p>
+          With unscripted Newtonian physics, final trajectory adjustments, and active aerodynamic lift-banking standing between you and disaster, you must thread a razor-thin 2-degree reentry keyhole through scorching atmospheric plasma. Far more than just a simulation, it becomes an awe-inspiring, heart-pounding WebXR journey among the stars.
+        </p>
+      </div>
+
+      <div class="section-header" style="margin-top:2rem;">
+        <h3 class="tag-green">🎙️ Director's Statement</h3>
+      </div>
+      <div class="statement-box">
+        <p>
+          "For as long as I can remember, I have looked up at the Moon and dreamed of what it feels like to leave Earth behind. When the private dearMoon lunar mission was canceled, I felt a deep ache—not just for myself, but for the millions of dreamers who yearn to experience deep space. I realized that if the doors to commercial lunar flight were closing, I had to open a new one through code.
+        </p>
+        <p>
+          I built 'Artemis: The Free Return' to place everyday people in the commander's seat. I refused to put the spacecraft on pre-baked animation rails; the universe doesn't have rails. By calculating dynamic Newtonian gravity and active aerodynamic drag in real time, the simulation honors the true danger, math, and silent awe of cislunar flight. When you watch our fragile blue world vanish behind the lunar limb, my hope is that you feel both the terror of the void and the profound realization that we are all travelers on the same small island in the dark."
+        </p>
+        <p style="font-size:0.85rem; color:var(--telemetry-green); font-family:var(--font-mono); margin-top:0.75rem;">
+          — Larry James Wulf, Lead Systems Architect &amp; VR Experience Director // UpLiftVR &amp; Wulf Design Studios
+        </p>
+      </div>
+    </section>
+
+    <!-- VERIFIED FLIGHT CONTROLS MATRIX -->
+    <section id="controls" class="hud-card controls-matrix">
+      <div class="section-header">
+        <h2 class="tag-green">🎮 Verified Flight Controls &amp; Avionics Matrix</h2>
+      </div>
+
+      <div class="mode-banner-grid">
+        <div class="mode-box" style="border-left: 4px solid var(--telemetry-green);">
+          <h4 style="color:var(--telemetry-green);">Mode 1: Turnkey Autopilot (Default)</h4>
+          <p>
+            Configured by default (<span class="key-badge badge-green">AUTOPILOT ON</span> + <span class="key-badge badge-green">AUTO WARP: ON</span>). The flight computer autonomously executes the 145s TLI burn, steps through continuous Hermite smoothstep warp gears (up to 7.2kx) during deep cislunar transit, holds for perilune observation, conducts midcourse corrections targeting a 40 km perigee corridor, and applies aerodynamic lifting-body bank trim through the 122 km reentry interface for safe ocean splashdown (~16–17 minutes hands-off).
+          </p>
+        </div>
+        <div class="mode-box" style="border-left: 4px solid var(--hud-cyan);">
+          <h4 style="color:var(--hud-cyan);">Mode 2: Taking the Helm (Manual Command)</h4>
+          <p>
+            Disengage automation at any stage by toggling <span class="key-badge">AUTOPILOT OFF</span> or selecting manual time-warp gears. Execute manual burns via <span class="key-badge">MANUAL BURN OVERRIDE</span>, align vectors with <span class="key-badge">EXECUTE TRAJECTORY ALIGNMENT</span>, adjust reentry G-forces via <span class="key-badge">BANK UP / BANK DOWN</span>, and lock celestial targets using <span class="key-badge">TRACK TARGET</span>.
+          </p>
+        </div>
+      </div>
+
+      <h3 style="font-size:1.1rem; color:#ffffff; margin: 1.5rem 0 0.75rem 0; font-family:var(--font-mono); text-transform:uppercase;">
+        Authentic Cockpit Avionics &amp; HUD Systems (From sim.html)
+      </h3>
+
+      <div style="overflow-x:auto;">
+        <table class="hud-controls-table">
+          <thead>
+            <tr>
+              <th>HUD Control / Button</th>
+              <th>System &amp; Trigger</th>
+              <th>Operational Behavior &amp; Physics Gating</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="key-badge">AUTOPILOT ON</span> / <span class="key-badge">ENABLE AUTO TMI</span><br>
+                <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-toggle-auto</code>
+              </td>
+              <td>Autopilot Toggle</td>
+              <td>Toggles automated TLI burn sequencing, midcourse correction scheduling, and automated atmospheric bank angle guidance.</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge">AUTO WARP: ON / OFF</span><br>
+                <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-auto-warp</code>
+              </td>
+              <td>Warp Automation</td>
+              <td>Dynamically regulates simulation speed based on orbital phase. Clamps to $\le$30x during burns and 1x during burns, holds, and entry interface.</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge badge-green">1x</span> <span class="key-badge badge-green">10x</span> <span class="key-badge badge-green">30x</span><br>
+                <span class="key-badge badge-amber">60x</span> <span class="key-badge badge-amber">300x</span> <span class="key-badge badge-amber">600x</span><br>
+                <span class="key-badge badge-red">1.8kx</span> <span class="key-badge badge-red">3.6kx</span> <span class="key-badge badge-red">7.2kx</span>
+              </td>
+              <td>9 Time Warp Speeds</td>
+              <td>
+                <strong>3-Tier Safety Gating with 1.0s Hermite Smoothstep Gliding:</strong><br>
+                • <em>Tier 1 (Safe / Green):</em> Speeds $\le$ max safe limit automatically ramped by Auto-Warp.<br>
+                • <em>Tier 2 (Advisory / Yellow):</em> Cautionary speeds honored without safety prompt.<br>
+                • <em>Tier 3 (Danger / Red):</em> Requires double-click confirmation (<span class="key-badge badge-red">CONFIRM</span> prompt). 7.2kx disabled outside deep cislunar space.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge">SKIP TO ACTION</span><br>
+                <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-skip-window</code>
+              </td>
+              <td>Mission Fast-Forward</td>
+              <td>Instantly accelerates time warp to the maximum permissible safe gear (<span class="key-badge">maxSafeWarp</span>) to advance to the next critical waypoint.</td>
+            </tr>
+            <tr>
+              <td><span class="key-badge">EXECUTE TRAJECTORY ALIGNMENT</span></td>
+              <td>MCC Vector Correction</td>
+              <td>Triggers midcourse correction burn (or countdown auto-alignment) executing iterative transverse $\Delta V$ calculation aiming for a 40 km perigee corridor.</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge badge-amber">MANUAL BURN OVERRIDE</span><br>
+                <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-thrust</code>
+              </td>
+              <td>Press &amp; Hold Throttle</td>
+              <td>Ignites primary rocket thrusters for as long as button/pointer/touch is held down. Consumes remaining propellant mass.</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge">BANK UP (REDUCE Gs)</span> <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-lift-up</code><br>
+                <span class="key-badge">BANK DOWN (STEEPEN)</span> <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-lift-down</code>
+              </td>
+              <td>Reentry Gimbal Banking</td>
+              <td>
+                Active aerodynamic lifting-body trim during atmospheric entry (&lt;122 km). Commands offset Center-of-Gravity gimbal bank angle ($-90^\circ$ to $+90^\circ, L/D \approx 0.25$) to limit G-loads or prevent atmospheric skip-out.
+              </td>
+            </tr>
+            <tr>
+              <td><span class="key-badge">Click + Drag</span> / <span class="key-badge">Mouse Scroll</span></td>
+              <td>Free Orbital Camera</td>
+              <td>360° click-and-drag yaw/pitch rotation around the spacecraft. Mouse wheel adjusts field-of-view (FOV zoom from 10° telephoto to 100° wide-angle).</td>
+            </tr>
+            <tr>
+              <td><span class="key-badge">RESET VIEW</span></td>
+              <td>Camera Recenter</td>
+              <td>Resets orbital camera pitch, yaw, and FOV to nominal trailing spacecraft chase perspective.</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge">TRACK TARGET: OFF / ON</span><br>
+                <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-track-target</code>
+              </td>
+              <td>Target Tracking Gimbal</td>
+              <td>Smoothly aligns the camera to track designated celestial bodies: Earth, Moon, Sun, or the instantaneous spacecraft Prograde velocity vector.</td>
+            </tr>
+            <tr>
+              <td><span class="key-badge badge-green">ENTER VR FLYBY</span></td>
+              <td>WebXR Immersive 6DoF</td>
+              <td>
+                Activates stereoscopic WebXR 6DoF session on Meta Quest Browser.<br>
+                • <strong>Controller 0 (Primary) Trigger:</strong> Fires main rocket engines (<span class="key-badge">selectstart</span> / <span class="key-badge">selectend</span>).<br>
+                • <strong>Controller 1 (Secondary) Trigger:</strong> Toggles target tracking lock.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="key-badge badge-red">ABORT / RESTART</span> <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-abort</code><br>
+                <span class="key-badge">SAVE FLIGHT LOG</span> <code style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">#btn-save-log</code>
+              </td>
+              <td>Mission Reset &amp; Logging</td>
+              <td>
+                • <em>ABORT:</em> Re-initializes state vectors to 400 km LEO parking orbit.<br>
+                • <em>SAVE FLIGHT LOG:</em> Exports comprehensive telemetry history as a downloadable JSON file.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ABSOLUTE AUDIT NOTICE: NO KEYBOARD SHORTCUTS -->
+      <div class="audit-warning-box">
+        <strong>⚠️ Cockpit Avionics &amp; Systems Architecture Note:</strong><br>
+        Flight operations are executed exclusively through the on-screen telemetry buttons, mouse/touch drag navigation, and WebXR 6DoF controller triggers. <strong>There are NO keyboard shortcut mappings (such as keyboard throttle, camera keys, or pause keys) in the simulation engine.</strong> All mission functions are operated through genuine interactive cockpit avionics interfaces.
+      </div>
+    </section>
+
+    <!-- OFFICIAL 2026 SHOWCASE PEDIGREE -->
+    <section id="pedigree" class="hud-card hud-card-alt">
+      <div class="section-header">
+        <h2 class="tag-green">🏆 Official 2026 Showcase Pedigree &amp; Exhibitions</h2>
+      </div>
+      <p style="font-size:0.92rem; color:#cbd5e1; margin-bottom:1rem;">
+        <em>Artemis: The Free Return</em> has been curated and exhibited across premier Pacific Northwest gaming, aerospace, and interactive media showcases:
+      </p>
+
+      <div class="pedigree-grid">
+        <div class="pedigree-card">
+          <h4>SLICE 2026</h4>
+          <div class="pedigree-date">September 2, 2026 // Seattle Center McCaw Hall</div>
+          <p>
+            Tabletop &amp; interactive media exposition. Hands-on public preview of the real-time cislunar orbital mechanics engine.
+          </p>
+        </div>
+        <div class="pedigree-card">
+          <h4>SiM PAX West Kickoff Showcase 2026</h4>
+          <div class="pedigree-date">September 3, 2026 // Seattle Interactive Media Lab</div>
+          <p>
+            Industry WebXR showcase and developer network triage during PAX West weekend.
+          </p>
+        </div>
+        <div class="pedigree-card" style="border-left-color:var(--telemetry-green);">
+          <h4>KremFest XR 2026</h4>
+          <div class="pedigree-date">September 25–26, 2026 // Kremwerk Complex Seattle</div>
+          <p>
+            <strong>Official Selection &amp; Turnkey Autopilot World Debut.</strong> Featured in the 15-page bound festival program guide, running live on standalone Meta Quest 3 headsets.
+          </p>
+        </div>
+        <div class="pedigree-card">
+          <h4>Seattle Space Week 2026</h4>
+          <div class="pedigree-date">Fall 2026 // Commercial Aerospace &amp; Museum Curation</div>
+          <p>
+            Featured educational visualization demonstrating unscripted Newtonian gravitational mechanics for museum and institutional partners.
+          </p>
+        </div>
+        <div class="pedigree-card" style="border-left-color:var(--caution-amber);">
+          <h4>GeekGirlCon 2026</h4>
+          <div class="pedigree-date">October 24–25, 2026 // Seattle Convention Center</div>
+          <p>
+            Exhibiting in the Seattle Indies Gaming Hall. Speaking panel: <em>Sunday Oct 25 @ 1:30 PM (Room 'America')</em>. Tabletop acrylic signage and WebXR demo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- V2.0 / V3.0 DEVELOPMENT ROADMAP -->
+    <section id="roadmap" class="hud-card">
+      <div class="section-header">
+        <h2 class="tag-cyan">🗺️ Technical Roadmap &amp; Feature Horizons (V2.0 / V3.0)</h2>
+      </div>
+      <p style="font-size:0.92rem; color:#cbd5e1;">
+        Upcoming orbital avionics, spatial rendering enhancements, and commercial expansion packs currently in active development:
+      </p>
+
+      <div class="roadmap-grid">
+        <div class="roadmap-node">
+          <div class="node-version">V3.0 Avionics</div>
+          <h4>Physical Pilot Command (Decoupled RCS 6DoF)</h4>
+          <p>
+            Full 6-degree-of-freedom reaction control system (RCS). Manual translational and rotational RCS thrusters mapped to physical VR thumbsticks and flight-stick HOTAS.
+          </p>
+        </div>
+        <div class="roadmap-node">
+          <div class="node-version">V2.2 Navigation</div>
+          <h4>Avionics &amp; Orthographic Minimap</h4>
+          <p>
+            Dual trajectory trail visualization: white historical trajectory flown vs. blue predicted gravitational orbit. Orthographic 3/4 top-down cislunar minimap with target waypoints.
+          </p>
+        </div>
+        <div class="roadmap-node">
+          <div class="node-version">V2.5 Spatial Graphics</div>
+          <h4>3D WebXR Cockpit &amp; NASA GLB Models</h4>
+          <p>
+            High-fidelity 3D spacecraft interior with interactive spatial panels, physical switches, and authenticated NASA GLB vehicle exterior meshes.
+          </p>
+        </div>
+        <div class="roadmap-node">
+          <div class="node-version">V2.8 Celestial Engine</div>
+          <h4>Astronomical Fidelity &amp; Tidal Locking</h4>
+          <p>
+            True celestial sphere rendering mapped from the Hipparcos star catalog, coupled with accurate 1:1 Earth-Moon tidal locking and lunar libration matrices.
+          </p>
+        </div>
+        <div class="roadmap-node" style="grid-column: 1 / -1; border-color:var(--telemetry-green);">
+          <div class="node-version" style="color:var(--telemetry-green);">Commercial Expansion</div>
+          <h4>Modular Mission Pack Marketplace</h4>
+          <p>
+            Modular scenario engine supporting drop-in historical and speculative spaceflight missions:
+            <br>• <strong>Mission Pack 1: Apollo 11</strong> — Historical 1969 Free Return trajectory, CSM-LM transposition, and powered descent.
+            <br>• <strong>Mission Pack 2: Lunar Gateway</strong> — Near-Rectilinear Halo Orbit (NRHO) station rendezvous and automated docking.
+            <br>• <strong>Mission Pack 3: Mars Transit</strong> — Earth-to-Mars Cycler trajectory and atmospheric aerocapture.
+            <br>• <strong>Mission Pack 4: Cislunar Sandbox</strong> — Customizable N-body physics laboratory with adjustable mass ratios and launch vectors.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HARDWARE RECOMMENDATION & BACKER PLAQUE SECTION -->
+    <section id="hardware" class="hardware-backer-grid">
+      <!-- Hardware Recommendation Card -->
+      <div class="action-card" style="border-left: 4px solid var(--hud-cyan);">
+        <div>
+          <h3 class="tag-cyan">🥽 Recommended VR Hardware</h3>
+          <p>
+            <em>Artemis: The Free Return</em> runs natively inside the Meta Quest Browser with zero downloads or cables required. We recommend the <strong>Meta Quest 3 or Meta Quest 3S</strong> for crisp pancake lens optics, 90 FPS low-latency rendering, and natural 6DoF hand/controller immersion.
+          </p>
+        </div>
+        <div>
+          <div class="link-row" style="margin-bottom:0.75rem;">
+            <a href="https://www.meta.com/referrals/link/wulfdesign/" target="_blank" rel="noopener" class="btn-affiliate">
+              🎁 Meta Quest Referral ($30–$60 Credit) ↗
+            </a>
+            <a href="https://amazon.com/dp/B0C8VKH1G9?tag=wulfdesign-20" target="_blank" rel="noopener" class="btn-affiliate">
+              🛒 Order Quest 3 on Amazon ↗
+            </a>
+          </div>
+          <div style="font-size:0.75rem; color:#64748b; font-family:var(--font-mono);">
+            *Affiliate links support independent spaceflight simulator development at no additional cost to you.
+          </div>
+        </div>
+      </div>
+
+      <!-- Cockpit Backer Plaque Card -->
+      <div class="action-card hud-card-amber" style="border-left: 4px solid var(--caution-amber);">
+        <div>
+          <h3 class="tag-amber">🎖️ Cockpit Backer Plaque Tier</h3>
+          <p>
+            Become an immortal part of the spacecraft! For a modest patron micro-pledge ($5–$15), have your <strong>Commander Callsign permanently engraved onto the 3D in-cockpit memorial plaque</strong> inside the WebXR flight deck, receive a personalized digital mission patch certificate, and gain priority access to upcoming closed beta releases.
+          </p>
+        </div>
+        <div>
+          <a href="#intake" class="btn-jump-secondary" style="border-color:var(--caution-amber); color:var(--caution-amber); width:100%; justify-content:center;">
+            ✍️ Request Plaque Inscription in Pilot Intake ↓
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Mission Briefing & Core Features -->
-    <section id="briefing" class="grid-2">
-      <div class="card" style="border-left: 4px solid var(--cyan);">
-        <h3>🌌 True Newtonian Dynamics</h3>
-        <p>
-          Unlike visualizers that follow pre-computed trajectory rails, <em>Artemis: The Free Return</em> integrates raw dynamic gravitational forces frame-by-frame using a calibrated Velocity Verlet solver. 
-        </p>
-        <p>
-          Every Trans-Lunar Injection (TLI) burn and Mid-Course Correction (MCC) alters your orbital energy, determining whether you thread Earth's narrow 2-degree reentry corridor or skip into deep space.
-        </p>
+    <!-- SILENT GOOGLE FORM INTAKE ENGINE -->
+    <section id="intake" class="intake-terminal">
+      <div class="section-header">
+        <h2 class="tag-cyan">📬 Artemis Flight Test Channel // Pilot Intake Roster</h2>
       </div>
-
-      <div class="card" style="border-left: 4px solid var(--magenta);">
-        <h3>🥽 WebXR &amp; Festival Turnkey Mode</h3>
-        <p>
-          Tested across standalone Meta Quest 3 headsets (KremFest XR 2026 &amp; GeekGirlCon official selection). Put on your headset and open this page in the Meta Quest Browser for an instant 6DOF spatial cockpit perspective.
-        </p>
-        <p>
-          <strong>Autopilot Captain:</strong> Features an automated ~16-minute cinematic free return that dynamically glides through deep-space time warps (up to 7,200x) and slows down for close lunar observation.
-        </p>
-      </div>
-    </section>
-
-    <!-- Flight Controls & Avionics Guide -->
-    <section id="controls" class="card" style="margin-bottom: 2.5rem; border-left: 4px solid var(--emerald);">
-      <h3>🎮 Flight Computer &amp; Pilot Controls</h3>
-      <p>
-        You can experience the mission passively under automated autopilot, or disengage automation to take manual control of thrusters and time slip:
+      <p style="font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
+        Submit your callsign and flight preferences below to receive standalone Meta Quest Horizon Store beta keys, PCVR dev builds, and development dispatches. Submissions are dispatched directly to Mission Control.
       </p>
 
-      <div class="grid-2" style="margin-bottom: 0;">
-        <div class="control-list">
-          <div class="control-item">
-            <span>Toggle Auto-Warp / Manual Throttle</span>
-            <span class="key-badge">W Key / Button</span>
+      <!-- Google Form Native Submission Target -> hidden_gform -->
+      <form id="lunarLeadForm"
+            action="https://docs.google.com/forms/d/e/1FAIpQLSfUR8SutNE7c-nIa0Gfly-Z6LC0T9wfmtiaKQiP8zR4PRmqsw/formResponse"
+            method="POST"
+            target="hidden_gform"
+            onsubmit="return validateAndSubmitLead();"
+            style="margin-top:1.5rem;">
+
+        <!-- Invisible Honeypot Anti-Spam Trap (Empty check, catches automated scrapers) -->
+        <input type="text" id="fb-hp" name="website_hp" style="display:none !important;" tabindex="-1" autocomplete="off">
+
+        <div class="form-grid-layout">
+          <!-- Callsign / Name (entry.2005620554, Required) -->
+          <div class="form-group">
+            <label for="pilot-callsign">Commander Callsign / Full Name *</label>
+            <input type="text" id="pilot-callsign" name="entry.2005620554" placeholder="e.g. Commander Shepard" required>
           </div>
-          <div class="control-item">
-            <span>Cycle Camera Views (Cockpit, Orbit, Perilune)</span>
-            <span class="key-badge">V Key</span>
+
+          <!-- Contact Email (entry.1045781291, Required, Email subtype) -->
+          <div class="form-group">
+            <label for="pilot-email">Contact Email (Meta / Oculus Account) *</label>
+            <input type="email" id="pilot-email" name="entry.1045781291" placeholder="commander@example.com" required>
           </div>
-          <div class="control-item">
-            <span>Pause / Resume Simulation</span>
-            <span class="key-badge">Spacebar</span>
+
+          <!-- Hardware Version (entry.1065046570, Required) -->
+          <div class="form-group form-span-2">
+            <label for="pilot-headset">Target Flight Hardware / Headset *</label>
+            <select id="pilot-headset" name="entry.1065046570" required>
+              <option value="" disabled selected>Select Primary VR / Browser Hardware...</option>
+              <option value="Meta Quest 3 / 3S Standalone (Horizon OS Browser)">Meta Quest 3 / 3S Standalone (Horizon OS Browser 6DoF)</option>
+              <option value="Meta Quest 2 Standalone">Meta Quest 2 Standalone</option>
+              <option value="PCVR - Meta Quest via Link / Virtual Desktop">PCVR - Meta Quest via Link / Virtual Desktop (SteamVR)</option>
+              <option value="PCVR - HTC Vive / Valve Index / Bigscreen Beyond">PCVR - HTC Vive / Valve Index / Bigscreen Beyond</option>
+              <option value="Desktop Chrome / Edge WebXR Browser">Desktop Chrome / Edge WebXR Browser (Mouse & Keyboard)</option>
+              <option value="Mobile WebXR / Android Chrome">Mobile WebXR / Android Chrome</option>
+              <option value="Apple Vision Pro (Safari WebXR)">Apple Vision Pro (Safari WebXR)</option>
+            </select>
           </div>
-          <div class="control-item">
-            <span>Fast-Forward to Next Mission Checkpoint</span>
-            <span class="key-badge">Skip Button</span>
+
+          <!-- Venue / Encounter (entry.1166974658, Optional) -->
+          <div class="form-group form-span-2">
+            <label for="pilot-venue">Where did you discover or demo the experience?</label>
+            <input type="text" id="pilot-venue" name="entry.1166974658" placeholder="e.g. KremFest XR 2026, GeekGirlCon, PAX West, SLICE, FilmFreeway, Web Search">
+          </div>
+
+          <!-- Version Tested (entry.1140066880, Checkboxes) -->
+          <div class="form-group form-span-2">
+            <label>Which build(s) have you experienced? (Select all that apply)</label>
+            <div class="checkbox-deck">
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.1140066880" value="Meta Quest - Standalone">
+                <span>Meta Quest - Standalone</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.1140066880" value="Meta Quest - PCVR (our Dev system or VRReady Laptop)">
+                <span>Meta Quest - PCVR</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.1140066880" value="HTC Vive - PCVR (Legacy from film festivals & events pre-2020)">
+                <span>HTC Vive - PCVR</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.1140066880" value="WebXR Browser (Desktop / Mobile)">
+                <span>WebXR Browser (Online)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Wishlist / Likes (entry.724109334, Optional) -->
+          <div class="form-group form-span-2">
+            <label for="pilot-likes">Upcoming Features &amp; Mission Packs of Greatest Interest</label>
+            <select id="pilot-likes" name="entry.724109334">
+              <option value="Apollo 11 Historical Free Return & Powered Descent">Apollo 11 Historical Free Return &amp; Powered Lunar Descent</option>
+              <option value="Lunar Gateway NRHO Halo Orbit Rendezvous & Docking">Lunar Gateway NRHO Halo Orbit Rendezvous &amp; Docking</option>
+              <option value="Physical 6DoF RCS Attitude Control with HOTAS / VR Sticks">Physical 6DoF RCS Attitude Control with HOTAS / VR Sticks</option>
+              <option value="3D WebXR Cockpit with NASA Vehicle Models">3D WebXR Cockpit with Authenticated NASA Vehicle Models</option>
+              <option value="Mars Transit Cycler & Aerocapture">Mars Transit Cycler &amp; Atmospheric Aerocapture</option>
+              <option value="General Physics Realism & Cislunar Free Return">General Newtonian Physics Realism &amp; Free Return Dynamics</option>
+            </select>
+          </div>
+
+          <!-- Pilot Comments / Debrief (entry.839337160, Optional) -->
+          <div class="form-group form-span-2">
+            <label for="pilot-comments">Pilot Debrief / Recommendations / Cockpit Plaque Call Sign Notes</label>
+            <textarea id="pilot-comments" name="entry.839337160" rows="3" placeholder="Telemetry feedback, feature requests, or notes for your engraved backer plaque..."></textarea>
+          </div>
+
+          <!-- Submission Button -->
+          <div class="form-span-2" style="margin-top:0.5rem; text-align:center;">
+            <button type="submit" id="btnSubmitLead" class="btn-submit-lead">
+              🚀 Log Flight Clearance &amp; Submit Credentials
+            </button>
           </div>
         </div>
-
-        <div class="control-list">
-          <div class="control-item">
-            <span>Free Orbit Camera Rotation</span>
-            <span class="key-badge">Click + Drag</span>
-          </div>
-          <div class="control-item">
-            <span>Camera Zoom In / Out</span>
-            <span class="key-badge">Mouse Scroll</span>
-          </div>
-          <div class="control-item">
-            <span>Enter VR Headset Mode (Quest 3)</span>
-            <span class="key-badge">VR Goggles Button</span>
-          </div>
-          <div class="control-item">
-            <span>Export Mission Telemetry Log (.JSON)</span>
-            <span class="key-badge">Telemetry Button</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Early Access Lead Capture / Test Channel Intake -->
-    <section id="intake" class="intake-card">
-      <div class="intake-header">
-        <h3>📬 Join the Meta Quest Release Test Channel</h3>
-        <p style="font-size:0.9rem; color:#cbd5e1;">
-          We are developing standalone Meta Quest Horizon Store releases and Steam PCVR editions of our spatial flight simulators. Enter your details below to request access to the closed beta channel and receive release notifications.
-        </p>
-      </div>
-
-      <form class="intake-form" id="leadForm" onsubmit="handleLeadSubmit(event)">
-        <div class="form-group">
-          <label for="callsign">Commander Call Sign / Name</label>
-          <input type="text" id="callsign" class="form-control" placeholder="e.g. Commander Shepard" required>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Contact Email</label>
-          <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
-        </div>
-
-        <div class="form-group">
-          <label for="platform">Primary Platform</label>
-          <select id="platform" class="form-control">
-            <option value="quest3">Meta Quest 3 / 3S (Standalone)</option>
-            <option value="webxr">Web Browser (Desktop / WebXR)</option>
-            <option value="pcvr">Steam PCVR (Link / Virtual Desktop)</option>
-            <option value="other">Other / Mobile</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn-submit" id="submitBtn">
-          🚀 Request Flight Clearance
-        </button>
       </form>
 
-      <div id="formSuccess" style="display:none; margin-top:1rem; padding:0.85rem; background:rgba(16, 185, 129, 0.15); border:1px solid var(--emerald); border-radius:6px; color:#10b981; font-size:0.9rem;">
-        ✅ <strong>Flight Clearance Logged!</strong> Thank you, Commander. Your early access request has been recorded locally on this terminal. Welcome to the flight roster!
+      <!-- Instant Confirmation Banner -->
+      <div id="formSuccessBanner">
+        <h4>🎉 Flight Clearance Confirmed // Data Synced</h4>
+        <p style="font-size:0.95rem; margin-bottom:0.75rem;">
+          Thank you, <strong id="confirmedCallsign">Commander</strong>. Your telemetry credentials have been safely recorded into the mission intake manifest. You are queued for closed beta dispatches and flight deck clearance.
+        </p>
+        <p style="font-size:0.8rem; color:#94a3b8; font-family:var(--font-mono);">
+          Dual-layer persistence confirmed: Local cache registered &bull; Dispatched to Google Forms intake engine.
+          <br>
+          Direct form backup: <a href="https://forms.gle/C1eSVvNBUsqhWwdQA" target="_blank" rel="noopener" style="color:var(--hud-cyan);">https://forms.gle/C1eSVvNBUsqhWwdQA</a>
+        </p>
       </div>
     </section>
 
   </main>
 
+  <!-- Mission Control Footer -->
   <footer>
-    <div class="container">
-      <p style="margin-bottom:0.5rem;">
-        <strong>Artemis: The Free Return / Lunar Flyby XR</strong> is crafted by <a href="https://wulfdesign.github.io/" target="_blank">UpLiftVR Studios &amp; Wulf Design Studios</a>.
-      </p>
-      <p style="font-size:0.8rem; color:#64748b;">
-        Exhibiting at GeekGirlCon 2026 (Seattle Indies Gaming Hall) &bull; Speaking Panel: Sunday Oct 25 @ 1:30 PM (Room 'America') &bull; <a href="../game-jams/panels/index.html">Game Jams Panel Hub</a>
-      </p>
+    <div class="container footer-flex">
+      <div>
+        <div style="font-weight:800; color:#ffffff; font-size:1rem; margin-bottom:0.25rem;">
+          ARTEMIS: THE FREE RETURN (LUNAR FLYBY XR)
+        </div>
+        <div style="font-size:0.82rem; color:#64748b;">
+          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.25
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener">Web Portal</a>
+        <a href="https://youtu.be/bdHbIKcqRBs" target="_blank" rel="noopener">YouTube (8x)</a>
+        <a href="https://www.youtube.com/@UpLiftVR" target="_blank" rel="noopener">UpLiftVR Channel</a>
+        <a href="https://filmfreeway.com/Lunar-Flyby-XR" target="_blank" rel="noopener">FilmFreeway Project</a>
+        <a href="https://filmfreeway.com/LarryJames" target="_blank" rel="noopener">FilmFreeway Creator</a>
+        <a href="https://upliftvr.itch.io/" target="_blank" rel="noopener">Itch.io</a>
+        <a href="https://linkedin.com/in/WulfDesignStudios" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
   </footer>
 
+  <!-- Client-Side Form & Simulation Launch Fallback Script -->
   <script>
-    function handleLeadSubmit(e) {
-      e.preventDefault();
-      const callsign = document.getElementById('callsign').value;
-      const email = document.getElementById('email').value;
-      const platform = document.getElementById('platform').value;
+    window.submittedGForm = false;
 
-      const lead = {
-        callsign,
-        email,
-        platform,
-        timestamp: new Date().toISOString()
-      };
+    // Resolve launch buttons: check if sim.html exists, fallback to index.html if not created yet
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('sim.html', { method: 'HEAD' }).then(res => {
+        if (res.ok) {
+          document.querySelectorAll('.btn-launch-sim').forEach(btn => {
+            btn.href = 'sim.html';
+          });
+        } else {
+          document.querySelectorAll('.btn-launch-sim').forEach(btn => {
+            btn.href = 'index.html';
+          });
+        }
+      }).catch(() => {
+        // In local/offline contexts where fetch is blocked, fallback safely to index.html
+        document.querySelectorAll('.btn-launch-sim').forEach(btn => {
+          btn.href = 'index.html';
+        });
+      });
+    });
 
-      // Store in localStorage
-      const existing = JSON.parse(localStorage.getItem('lunar_flyby_leads') || '[]');
-      existing.push(lead);
-      localStorage.setItem('lunar_flyby_leads', JSON.stringify(existing));
+    function validateAndSubmitLead() {
+      // 1. Anti-spam Honeypot verification
+      const hp = document.getElementById('fb-hp');
+      if (hp && hp.value !== '') {
+        console.warn("Spam submission intercepted via honeypot trap.");
+        return false;
+      }
 
-      // Display success feedback
-      const form = document.getElementById('leadForm');
-      const success = document.getElementById('formSuccess');
-      if (form) form.style.display = 'none';
-      if (success) success.style.display = 'block';
+      // 2. Extract values
+      const callsign = document.getElementById('pilot-callsign').value.trim();
+      const email = document.getElementById('pilot-email').value.trim();
+      const headset = document.getElementById('pilot-headset').value;
+      const venue = document.getElementById('pilot-venue').value.trim();
+      const likes = document.getElementById('pilot-likes').value;
+      const comments = document.getElementById('pilot-comments').value.trim();
+
+      // Gather checked builds
+      const checkedBuilds = [];
+      document.querySelectorAll('input[name="entry.1140066880"]:checked').forEach(cb => {
+        checkedBuilds.push(cb.value);
+      });
+
+      // 3. LocalStorage Redundancy Caching
+      try {
+        const leadRecord = {
+          callsign,
+          email,
+          headset,
+          venue,
+          buildsTested: checkedBuilds,
+          likes,
+          comments,
+          submittedAt: new Date().toISOString()
+        };
+        const existing = JSON.parse(localStorage.getItem('lunar_flyby_leads') || '[]');
+        existing.push(leadRecord);
+        localStorage.setItem('lunar_flyby_leads', JSON.stringify(existing));
+      } catch (err) {
+        console.warn("LocalStorage caching non-fatal warning:", err);
+      }
+
+      // 4. Update UI confirmation text
+      const namePlaceholder = document.getElementById('confirmedCallsign');
+      if (namePlaceholder) {
+        namePlaceholder.textContent = callsign || "Commander";
+      }
+
+      // 5. Arm iframe submission flag
+      window.submittedGForm = true;
+
+      // Also reveal confirmation banner immediately so pilot receives instant feedback
+      const successBanner = document.getElementById('formSuccessBanner');
+      if (successBanner) {
+        successBanner.style.display = 'block';
+        successBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Reset form fields after small delay to allow native POST to construct
+      setTimeout(() => {
+        const form = document.getElementById('lunarLeadForm');
+        if (form) form.reset();
+      }, 500);
+
+      return true; // Allows standard form POST into hidden_gform
+    }
+
+    function handleGFormSubmitted() {
+      window.submittedGForm = false;
+      const successBanner = document.getElementById('formSuccessBanner');
+      if (successBanner) {
+        successBanner.style.display = 'block';
+      }
     }
   </script>
 </body>
