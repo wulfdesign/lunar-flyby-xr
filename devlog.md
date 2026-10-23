@@ -6,6 +6,22 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-10-22 17:44] - v2.1.28: Pre-Filled Google Form Backup Link, Recorded Payload Summary & Platform-Neutral Wording 📬💻📱✨**
+
+📝 **Summary**
+1. **Verified Live Operator Submissions in Dedicated Google Form (`1xXvRkRHuk9pd-wzqjvie041JZfQ4E0C98WKatoQk4fw`):**
+   - Empirically confirmed via Google Forms Responses API that both of Magus Wulf's live website test submissions (`Capt James Jarvish` at `00:30:50Z` and `Larry James` at `00:36:13Z` with all 4 platforms checked + `"Desktop / Laptop, Tablet / Phone, Quest 3 / 3S"`) were 100% captured and recorded in Google Forms.
+2. **Dynamic Pre-Filled Google Form Link & Recorded Payload Summary (`#formSuccessBanner`):**
+   - Diagnosed why clicking the static `/viewform` link in the confirmation banner appeared to show an empty un-submitted form: `/viewform` opens a blank form for new respondents rather than displaying the already-recorded response.
+   - Added a live **`#recordedPayloadSummary`** box inside `#formSuccessBanner` displaying the exact `Callsign`, `Platforms`, `Write-In`, and `Mission Vote` that were just recorded.
+   - Updated `#prefilledGFormLink` to dynamically construct a `?usp=pp_url&entry.486472330=...` URL with all of the user's submitted answers pre-filled if they open the standalone Google Form link.
+3. **Removed Remaining XR Slant in Google Form & Intake Labels:**
+   - Updated Question #2 in the Google Form and website to **`Contact Email (Mission Updates & Early Access)`** (removing "Horizon Store Beta Keys") and updated the Google Form header description to lead with Desktop, Laptop, Tablet, and Phone browser accessibility.
+
+🧙‍♂️ Magus Wulf & 🐈 Hermes
+
+---
+
 ### **[2026-10-22 17:34] - v2.1.27: Universal Desktop / Laptop / Tablet / Phone Platform Multi-Select + Write-In & Streamlined XR Options 💻📱🥽✨**
 
 📝 **Summary**

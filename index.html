@@ -890,7 +890,7 @@
       </a>
       <div class="status-pill">
         <span class="pulse-dot"></span>
-        <span>TELEMETRY ONLINE // v2.1.27</span>
+        <span>TELEMETRY ONLINE // v2.1.28</span>
       </div>
       <div class="nav-links">
         <a href="#briefing">Briefing</a>
@@ -1385,13 +1385,13 @@
 
           <!-- Q2: Contact Email (entry.500788665, Required) -->
           <div class="form-group">
-            <label for="pilot-email">Contact Email (Mission Updates, Early Access &amp; Beta Keys) *</label>
+            <label for="pilot-email">Contact Email (Mission Updates &amp; Early Access) *</label>
             <input type="email" id="pilot-email" name="entry.500788665" placeholder="commander@example.com" required>
           </div>
 
           <!-- Q3: Select Your Platform(s) Multi-Select Checkboxes (entry.993873424) -->
           <div class="form-group form-span-2">
-            <label>Select Your Platform(s) (Check all that apply — Desktop, Laptop, Tablet, Phone &amp; XR)</label>
+            <label>Select Your Platform(s) (Check all that apply — Desktop first, Tablet, Phone, or XR)</label>
             <div class="checkbox-deck">
               <label class="checkbox-pill">
                 <input type="checkbox" name="entry.993873424" value="Desktop / Laptop Browser (Windows / Mac / Linux)" checked>
@@ -1414,8 +1414,8 @@
 
           <!-- Q5: Platform Write-In / XR Headset Type (entry.1519432357, Optional Write-In + Quick-Add Chips) -->
           <div class="form-group form-span-2">
-            <label for="pilot-headset">Platform Write-In / XR Headset Type (Optional — write in your device or XR headset type)</label>
-            <input type="text" id="pilot-headset" name="entry.1519432357" list="xr-platform-suggestions" placeholder="Write in your setup (e.g. Desktop Chrome, iPad, Android, Meta Quest 3, PCVR / SteamVR, Vision Pro)...">
+            <label for="pilot-headset">Platform / Device Write-In (Optional — or note what kind of setup / XR headset in Comments below)</label>
+            <input type="text" id="pilot-headset" name="entry.1519432357" list="xr-platform-suggestions" placeholder="Write in your setup (e.g. Desktop Chrome, iPad, Android, or XR headset type) or note in Comments...">
             <datalist id="xr-platform-suggestions">
               <option value="Desktop / Laptop (Windows / Mac / Linux Browser)">
               <option value="Tablet / Phone (iOS Safari / Android Chrome)">
@@ -1458,8 +1458,8 @@
 
           <!-- Q7: Pilot Debrief & Telemetry Log Notes (entry.743170660, Optional) -->
           <div class="form-group form-span-2">
-            <label for="pilot-comments">Flight Telemetry Log / Mission Debrief / Cockpit Plaque Callsign</label>
-            <textarea id="pilot-comments" name="entry.743170660" rows="3" placeholder="Paste your flight telemetry stats (MET Flight Time, Perilune Altitude, Max Entry G-Load, Splashdown Outcome), mission feedback, or backer plaque callsign..."></textarea>
+            <label for="pilot-comments">Comments / Device Details / Flight Telemetry Log / Cockpit Plaque Callsign</label>
+            <textarea id="pilot-comments" name="entry.743170660" rows="3" placeholder="Tell us what platform, browser, or XR headset you're using, share feedback, or paste flight telemetry stats..."></textarea>
           </div>
 
           <!-- Submission Button -->
@@ -1473,14 +1473,15 @@
 
       <!-- Instant Confirmation Banner -->
       <div id="formSuccessBanner">
-        <h4>🎉 Flight Clearance Confirmed // Dedicated Artemis Telemetry Synced</h4>
-        <p style="font-size:0.95rem; margin-bottom:0.75rem;">
-          Thank you, <strong id="confirmedCallsign">Commander</strong>. Your pilot credentials, mission vote, and telemetry debrief have been recorded into the dedicated <em>Artemis: The Free Return</em> Mission Control manifest.
+        <h4>🎉 Flight Clearance Confirmed // Submission Recorded in Google Forms!</h4>
+        <p style="font-size:0.95rem; margin-bottom:0.65rem;">
+          Thank you, <strong id="confirmedCallsign">Commander</strong>! Your submission has been <strong>automatically recorded</strong> into the Mission Control Google Form database (no second submission required).
         </p>
+        <div id="recordedPayloadSummary" style="font-size:0.82rem; color:#d1fae5; background:rgba(2,10,20,0.65); border:1px solid rgba(16,185,129,0.35); border-radius:4px; padding:0.65rem 0.9rem; margin:0 auto 0.75rem auto; max-width:680px; text-align:left; font-family:var(--font-mono);"></div>
         <p style="font-size:0.8rem; color:#94a3b8; font-family:var(--font-mono);">
           Dual-layer persistence confirmed: Local cache registered &bull; Dispatched to dedicated Artemis Google Form intake engine.
           <br>
-          Direct form link: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/viewform" target="_blank" rel="noopener" style="color:var(--hud-cyan);">Open Standalone Artemis Intake Form ↗</a>
+          Need to send another copy or verify via Google Forms UI? <a id="prefilledGFormLink" href="https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/viewform" target="_blank" rel="noopener" style="color:var(--hud-cyan);">Open Pre-Filled Google Form Backup ↗</a>
         </p>
       </div>
     </section>
@@ -1495,7 +1496,7 @@
           ARTEMIS: THE FREE RETURN (LUNAR FLYBY XR)
         </div>
         <div style="font-size:0.82rem; color:#64748b;">
-          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.27
+          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.28
         </div>
       </div>
       <div class="footer-links">
@@ -1583,10 +1584,34 @@
         console.warn("LocalStorage caching non-fatal warning:", err);
       }
 
-      // 4. Update UI confirmation text
+      // 4. Update UI confirmation text & recorded payload summary
       const namePlaceholder = document.getElementById('confirmedCallsign');
       if (namePlaceholder) {
         namePlaceholder.textContent = callsign || "Commander";
+      }
+
+      const summaryEl = document.getElementById('recordedPayloadSummary');
+      if (summaryEl) {
+        const platStr = checkedPlatforms.length ? checkedPlatforms.join(' | ') : 'None selected';
+        summaryEl.innerHTML =
+          `<div><strong>✅ Recorded Callsign:</strong> ${callsign} (${email})</div>` +
+          `<div><strong>💻 Platforms:</strong> ${platStr}${platformWriteIn ? ' — ' + platformWriteIn : ''}</div>` +
+          `<div><strong>🗺️ Mission Vote:</strong> ${likes}</div>`;
+      }
+
+      // Dynamically construct pre-filled Google Form backup URL with user's exact inputs
+      const prefillLink = document.getElementById('prefilledGFormLink');
+      if (prefillLink) {
+        const params = new URLSearchParams();
+        params.set('usp', 'pp_url');
+        if (callsign) params.append('entry.486472330', callsign);
+        if (email) params.append('entry.500788665', email);
+        checkedPlatforms.forEach(p => params.append('entry.993873424', p));
+        if (venue) params.append('entry.295781498', venue);
+        if (platformWriteIn) params.append('entry.1519432357', platformWriteIn);
+        if (likes) params.append('entry.2105931848', likes);
+        if (comments) params.append('entry.743170660', comments);
+        prefillLink.href = 'https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/viewform?' + params.toString();
       }
 
       // 5. Arm iframe submission flag

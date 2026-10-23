@@ -9,7 +9,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * **Status:** 🛠️ (In Progress) | 🧪 (Ready for QA) | 🧠 (HITL Action Needed) | 🩹 (Tech Debt) | 🏆 (Verified/Done)
 * **Attribution:** 🐈 (Hermes) | 🦞 (MugWort)
 
-**Version:** v2.1.27 (Universal Desktop / Laptop / Tablet / Phone Platform Multi-Select + Write-In & Dedicated Artemis Intake 💻📱🥽📬✨)
+**Version:** v2.1.28 (Pre-Filled Google Form Backup Link, Recorded Payload Summary & Platform-Neutral Wording 📬💻📱✨)
 
 ---
 
