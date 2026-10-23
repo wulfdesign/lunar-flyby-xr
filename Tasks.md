@@ -50,6 +50,7 @@ DO NOT mark any task as done (🏆 or [x]) until the Human-in-the-Loop (Magus Wu
 * [ ] 🧠 🔥 **QA: Mobile View**: Fixed native CSS Grid proportions. 🧪
 
 ## 🛠️ Current Work
+* [ ] 📬 📋 🔥🔥🔥 **Dedicated Lunar Flyby XR Standalone Google Form & Response Sheet:** Create a dedicated Google Form specifically for *Artemis: The Free Return (Lunar Flyby XR)* (currently sharing the general UpLiftVR intake endpoint `1FAIpQLSfUR8SutNE7c-nIa0Gfly-Z6LC0T9wfmtiaKQiP8zR4PRmqsw/formResponse`) with tailored cislunar flight debrief, Mission Pack voting (Apollo 11, Mars Aerobraking, Lunar Gateway NRHO), and Cockpit Backer Plaque callsign fields, then swap the `formResponse` URL and `entry.XXXXX` IDs in `private/dev_site/index.html` and `index.html` per `private/GOOGLE_FORM_SETUP_GUIDE.md`. 🛠️ 🐈
 * [ ] 🏗️ 🔥🔥🔥 **Physics: True TLI Targeting Engine**: Replace artificial MISSION_LEAD_ANGLE with realistic TLI parameters. 🛠️
 * [ ] 🏗️ 🔥🔥🔥 **Artemis II Telemetry**: Implement data-mapping from NASA AROW/OEM files. 🛠️
 * [ ] 🏗️ 🔥🔥 **UI: Mobile XR UX Overhaul**: Rebuild the XR HUD to be fully interactive within the headset natively. 🛠️
