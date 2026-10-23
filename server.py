@@ -35,7 +35,7 @@ if sys.platform == "win32":
         pass
 
 PORT = 3550
-SERVER_VERSION = "2.1.25"
+SERVER_VERSION = "2.1.26"
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PRIVATE_DIR = os.path.join(ROOT_DIR, "private")
 CHECKLIST_FILE = os.path.join(PRIVATE_DIR, "checklist_status.json")

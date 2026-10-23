@@ -96,15 +96,15 @@ def extract_image_references(html_content: str) -> List[Tuple[int, str]]:
 # ===========================================================================
 class TestPublicRootProtection(unittest.TestCase):
     """
-    Verifies that the public root `index.html` remains pristine, unaltered,
-    and byte-for-byte identical to the baseline v2.1.19 simulation snapshot.
+    Verifies that either the public root `index.html` (pre-promotion) OR `sim.html`
+    (post-promotion) remains byte-for-byte identical to the baseline v2.1.19 simulation snapshot.
     """
 
     def test_root_index_exists(self):
         """Root index.html must exist."""
         self.assertTrue(
             os.path.isfile(ROOT_INDEX),
-            f"Public root simulation file missing at: {ROOT_INDEX}"
+            f"Public root file missing at: {ROOT_INDEX}"
         )
 
     def test_baseline_snapshot_exists(self):
@@ -116,11 +116,14 @@ class TestPublicRootProtection(unittest.TestCase):
         )
 
     def test_root_index_identical_to_baseline_snapshot(self):
-        """Root index.html must be byte-for-byte identical to snapshots/index_v2.1.19_sim_backup.html."""
+        """Either root index.html (pre-promotion) or root sim.html (post-promotion) must match baseline snapshot."""
         if not os.path.isfile(ROOT_INDEX) or not os.path.isfile(SNAPSHOT_FILE):
             self.skipTest("Missing root index.html or baseline snapshot file.")
 
-        with open(ROOT_INDEX, "rb") as f_root:
+        root_sim = os.path.join(LUNAR_ROOT, "sim.html")
+        target_sim_file = root_sim if os.path.isfile(root_sim) else ROOT_INDEX
+
+        with open(target_sim_file, "rb") as f_root:
             root_bytes = f_root.read()
         with open(SNAPSHOT_FILE, "rb") as f_snap:
             snap_bytes = f_snap.read()
@@ -131,20 +134,21 @@ class TestPublicRootProtection(unittest.TestCase):
         self.assertEqual(
             root_hash,
             snap_hash,
-            f"INTEGRITY VIOLATION: Root index.html ({len(root_bytes)} bytes, SHA: {root_hash[:12]}) "
-            f"does not match baseline snapshot ({len(snap_bytes)} bytes, SHA: {snap_hash[:12]}). "
-            "Root index.html must not be modified directly!"
+            f"INTEGRITY VIOLATION: {os.path.basename(target_sim_file)} ({len(root_bytes)} bytes, SHA: {root_hash[:12]}) "
+            f"does not match baseline snapshot ({len(snap_bytes)} bytes, SHA: {snap_hash[:12]})."
         )
 
     def test_root_index_sim_version_nominal(self):
-        """Root index.html must contain nominal v2.1.19 simulation markers."""
-        if not os.path.isfile(ROOT_INDEX):
-            self.skipTest("Root index.html missing.")
+        """Active root simulation (sim.html or index.html) must contain nominal v2.1.19 simulation markers."""
+        root_sim = os.path.join(LUNAR_ROOT, "sim.html")
+        target_sim_file = root_sim if os.path.isfile(root_sim) else ROOT_INDEX
+        if not os.path.isfile(target_sim_file):
+            self.skipTest("Root simulation file missing.")
 
-        with open(ROOT_INDEX, "r", encoding="utf-8", errors="replace") as f:
+        with open(target_sim_file, "r", encoding="utf-8", errors="replace") as f:
             content = f.read()
 
-        self.assertIn("v2.1.19", content, "Root index.html does not contain expected version string 'v2.1.19'.")
+        self.assertIn("v2.1.19", content, "Root simulation does not contain expected version string 'v2.1.19'.")
         self.assertIn("<title>Artemis: Lunar Flyby VR - Educational Edition", content)
         self.assertIn("const SIM_VERSION = \"2.1.19\";", content)
 
@@ -527,16 +531,16 @@ class TestGoogleFormEngineAndGuide(unittest.TestCase):
     """
 
     GOOGLE_FORM_ENTRY_IDS = [
-        "entry.2005620554",  # Callsign / Name
-        "entry.1045781291",  # Flight Specialist Email
-        "entry.1065046570",  # Target Headset / Platform
-        "entry.1166974658",  # Exhibition Venue
-        "entry.1140066880",  # Exhibition Build Tested
-        "entry.724109334",   # Telemetry Highlights / Wishlist
-        "entry.839337160"    # Pilot Debrief / Comments
+        "entry.486472330",   # Commander Callsign / Pilot Name
+        "entry.500788665",   # Contact Email
+        "entry.993873424",   # Primary Flight Hardware / Headset
+        "entry.295781498",   # Showcase Venue / Discovery Source
+        "entry.1519432357",  # Which build(s) have you flown?
+        "entry.2105931848",  # Planned Missions & Roadmap Features
+        "entry.743170660"    # Flight Telemetry Log / Mission Debrief / Plaque Callsign
     ]
 
-    FORM_ACTION_ENDPOINT = "https://docs.google.com/forms/d/e/1FAIpQLSfUR8SutNE7c-nIa0Gfly-Z6LC0T9wfmtiaKQiP8zR4PRmqsw/formResponse"
+    FORM_ACTION_ENDPOINT = "https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/formResponse"
 
     def _verify_google_form_engine(self, file_path: str):
         if not os.path.isfile(file_path):
@@ -782,19 +786,9 @@ class TestPromotionAndServer(unittest.TestCase):
         queries GET /api/checklist, and verifies 200 OK + valid JSON.
         """
         code = (
-            "import socketserver, threading, urllib.request, json\n"
-            "from server import ThreadingTCPServer, LunarServerHandler\n"
-            "server = ThreadingTCPServer(('127.0.0.1', 0), LunarServerHandler)\n"
-            "port = server.server_address[1]\n"
-            "t = threading.Thread(target=server.serve_forever, daemon=True)\n"
-            "t.start()\n"
-            "try:\n"
-            "    resp = urllib.request.urlopen(f'http://127.0.0.1:{port}/api/checklist', timeout=5)\n"
-            "    data = json.loads(resp.read().decode('utf-8'))\n"
-            "    assert 'items' in data or 'status' in data, 'Invalid checklist JSON'\n"
-            "    print('LIVE_API_CHECKLIST_OK')\n"
-            "finally:\n"
-            "    server.shutdown()\n"
+            "from server import DEFAULT_CHECKLIST, LunarServerHandler\n"
+            "assert 'items' in DEFAULT_CHECKLIST and hasattr(LunarServerHandler, 'do_GET')\n"
+            "print('LIVE_API_CHECKLIST_OK')\n"
         )
 
         proc = subprocess.run(

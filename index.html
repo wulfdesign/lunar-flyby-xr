@@ -890,7 +890,7 @@
       </a>
       <div class="status-pill">
         <span class="pulse-dot"></span>
-        <span>TELEMETRY ONLINE // v2.1.25</span>
+        <span>TELEMETRY ONLINE // v2.1.26</span>
       </div>
       <div class="nav-links">
         <a href="#briefing">Briefing</a>
@@ -1256,50 +1256,60 @@
     <!-- V2.0 / V3.0 DEVELOPMENT ROADMAP -->
     <section id="roadmap" class="hud-card">
       <div class="section-header">
-        <h2 class="tag-cyan">🗺️ Technical Roadmap &amp; Feature Horizons (V2.0 / V3.0)</h2>
+        <h2 class="tag-cyan">🗺️ Technical Roadmap &amp; Planned Cislunar Missions (V2.0 / V3.0)</h2>
       </div>
       <p style="font-size:0.92rem; color:#cbd5e1;">
-        Upcoming orbital avionics, spatial rendering enhancements, and commercial expansion packs currently in active development:
+        Upcoming orbital mission profiles, avionics upgrades, spatial rendering enhancements, and our Consumer Deep Space CubeSat initiative:
       </p>
 
       <div class="roadmap-grid">
         <div class="roadmap-node">
-          <div class="node-version">V3.0 Avionics</div>
-          <h4>Physical Pilot Command (Decoupled RCS 6DoF)</h4>
+          <div class="node-version">V2.2 Mission Profile</div>
+          <h4>Lunar Orbit Insertion (LOI) &amp; Return</h4>
           <p>
-            Full 6-degree-of-freedom reaction control system (RCS). Manual translational and rotational RCS thrusters mapped to physical VR thumbsticks and flight-stick HOTAS.
+            Execute a retrograde perilune capture burn to enter Low Lunar Orbit instead of a passive Free Return, conduct multi-orbit lunar reconnaissance, and fire a timed Trans-Earth Injection (TEI) burn for Earth return.
           </p>
         </div>
         <div class="roadmap-node">
-          <div class="node-version">V2.2 Navigation</div>
-          <h4>Avionics &amp; Orthographic Minimap</h4>
+          <div class="node-version">V2.4 Cislunar Logistics</div>
+          <h4>Earth–Moon Cycler Orbit</h4>
           <p>
-            Dual trajectory trail visualization: white historical trajectory flown vs. blue predicted gravitational orbit. Orthographic 3/4 top-down cislunar minimap with target waypoints.
+            Navigate a repeating cislunar gravity-assist cycler trajectory that shuttles continuously between Earth and Moon encounters using minimal station-keeping propellant.
           </p>
         </div>
         <div class="roadmap-node">
-          <div class="node-version">V2.5 Spatial Graphics</div>
-          <h4>3D WebXR Cockpit &amp; NASA GLB Models</h4>
+          <div class="node-version">V2.5 Deep Space Station</div>
+          <h4>Lunar Gateway NRHO Rendezvous &amp; Docking</h4>
           <p>
-            High-fidelity 3D spacecraft interior with interactive spatial panels, physical switches, and authenticated NASA GLB vehicle exterior meshes.
+            Insert into a Near-Rectilinear Halo Orbit (NRHO), match phase vectors with the Lunar Gateway station, and execute 6DoF proximity approach and docking.
           </p>
         </div>
         <div class="roadmap-node">
-          <div class="node-version">V2.8 Celestial Engine</div>
-          <h4>Astronomical Fidelity &amp; Tidal Locking</h4>
+          <div class="node-version">V2.6 3-Body Sandbox</div>
+          <h4>Lagrangian Points (L1–L4) &amp; Custom Delta-V</h4>
           <p>
-            True celestial sphere rendering mapped from the Hipparcos star catalog, coupled with accurate 1:1 Earth-Moon tidal locking and lunar libration matrices.
+            Plot custom maneuver nodes across the Earth–Moon 3-body gravitational potential well, station-keeping in L1/L2 halo orbits and L4/L5 Trojan equilibrium pockets.
+          </p>
+        </div>
+        <div class="roadmap-node">
+          <div class="node-version">V2.8 Spatial Avionics</div>
+          <h4>3D NASA Cockpit, Orthographic Minimap &amp; Hipparcos Sky</h4>
+          <p>
+            Interactive 3D WebXR flight deck with authenticated NASA Orion/SLS GLB meshes, dual trajectory trail minimap (flown vs. predicted orbit), and 1:1 lunar tidal locking.
+          </p>
+        </div>
+        <div class="roadmap-node">
+          <div class="node-version">V3.0 Full Manual 6DoF</div>
+          <h4>Decoupled RCS Attitude &amp; Historical / Mars Profiles</h4>
+          <p>
+            Uncouple spacecraft attitude from the prograde vector for manual Yaw/Pitch/Roll RCS thrusters across <strong>Apollo 13 Emergency Recovery</strong>, <strong>Apollo 11 Powered Descent</strong>, and <strong>Mars Aerobraking Corridor</strong> scenarios.
           </p>
         </div>
         <div class="roadmap-node" style="grid-column: 1 / -1; border-color:var(--telemetry-green);">
-          <div class="node-version" style="color:var(--telemetry-green);">Commercial Expansion</div>
-          <h4>Modular Mission Pack Marketplace</h4>
+          <div class="node-version" style="color:var(--telemetry-green);">Hardware &amp; Telemetry Bridge // Consumer Deep Space</div>
+          <h4>6U/12U Cislunar CubeSat Digital Twin &amp; Flight Telemetry Log Upload</h4>
           <p>
-            Modular scenario engine supporting drop-in historical and speculative spaceflight missions:
-            <br>• <strong>Mission Pack 1: Apollo 11</strong> — Historical 1969 Free Return trajectory, CSM-LM transposition, and powered descent.
-            <br>• <strong>Mission Pack 2: Lunar Gateway</strong> — Near-Rectilinear Halo Orbit (NRHO) station rendezvous and automated docking.
-            <br>• <strong>Mission Pack 3: Mars Transit</strong> — Earth-to-Mars Cycler trajectory and atmospheric aerocapture.
-            <br>• <strong>Mission Pack 4: Cislunar Sandbox</strong> — Customizable N-body physics laboratory with adjustable mass ratios and launch vectors.
+            <em>Artemis: The Free Return</em> serves as the interactive orbital visualization and telemetry testbed for our long-term <strong>Consumer Deep Space 6U/12U CubeSat</strong> initiative—combining high-performance COTS mobile SoCs with a radiation-tolerant FPGA hardware watchdog for real cislunar flight. Pilots can export JSON flight logs (<span class="key-badge">SAVE FLIGHT LOG</span>) and submit mission telemetry directly through the Pilot Intake &amp; Telemetry Terminal below.
           </p>
         </div>
       </div>
@@ -1346,21 +1356,18 @@
       </div>
     </section>
 
-    <!-- SILENT GOOGLE FORM INTAKE ENGINE -->
+    <!-- SILENT GOOGLE FORM INTAKE ENGINE (DEDICATED ARTEMIS: THE FREE RETURN FORM) -->
     <section id="intake" class="intake-terminal">
       <div class="section-header">
-        <h2 class="tag-cyan">🚧 📬 Artemis Flight Test Channel // Pilot Intake Roster — Under Construction 🚧</h2>
-      </div>
-      <div class="audit-warning-box" style="margin-top:0; margin-bottom:1.15rem;">
-        <strong>🚧 Under Construction Notice:</strong> This intake section currently routes to our shared <strong>UpLiftVR Studios Feedback &amp; Early Access Form</strong> while we finish wiring the dedicated <em>Artemis: The Free Return</em> standalone form (updating soon!). Your callsign, email, and mission feedback are still captured 100% by Mission Control.
+        <h2 class="tag-cyan">📬 Artemis Flight Test Channel // Pilot Intake, Telemetry &amp; Mission Poll</h2>
       </div>
       <p style="font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
-        Submit your callsign and flight preferences below to receive standalone Meta Quest Horizon Store beta keys, PCVR dev builds, and development dispatches. Submissions are dispatched directly to Mission Control.
+        Register your callsign on the official <strong>Artemis: The Free Return (Lunar Flyby XR)</strong> flight roster to receive Meta Quest Horizon Store beta keys, vote on upcoming cislunar mission profiles (such as <em>Lunar Orbit &amp; Return</em> or the <em>Earth–Moon Cycler</em>), and log your flight telemetry debriefs.
       </p>
 
-      <!-- Google Form Native Submission Target -> hidden_gform -->
+      <!-- Dedicated Artemis Google Form Native Submission Target -> hidden_gform -->
       <form id="lunarLeadForm"
-            action="https://docs.google.com/forms/d/e/1FAIpQLSfUR8SutNE7c-nIa0Gfly-Z6LC0T9wfmtiaKQiP8zR4PRmqsw/formResponse"
+            action="https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/formResponse"
             method="POST"
             target="hidden_gform"
             onsubmit="return validateAndSubmitLead();"
@@ -1370,85 +1377,91 @@
         <input type="text" id="fb-hp" name="website_hp" style="display:none !important;" tabindex="-1" autocomplete="off">
 
         <div class="form-grid-layout">
-          <!-- Callsign / Name (entry.2005620554, Required) -->
+          <!-- Q1: Callsign / Name (entry.486472330, Required) -->
           <div class="form-group">
-            <label for="pilot-callsign">Commander Callsign / Full Name *</label>
-            <input type="text" id="pilot-callsign" name="entry.2005620554" placeholder="e.g. Commander Shepard" required>
+            <label for="pilot-callsign">Commander Callsign / Pilot Name *</label>
+            <input type="text" id="pilot-callsign" name="entry.486472330" placeholder="e.g. CDR-SHEPARD / Alex Vance" required>
           </div>
 
-          <!-- Contact Email (entry.1045781291, Required, Email subtype) -->
+          <!-- Q2: Contact Email (entry.500788665, Required) -->
           <div class="form-group">
-            <label for="pilot-email">Contact Email (Meta / Oculus Account) *</label>
-            <input type="email" id="pilot-email" name="entry.1045781291" placeholder="commander@example.com" required>
+            <label for="pilot-email">Contact Email (Early Access, Mission Updates &amp; Beta Keys) *</label>
+            <input type="email" id="pilot-email" name="entry.500788665" placeholder="commander@example.com" required>
           </div>
 
-          <!-- Hardware Version (entry.1065046570, Required) -->
+          <!-- Q3: Primary Flight Hardware / Headset (entry.993873424, Required, exact match options) -->
           <div class="form-group form-span-2">
-            <label for="pilot-headset">Target Flight Hardware / Headset *</label>
-            <select id="pilot-headset" name="entry.1065046570" required>
-              <option value="" disabled selected>Select Primary VR / Browser Hardware...</option>
-              <option value="Meta Quest 3 / 3S Standalone (Horizon OS Browser)">Meta Quest 3 / 3S Standalone (Horizon OS Browser 6DoF)</option>
-              <option value="Meta Quest 2 Standalone">Meta Quest 2 Standalone</option>
-              <option value="PCVR - Meta Quest via Link / Virtual Desktop">PCVR - Meta Quest via Link / Virtual Desktop (SteamVR)</option>
-              <option value="PCVR - HTC Vive / Valve Index / Bigscreen Beyond">PCVR - HTC Vive / Valve Index / Bigscreen Beyond</option>
-              <option value="Desktop Chrome / Edge WebXR Browser">Desktop Chrome / Edge WebXR Browser (Mouse & Keyboard)</option>
-              <option value="Mobile WebXR / Android Chrome">Mobile WebXR / Android Chrome</option>
-              <option value="Apple Vision Pro (Safari WebXR)">Apple Vision Pro (Safari WebXR)</option>
+            <label for="pilot-headset">Primary Flight Hardware / Headset *</label>
+            <select id="pilot-headset" name="entry.993873424" required>
+              <option value="" disabled selected>Select Primary VR / Browser Flight Deck...</option>
+              <option value="Meta Quest 3 / Quest 3S (Standalone WebXR / Horizon Store)">Meta Quest 3 / Quest 3S (Standalone WebXR / Horizon Store)</option>
+              <option value="Meta Quest 2 / Pro (Standalone or PCVR Link)">Meta Quest 2 / Pro (Standalone or PCVR Link)</option>
+              <option value="PCVR Headset (Valve Index / Vive / Bigscreen Beyond / Pimax)">PCVR Headset (Valve Index / Vive / Bigscreen Beyond / Pimax)</option>
+              <option value="Apple Vision Pro / Android XR Headset">Apple Vision Pro / Android XR Headset</option>
+              <option value="Desktop 2D Browser (Mouse & Keyboard Flight Deck)">Desktop 2D Browser (Mouse &amp; Keyboard Flight Deck)</option>
+              <option value="Mobile / Tablet Browser">Mobile / Tablet Browser</option>
             </select>
           </div>
 
-          <!-- Venue / Encounter (entry.1166974658, Optional) -->
+          <!-- Q4: Showcase Venue / Discovery Source (entry.295781498, Optional) -->
           <div class="form-group form-span-2">
-            <label for="pilot-venue">Where did you discover or demo the experience?</label>
-            <input type="text" id="pilot-venue" name="entry.1166974658" placeholder="e.g. KremFest XR 2026, GeekGirlCon, PAX West, SLICE, FilmFreeway, Web Search">
+            <label for="pilot-venue">Where did you experience or discover Artemis: The Free Return?</label>
+            <input type="text" id="pilot-venue" name="entry.295781498" placeholder="e.g. Web Portal / GitHub Pages, KremFest XR 2026, GeekGirlCon 2026, Seattle Space Week, SiM PAX West, SLICE 2026">
           </div>
 
-          <!-- Version Tested (entry.1140066880, Checkboxes) -->
+          <!-- Q5: Version Tested (entry.1519432357, Checkboxes) -->
           <div class="form-group form-span-2">
-            <label>Which build(s) have you experienced? (Select all that apply)</label>
+            <label>Which build(s) have you flown? (Select all that apply)</label>
             <div class="checkbox-deck">
               <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1140066880" value="Meta Quest - Standalone">
-                <span>Meta Quest - Standalone</span>
+                <input type="checkbox" name="entry.1519432357" value="WebXR Browser (Desktop / Mobile / Headset Online)">
+                <span>WebXR Browser (Online)</span>
               </label>
               <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1140066880" value="Meta Quest - PCVR (our Dev system or VRReady Laptop)">
+                <input type="checkbox" name="entry.1519432357" value="Meta Quest 3 / 3S - Standalone">
+                <span>Meta Quest 3 / 3S - Standalone</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.1519432357" value="Meta Quest - PCVR (Link / Virtual Desktop / SteamVR)">
                 <span>Meta Quest - PCVR</span>
               </label>
               <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1140066880" value="HTC Vive - PCVR (Legacy from film festivals & events pre-2020)">
-                <span>HTC Vive - PCVR</span>
+                <input type="checkbox" name="entry.1519432357" value="HTC Vive / Index - PCVR">
+                <span>HTC Vive / Index - PCVR</span>
               </label>
               <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1140066880" value="WebXR Browser (Desktop / Mobile)">
-                <span>WebXR Browser (Online)</span>
+                <input type="checkbox" name="entry.1519432357" value="Haven't flown yet — joining the Pilot Roster / Waitlist!">
+                <span>Joining Pilot Roster / Waitlist</span>
               </label>
             </div>
           </div>
 
-          <!-- Wishlist / Likes (entry.724109334, Optional) -->
+          <!-- Q6: Planned Missions & V2.0/V3.0 Roadmap Features (entry.2105931848) -->
           <div class="form-group form-span-2">
-            <label for="pilot-likes">Upcoming Features &amp; Mission Packs of Greatest Interest</label>
-            <select id="pilot-likes" name="entry.724109334">
-              <option value="Apollo 11 Historical Free Return & Powered Descent">Apollo 11 Historical Free Return &amp; Powered Lunar Descent</option>
-              <option value="Lunar Gateway NRHO Halo Orbit Rendezvous & Docking">Lunar Gateway NRHO Halo Orbit Rendezvous &amp; Docking</option>
-              <option value="Physical 6DoF RCS Attitude Control with HOTAS / VR Sticks">Physical 6DoF RCS Attitude Control with HOTAS / VR Sticks</option>
-              <option value="3D WebXR Cockpit with NASA Vehicle Models">3D WebXR Cockpit with Authenticated NASA Vehicle Models</option>
-              <option value="Mars Transit Cycler & Aerocapture">Mars Transit Cycler &amp; Atmospheric Aerocapture</option>
-              <option value="General Physics Realism & Cislunar Free Return">General Newtonian Physics Realism &amp; Free Return Dynamics</option>
+            <label for="pilot-likes">Primary Planned Mission / Roadmap Feature You Are Most Excited For</label>
+            <select id="pilot-likes" name="entry.2105931848">
+              <option value="Lunar Orbit Insertion (LOI) & Trans-Earth Return (Retrograde Perilune Capture & TEI Burn)">Lunar Orbit Insertion (LOI) &amp; Trans-Earth Return (Retrograde Perilune Capture &amp; TEI Burn)</option>
+              <option value="Earth–Moon Cycler Orbit (Repeating Cislunar Gravity-Assist Trajectory)">Earth–Moon Cycler Orbit (Repeating Cislunar Gravity-Assist Trajectory)</option>
+              <option value="Lunar Gateway Rendezvous & NRHO Station-Keeping / 6DoF Docking">Lunar Gateway Rendezvous &amp; NRHO Station-Keeping / 6DoF Docking</option>
+              <option value="Lagrangian Points (L1–L4) & Custom Delta-V Orbit Sandbox">Lagrangian Points (L1–L4) &amp; Custom Delta-V Orbit Sandbox</option>
+              <option value="Apollo 13: The Recovery (Historical Emergency Free-Return Survival)">Apollo 13: The Recovery (Historical Emergency Free-Return Survival)</option>
+              <option value="Apollo 11 Powered Lunar Descent & Manual RCS Boulder-Field Touchdown">Apollo 11 Powered Lunar Descent &amp; Manual RCS Boulder-Field Touchdown</option>
+              <option value="Mars Transit, Arrival & Atmospheric Skip Aerobraking Corridor">Mars Transit, Arrival &amp; Atmospheric Skip Aerobraking Corridor</option>
+              <option value="Physical 6DoF RCS Attitude Control, NASA Orion 3D Cockpit & Overview Minimap">Physical 6DoF RCS Attitude Control, NASA Orion 3D Cockpit &amp; Overview Minimap</option>
+              <option value="Consumer Deep Space 6U/12U CubeSat Digital Twin & Live Flight Telemetry Upload">Consumer Deep Space 6U/12U CubeSat Digital Twin &amp; Live Flight Telemetry Upload</option>
             </select>
           </div>
 
-          <!-- Pilot Comments / Debrief (entry.839337160, Optional) -->
+          <!-- Q7: Pilot Debrief & Telemetry Log Notes (entry.743170660, Optional) -->
           <div class="form-group form-span-2">
-            <label for="pilot-comments">Pilot Debrief / Recommendations / Cockpit Plaque Call Sign Notes</label>
-            <textarea id="pilot-comments" name="entry.839337160" rows="3" placeholder="Telemetry feedback, feature requests, or notes for your engraved backer plaque..."></textarea>
+            <label for="pilot-comments">Flight Telemetry Log / Mission Debrief / Cockpit Plaque Callsign</label>
+            <textarea id="pilot-comments" name="entry.743170660" rows="3" placeholder="Paste your flight telemetry stats (MET Flight Time, Perilune Altitude, Max Entry G-Load, Splashdown Outcome), mission feedback, or backer plaque callsign..."></textarea>
           </div>
 
           <!-- Submission Button -->
           <div class="form-span-2" style="margin-top:0.5rem; text-align:center;">
             <button type="submit" id="btnSubmitLead" class="btn-submit-lead">
-              🚀 Log Flight Clearance &amp; Submit Credentials
+              🚀 Log Flight Clearance &amp; Submit Telemetry
             </button>
           </div>
         </div>
@@ -1456,14 +1469,14 @@
 
       <!-- Instant Confirmation Banner -->
       <div id="formSuccessBanner">
-        <h4>🎉 Flight Clearance Confirmed // Data Synced</h4>
+        <h4>🎉 Flight Clearance Confirmed // Dedicated Artemis Telemetry Synced</h4>
         <p style="font-size:0.95rem; margin-bottom:0.75rem;">
-          Thank you, <strong id="confirmedCallsign">Commander</strong>. Your telemetry credentials have been safely recorded into the mission intake manifest. You are queued for closed beta dispatches and flight deck clearance.
+          Thank you, <strong id="confirmedCallsign">Commander</strong>. Your pilot credentials, mission vote, and telemetry debrief have been recorded into the dedicated <em>Artemis: The Free Return</em> Mission Control manifest.
         </p>
         <p style="font-size:0.8rem; color:#94a3b8; font-family:var(--font-mono);">
-          Dual-layer persistence confirmed: Local cache registered &bull; Dispatched to Google Forms intake engine.
+          Dual-layer persistence confirmed: Local cache registered &bull; Dispatched to dedicated Artemis Google Form intake engine.
           <br>
-          Direct form backup: <a href="https://forms.gle/C1eSVvNBUsqhWwdQA" target="_blank" rel="noopener" style="color:var(--hud-cyan);">https://forms.gle/C1eSVvNBUsqhWwdQA</a>
+          Direct form link: <a href="https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/viewform" target="_blank" rel="noopener" style="color:var(--hud-cyan);">Open Standalone Artemis Intake Form ↗</a>
         </p>
       </div>
     </section>
@@ -1478,7 +1491,7 @@
           ARTEMIS: THE FREE RETURN (LUNAR FLYBY XR)
         </div>
         <div style="font-size:0.82rem; color:#64748b;">
-          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.25
+          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.26
         </div>
       </div>
       <div class="footer-links">
@@ -1529,9 +1542,9 @@
       const likes = document.getElementById('pilot-likes').value;
       const comments = document.getElementById('pilot-comments').value.trim();
 
-      // Gather checked builds
+      // Gather checked builds (entry.1519432357)
       const checkedBuilds = [];
-      document.querySelectorAll('input[name="entry.1140066880"]:checked').forEach(cb => {
+      document.querySelectorAll('input[name="entry.1519432357"]:checked').forEach(cb => {
         checkedBuilds.push(cb.value);
       });
 

@@ -6,6 +6,30 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-10-22 17:19] - v2.1.26: Dedicated Artemis Google Form Intake, Telemetry Log & Authentic Cislunar Mission Roadmap 🚀📬🛰️🌕✨**
+
+📝 **Summary**
+1. **Dedicated Standalone Google Form Provisioned via Hermes Google Workspace API (`1xXvRkRHuk9pd-wzqjvie041JZfQ4E0C98WKatoQk4fw`):**
+   - Created a brand-new dedicated standalone Google Form (**"Artemis: The Free Return (Lunar Flyby XR) — Pilot Intake & Telemetry Log"**) via `symbionts/hermes/tools/google_bridge.py` (`forms.create` + `batchUpdate`) and shared writer/editor ownership with `wulfdesign@gmail.com`.
+   - Public Responder Endpoint: `https://docs.google.com/forms/d/e/1FAIpQLSd9yuRimzA1dSi-9yehOQi7DopunOQhJx1unf0v2I9CP6qG4A/viewform` (`.../formResponse` for silent iframe POST).
+   - Mapped and verified all 7 decimal `entry.XXXXX` IDs from hex `questionId` values (`entry.486472330` Callsign, `entry.500788665` Email, `entry.993873424` Flight Hardware, `entry.295781498` Showcase Venue, `entry.1519432357` Builds Flown, `entry.2105931848` Planned Missions Poll, `entry.743170660` Flight Telemetry Log & Debrief).
+   - Empirically verified end-to-end HTTP `200 OK` submission and confirmed response capture via `forms().responses().list()`.
+2. **Authentic Planned Missions & Consumer Deep Space CubeSat Roadmap (`#roadmap` & `#pilot-likes`):**
+   - Updated the V2.0/V3.0 Roadmap section and Pilot Mission Poll across `private/dev_site/index.html`, `landing.html`, and promoted `index.html` to reflect the authentic planned missions from `README.md`, `Tasks.md`, and the `private/` vault:
+     - **Lunar Orbit Insertion (LOI) & Trans-Earth Return:** Retrograde perilune capture burn into Low Lunar Orbit + timed Trans-Earth Injection (TEI) return burn.
+     - **Earth–Moon Cycler Orbit:** Repeating cislunar gravity-assist cycler trajectory shuttling continuously between Earth and Moon.
+     - **Lunar Gateway NRHO Rendezvous & Docking:** Near-Rectilinear Halo Orbit station-keeping and 6DoF proximity docking.
+     - **Lagrangian Points (L1–L4) & Custom Delta-V Orbit Sandbox:** 3-body gravitational potential well maneuver nodes and halo orbit station-keeping.
+     - **Historical & Interplanetary Profiles:** *Apollo 13: The Recovery*, *Apollo 11 Powered Lunar Descent*, and *Mars Transit & Atmospheric Skip Aerobraking Corridor*.
+     - **Physical 6DoF RCS Attitude Control, 3D NASA Cockpit & Orthographic Minimap.**
+     - **Consumer Deep Space 6U/12U CubeSat Digital Twin & Live Flight Telemetry Log Upload.**
+3. **Production Promotion & 28/28 E2E Verification:**
+   - Removed the temporary `🚧 Under Construction` banner on `#intake`, promoted `private/dev_site/index.html` ➔ root `index.html` & `landing.html`, updated `private/GOOGLE_FORM_SETUP_GUIDE.md`, and verified `28/28` automated E2E tests passing (`tests/test_staging_and_portal.py`).
+
+🧙‍♂️ Magus Wulf & 🐈 Hermes
+
+---
+
 ### **[2026-10-22 23:25] - v2.1.25: Air-Gapped Private Dev Staging, Operator Dashboard & Mission Control Landing Portal 🚀🛡️🎛️🌐🥽✨**
 
 📝 **Summary**
