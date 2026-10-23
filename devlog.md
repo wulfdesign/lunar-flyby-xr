@@ -6,6 +6,24 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-10-22 17:34] - v2.1.27: Universal Desktop / Laptop / Tablet / Phone Platform Multi-Select + Write-In & Streamlined XR Options 💻📱🥽✨**
+
+📝 **Summary**
+1. **Universal Browser Accessibility First (Desktop, Laptop, Tablet & Phone + Optional VR/XR):**
+   - Updated Hero telemetry badges, CTA buttons, and the `#hardware` section (`💻 📱 🥽 Play on Desktop, Tablet & Phone — or Step Inside in VR / XR`) across `private/dev_site/index.html`, `landing.html`, and promoted `index.html` to emphasize that *Artemis: The Free Return* is 100% accessible in any everyday Desktop, Laptop, Tablet, or Smartphone browser while offering WebXR headsets as a profound stereoscopic option.
+2. **Multi-Select Platform Checkboxes (`entry.993873424`) + Platform / XR Headset Write-In (`entry.1519432357`):**
+   - Updated Question #3 (`entry.993873424`) in the dedicated Google Form (`1xXvRkRHuk9pd-wzqjvie041JZfQ4E0C98WKatoQk4fw`) and on the website to a multi-select checkbox group (**"Select Your Platform(s)"**):
+     - `💻 Desktop / Laptop Browser (Windows / Mac / Linux)`
+     - `📟 Tablet / iPad Browser`
+     - `📱 Phone / Mobile Browser (iOS / Android)`
+     - `🥽 VR / XR Headset (Standalone or PCVR)`
+   - Replaced the redundant 5-build XR checkbox list with a unified **Platform Write-In / XR Headset Type (`entry.1519432357`)** text field featuring quick-add chips (`+ Desktop / Laptop`, `+ Tablet / Phone`, `+ XR: Quest 3 / 3S`, `+ XR: Quest 2 / Pro`, `+ XR: PCVR`, `+ XR: Vision Pro / Other`) and `<datalist>` autocomplete.
+   - Empirically verified multi-select + write-in submission (`HTTP 200 OK`, 3 total recorded responses in Google Form) and `28/28` E2E tests passing.
+
+🧙‍♂️ Magus Wulf & 🐈 Hermes
+
+---
+
 ### **[2026-10-22 17:19] - v2.1.26: Dedicated Artemis Google Form Intake, Telemetry Log & Authentic Cislunar Mission Roadmap 🚀📬🛰️🌕✨**
 
 📝 **Summary**

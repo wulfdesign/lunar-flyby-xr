@@ -890,14 +890,14 @@
       </a>
       <div class="status-pill">
         <span class="pulse-dot"></span>
-        <span>TELEMETRY ONLINE // v2.1.26</span>
+        <span>TELEMETRY ONLINE // v2.1.27</span>
       </div>
       <div class="nav-links">
         <a href="#briefing">Briefing</a>
         <a href="#controls">Flight Controls</a>
         <a href="#pedigree">Pedigree</a>
         <a href="#roadmap">Roadmap</a>
-        <a href="#hardware">Hardware</a>
+        <a href="#hardware">Platforms</a>
         <a href="#intake">Join Intake</a>
         <a href="sim.html" class="nav-cta btn-launch-sim">LAUNCH SIM ↗</a>
       </div>
@@ -921,16 +921,16 @@
       <!-- Telemetry Status Badges -->
       <div class="telemetry-badges-strip">
         <div class="telemetry-badge-item">
-          <span class="bullet">◆</span> Real-Time Newtonian N-Body Physics
+          <span class="bullet">◆</span> Desktop, Laptop, Tablet &amp; Phone Ready
         </div>
         <div class="telemetry-badge-item">
-          <span class="bullet">◆</span> Velocity Verlet Solver
+          <span class="bullet">◆</span> Real-Time Newtonian N-Body Physics
         </div>
         <div class="telemetry-badge-item">
           <span class="bullet">◆</span> ~16-Min Turnkey Autopilot
         </div>
         <div class="telemetry-badge-item">
-          <span class="bullet">◆</span> WebXR 6DoF
+          <span class="bullet">◆</span> Optional WebXR 6DoF VR Mode
         </div>
       </div>
 
@@ -943,7 +943,7 @@
           🎮 Flight Controls &amp; Autopilot
         </a>
         <a href="#hardware" class="btn-jump-secondary">
-          🥽 WebXR Headset Setup
+          💻 📱 🥽 Platforms &amp; VR Setup
         </a>
         <a href="#roadmap" class="btn-jump-secondary">
           🗺️ V2.0 / V3.0 Roadmap
@@ -1317,12 +1317,12 @@
 
     <!-- HARDWARE RECOMMENDATION & BACKER PLAQUE SECTION -->
     <section id="hardware" class="hardware-backer-grid">
-      <!-- Hardware Recommendation Card -->
+      <!-- Universal Browser & VR Hardware Card -->
       <div class="action-card" style="border-left: 4px solid var(--hud-cyan);">
         <div>
-          <h3 class="tag-cyan">🥽 Recommended VR Hardware</h3>
+          <h3 class="tag-cyan">💻 📱 🥽 Play on Desktop, Tablet &amp; Phone — or Step Inside in VR / XR</h3>
           <p>
-            <em>Artemis: The Free Return</em> runs natively inside the Meta Quest Browser with zero downloads or cables required. We recommend the <strong>Meta Quest 3 or Meta Quest 3S</strong> for crisp pancake lens optics, 90 FPS low-latency rendering, and natural 6DoF hand/controller immersion.
+            <em>Artemis: The Free Return</em> is engineered first and foremost to be <strong>100% accessible right in your web browser on any Desktop, Laptop, Tablet, or Smartphone</strong> with zero downloads or installs required. And when you're ready for a truly profound stereoscopic experience, launch it inside a <strong>WebXR headset</strong> (such as the Meta Quest 3 / 3S, PCVR, or Vision Pro) to sit physically inside the cislunar flight deck.
           </p>
         </div>
         <div>
@@ -1331,11 +1331,11 @@
               🎁 Meta Quest Referral ($30–$60 Credit) ↗
             </a>
             <a href="https://amazon.com/dp/B0C8VKH1G9?tag=wulfdesign-20" target="_blank" rel="noopener" class="btn-affiliate">
-              🛒 Order Quest 3 on Amazon ↗
+              🛒 Explore Quest 3 on Amazon ↗
             </a>
           </div>
           <div style="font-size:0.75rem; color:#64748b; font-family:var(--font-mono);">
-            *Affiliate links support independent spaceflight simulator development at no additional cost to you.
+            *Optional VR hardware affiliate links support independent spaceflight simulator development at no extra cost to you.
           </div>
         </div>
       </div>
@@ -1362,7 +1362,7 @@
         <h2 class="tag-cyan">📬 Artemis Flight Test Channel // Pilot Intake, Telemetry &amp; Mission Poll</h2>
       </div>
       <p style="font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
-        Register your callsign on the official <strong>Artemis: The Free Return (Lunar Flyby XR)</strong> flight roster to receive Meta Quest Horizon Store beta keys, vote on upcoming cislunar mission profiles (such as <em>Lunar Orbit &amp; Return</em> or the <em>Earth–Moon Cycler</em>), and log your flight telemetry debriefs.
+        Register your callsign on the official <strong>Artemis: The Free Return (Lunar Flyby XR)</strong> flight roster to receive mission updates, vote on upcoming cislunar trajectories (such as <em>Lunar Orbit &amp; Return</em> or the <em>Earth–Moon Cycler</em>), and log your flight telemetry debriefs across Desktop, Mobile, or XR.
       </p>
 
       <!-- Dedicated Artemis Google Form Native Submission Target -> hidden_gform -->
@@ -1385,55 +1385,59 @@
 
           <!-- Q2: Contact Email (entry.500788665, Required) -->
           <div class="form-group">
-            <label for="pilot-email">Contact Email (Early Access, Mission Updates &amp; Beta Keys) *</label>
+            <label for="pilot-email">Contact Email (Mission Updates, Early Access &amp; Beta Keys) *</label>
             <input type="email" id="pilot-email" name="entry.500788665" placeholder="commander@example.com" required>
           </div>
 
-          <!-- Q3: Primary Flight Hardware / Headset (entry.993873424, Required, exact match options) -->
+          <!-- Q3: Select Your Platform(s) Multi-Select Checkboxes (entry.993873424) -->
           <div class="form-group form-span-2">
-            <label for="pilot-headset">Primary Flight Hardware / Headset *</label>
-            <select id="pilot-headset" name="entry.993873424" required>
-              <option value="" disabled selected>Select Primary VR / Browser Flight Deck...</option>
-              <option value="Meta Quest 3 / Quest 3S (Standalone WebXR / Horizon Store)">Meta Quest 3 / Quest 3S (Standalone WebXR / Horizon Store)</option>
-              <option value="Meta Quest 2 / Pro (Standalone or PCVR Link)">Meta Quest 2 / Pro (Standalone or PCVR Link)</option>
-              <option value="PCVR Headset (Valve Index / Vive / Bigscreen Beyond / Pimax)">PCVR Headset (Valve Index / Vive / Bigscreen Beyond / Pimax)</option>
-              <option value="Apple Vision Pro / Android XR Headset">Apple Vision Pro / Android XR Headset</option>
-              <option value="Desktop 2D Browser (Mouse & Keyboard Flight Deck)">Desktop 2D Browser (Mouse &amp; Keyboard Flight Deck)</option>
-              <option value="Mobile / Tablet Browser">Mobile / Tablet Browser</option>
-            </select>
+            <label>Select Your Platform(s) (Check all that apply — Desktop, Laptop, Tablet, Phone &amp; XR)</label>
+            <div class="checkbox-deck">
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.993873424" value="Desktop / Laptop Browser (Windows / Mac / Linux)" checked>
+                <span>💻 Desktop / Laptop Browser</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.993873424" value="Tablet / iPad Browser">
+                <span>📟 Tablet / iPad Browser</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.993873424" value="Phone / Mobile Browser (iOS / Android)">
+                <span>📱 Phone / Mobile Browser</span>
+              </label>
+              <label class="checkbox-pill">
+                <input type="checkbox" name="entry.993873424" value="VR / XR Headset (Standalone or PCVR)">
+                <span>🥽 VR / XR Headset</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Q5: Platform Write-In / XR Headset Type (entry.1519432357, Optional Write-In + Quick-Add Chips) -->
+          <div class="form-group form-span-2">
+            <label for="pilot-headset">Platform Write-In / XR Headset Type (Optional — write in your device or XR headset type)</label>
+            <input type="text" id="pilot-headset" name="entry.1519432357" list="xr-platform-suggestions" placeholder="Write in your setup (e.g. Desktop Chrome, iPad, Android, Meta Quest 3, PCVR / SteamVR, Vision Pro)...">
+            <datalist id="xr-platform-suggestions">
+              <option value="Desktop / Laptop (Windows / Mac / Linux Browser)">
+              <option value="Tablet / Phone (iOS Safari / Android Chrome)">
+              <option value="VR / XR: Meta Quest 3 / 3S (Standalone)">
+              <option value="VR / XR: Meta Quest 2 / Pro">
+              <option value="VR / XR: PCVR (SteamVR / Link / Index / Vive)">
+              <option value="VR / XR: Apple Vision Pro / Android XR">
+            </datalist>
+            <div style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-top:0.4rem;">
+              <button type="button" class="key-badge" style="cursor:pointer;" onclick="appendPlatformTag('Desktop / Laptop')">+ Desktop / Laptop</button>
+              <button type="button" class="key-badge" style="cursor:pointer;" onclick="appendPlatformTag('Tablet / Phone')">+ Tablet / Phone</button>
+              <button type="button" class="key-badge" style="cursor:pointer;" onclick="appendPlatformTag('Quest 3 / 3S')">+ XR: Quest 3 / 3S</button>
+              <button type="button" class="key-badge" style="cursor:pointer;" onclick="appendPlatformTag('Quest 2 / Pro')">+ XR: Quest 2 / Pro</button>
+              <button type="button" class="key-badge" style="cursor:pointer;" onclick="appendPlatformTag('PCVR (SteamVR / Index / Vive)')">+ XR: PCVR</button>
+              <button type="button" class="key-badge" style="cursor:pointer;" onclick="appendPlatformTag('Vision Pro / Android XR')">+ XR: Vision Pro / Other</button>
+            </div>
           </div>
 
           <!-- Q4: Showcase Venue / Discovery Source (entry.295781498, Optional) -->
           <div class="form-group form-span-2">
             <label for="pilot-venue">Where did you experience or discover Artemis: The Free Return?</label>
             <input type="text" id="pilot-venue" name="entry.295781498" placeholder="e.g. Web Portal / GitHub Pages, KremFest XR 2026, GeekGirlCon 2026, Seattle Space Week, SiM PAX West, SLICE 2026">
-          </div>
-
-          <!-- Q5: Version Tested (entry.1519432357, Checkboxes) -->
-          <div class="form-group form-span-2">
-            <label>Which build(s) have you flown? (Select all that apply)</label>
-            <div class="checkbox-deck">
-              <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1519432357" value="WebXR Browser (Desktop / Mobile / Headset Online)">
-                <span>WebXR Browser (Online)</span>
-              </label>
-              <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1519432357" value="Meta Quest 3 / 3S - Standalone">
-                <span>Meta Quest 3 / 3S - Standalone</span>
-              </label>
-              <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1519432357" value="Meta Quest - PCVR (Link / Virtual Desktop / SteamVR)">
-                <span>Meta Quest - PCVR</span>
-              </label>
-              <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1519432357" value="HTC Vive / Index - PCVR">
-                <span>HTC Vive / Index - PCVR</span>
-              </label>
-              <label class="checkbox-pill">
-                <input type="checkbox" name="entry.1519432357" value="Haven't flown yet — joining the Pilot Roster / Waitlist!">
-                <span>Joining Pilot Roster / Waitlist</span>
-              </label>
-            </div>
           </div>
 
           <!-- Q6: Planned Missions & V2.0/V3.0 Roadmap Features (entry.2105931848) -->
@@ -1491,7 +1495,7 @@
           ARTEMIS: THE FREE RETURN (LUNAR FLYBY XR)
         </div>
         <div style="font-size:0.82rem; color:#64748b;">
-          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.26
+          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.1.27
         </div>
       </div>
       <div class="footer-links">
@@ -1509,6 +1513,18 @@
   <!-- Client-Side Form & Simulation Launch Fallback Script -->
   <script>
     window.submittedGForm = false;
+
+    function appendPlatformTag(tag) {
+      const input = document.getElementById('pilot-headset');
+      if (!input) return;
+      const cur = input.value.trim();
+      if (!cur) {
+        input.value = tag;
+      } else if (!cur.toLowerCase().includes(tag.toLowerCase())) {
+        input.value = cur + ', ' + tag;
+      }
+      input.focus();
+    }
 
     // Resolve launch buttons: verify if sim.html exists, fallback to ../../index.html if in private/dev_site
     document.addEventListener('DOMContentLoaded', () => {
@@ -1537,15 +1553,15 @@
       // 2. Extract values
       const callsign = document.getElementById('pilot-callsign').value.trim();
       const email = document.getElementById('pilot-email').value.trim();
-      const headset = document.getElementById('pilot-headset').value;
+      const platformWriteIn = document.getElementById('pilot-headset').value.trim();
       const venue = document.getElementById('pilot-venue').value.trim();
       const likes = document.getElementById('pilot-likes').value;
       const comments = document.getElementById('pilot-comments').value.trim();
 
-      // Gather checked builds (entry.1519432357)
-      const checkedBuilds = [];
-      document.querySelectorAll('input[name="entry.1519432357"]:checked').forEach(cb => {
-        checkedBuilds.push(cb.value);
+      // Gather checked platforms (entry.993873424)
+      const checkedPlatforms = [];
+      document.querySelectorAll('input[name="entry.993873424"]:checked').forEach(cb => {
+        checkedPlatforms.push(cb.value);
       });
 
       // 3. LocalStorage Redundancy Caching
@@ -1553,9 +1569,9 @@
         const leadRecord = {
           callsign,
           email,
-          headset,
+          platforms: checkedPlatforms,
+          platformWriteIn,
           venue,
-          buildsTested: checkedBuilds,
           likes,
           comments,
           submittedAt: new Date().toISOString()
