@@ -6,6 +6,25 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 15:30] - v2.1.32-dev: Lunar 1:1 Tidal Locking, Anti-Washout Crater Relief, Real Astronomical Starfield & Interactive Task Dashboard 🌕✨🧭🎛️**
+
+📝 **Summary**
+1. **Lunar 1:1 Tidal Locking & Anti-Washout Crater Relief (`v2.1.30-dev` — Dev Staging Only):**
+   - Verified `THREE.SphereBufferGeometry` UV mapping in `vendor/three.min.js`: `u = 0.5` ($0^\circ$ longitude, Lunar Near Side maria) maps to local `+X`, causing the Far Side (`-X`) to face Earth when `moon.rotation.y = 0`.
+   - Set `moon.rotation.y = Math.PI - moonAngle` inside `resetMission()` and `updatePhysics(dt)` in `private/dev_site/sim.html` and `dev/index.html`, achieving exact 1:1 tidal locking ($\mathbf{r}_{\text{near}} \cdot \hat{\mathbf{r}}_{\text{moon}} = -1.0$ across all 360°).
+   - Calibrated `moonMat` (`color: 0xb8b8b4`, `roughness: 0.96`, `bumpMap: tex`, `bumpScale: 0.012`) and balanced lighting (`sunLight: 1.35`, `AmbientLight: 0x282c38`) to prevent white highlight clipping and preserve crater/maria contrast on approach.
+2. **Performant 3-Draw-Call Real Astronomical Starfield & 5 Naked-Eye Planets (`v2.1.31-dev` — Dev Staging Only):**
+   - Replaced 5,000 random white dots with `celestialGroup` (`THREE.Group`) featuring Poly-Zone's $32 \times 32$ anti-flicker subpixel radial sprite texture (`createStarPointTexture()`), infinity parallax lock (`celestialGroup.position.copy(shipGroup.position)`), and Planck Blackbody $B-V$ spectral RGB mapping.
+   - Included **59 J2000 Apollo Optical Navigation & Constellation Stars** (*Sirius, Canopus, Rigel, Betelgeuse, Procyon, Arcturus, Vega, Capella, Altair, Acrux, Aldebaran, Antares, Spica, Polaris, Big Dipper, Cassiopeia, Orion's Belt*) plus **5 Naked-Eye Planets** (`Venus, Jupiter, Mars, Saturn, Mercury`) and `2,950` deterministic seeded background stars (with 35% Galactic Plane Milky Way density band) batched into 3 `THREE.Points` layers.
+   - Added a `1.8°` crosshair angular lookup in `#target-popup` (with `TRACK TARGET` lock via `celestialTargetAnchor`), including **"⭐ SIRIUS (α CMa) — Apollo Nav Star #18 • The Dog Star — In Honor of Fin 🐾"** for Saturday's Fin Fest showcase.
+3. **Operator Dev Dashboard Interactive Task Ledger & E2E Tests (`v2.1.32-dev`):**
+   - Upgraded `server.py` (`SERVER_VERSION = "2.1.32"`) with `GET /api/tasks` and `POST /api/task-action` (`toggle_check`, `promote_to_qa`, `confirm_qa` -> `COMPLETED.md`).
+   - Added the **📋 Live Project Tasks & HITL QA Command Deck** to `private/dev_dashboard/index.html`, restored the 8-item `private/checklist_status.json`, added `/api/tasks` + checklist cleanup + tidal/starfield assertions to `tests/test_staging_and_portal.py` (`29/29` passing), and verified root production `sim.html` remains untouched (`SHA-256: 5ecfaa50...`).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 15:25] - v2.1.29: Post-Showcase Tour Documentation Sync, Physics Forensic Audit & Fin Fest Roadmap 📚🔬🐾✨**
 
 📝 **Summary**

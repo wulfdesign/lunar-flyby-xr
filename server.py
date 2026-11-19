@@ -12,6 +12,8 @@ Features:
 - REST API Endpoints:
   - GET  /api/checklist   -> Serves private/checklist_status.json
   - POST /api/checklist   -> Persists checklist state atomically to disk
+  - GET  /api/tasks       -> Parses Tasks.md and private/privTasks.md live task ledgers
+  - POST /api/task-action -> Toggles checkboxes, promotes to QA, or confirms QA to COMPLETED.md
   - POST /api/promote     -> Executes promote(dry_run=False) in-process
   - POST /api/rollback    -> Restores public index.html from baseline backup
   - OPTIONS               -> Complete CORS header handling
@@ -22,10 +24,12 @@ import sys
 import time
 import socket
 import json
+import re
 import socketserver
 import http.server
 import webbrowser
 import threading
+from datetime import datetime
 
 if sys.platform == "win32":
     try:
@@ -35,10 +39,14 @@ if sys.platform == "win32":
         pass
 
 PORT = 3550
-SERVER_VERSION = "2.1.28"
+SERVER_VERSION = "2.1.32"
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PRIVATE_DIR = os.path.join(ROOT_DIR, "private")
 CHECKLIST_FILE = os.path.join(PRIVATE_DIR, "checklist_status.json")
+TASKS_FILE = os.path.join(ROOT_DIR, "Tasks.md")
+COMPLETED_FILE = os.path.join(ROOT_DIR, "COMPLETED.md")
+PRIV_TASKS_FILE = os.path.join(PRIVATE_DIR, "privTasks.md")
+PRIV_COMPLETED_FILE = os.path.join(PRIVATE_DIR, "privCompleted.md")
 
 # Ensure private is in sys.path for direct import
 if PRIVATE_DIR not in sys.path:
@@ -64,10 +72,22 @@ def get_local_ip():
         return "127.0.0.1"
 
 DEFAULT_CHECKLIST = {
-    "updated_at": "2026-10-22T22:45:00Z",
+    "updated_at": "2026-11-19T23:30:00Z",
     "updated_by": "default_seed",
-    "version": "v2.1.25-dev",
+    "version": "v2.1.32-dev",
     "items": {
+        "sim-tidal-moon": {
+            "title": "Lunar 1:1 Tidal Locking & Anti-Washout Crater Relief (v2.1.30-dev)",
+            "desc": "Confirm Lunar Near Side faces Earth continuously (moon.rotation.y = Math.PI - moonAngle) and crater relief remains crisp without white wash-out on approach.",
+            "category": "Graphics",
+            "checked": False
+        },
+        "sim-real-stars": {
+            "title": "Real Astronomical Starfield, 5 Planets & Sirius Fin Beacon (v2.1.31-dev)",
+            "desc": "Verify 3,000+ star celestial sphere, Pogson magnitudes, Planck B-V colors, Venus/Jupiter/Mars/Saturn/Mercury, and HUD hover on Sirius (The Dog Star — In Honor of Fin).",
+            "category": "Graphics",
+            "checked": False
+        },
         "sim-verlet": {
             "title": "Velocity Verlet Orbital Dynamics Verified",
             "desc": "Confirm frame-by-frame Vis-viva gravitational integration across 800,000 km cislunar free return without numerical drift.",
@@ -107,6 +127,164 @@ DEFAULT_CHECKLIST = {
     }
 }
 
+def _extract_task_fields(raw_line):
+    m_bold = re.search(r"\*\*(.+?)\*\*:?\s*(.*)", raw_line)
+    if m_bold:
+        title = m_bold.group(1).strip().rstrip(":")
+        desc = m_bold.group(2).strip().lstrip(":").strip()
+    else:
+        clean = re.sub(r"^\s*[-*]\s*\[[ xX]\]\s*", "", raw_line).strip()
+        title = clean
+        desc = ""
+    return title, desc
+
+def parse_tasks_file(filepath, target_name):
+    items = []
+    version = "v2.1.32-dev"
+    if not os.path.exists(filepath):
+        return items, version
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+
+    section = "General"
+    for idx, line in enumerate(lines):
+        s = line.strip()
+        if s.startswith("**Version:**"):
+            version = s.replace("**Version:**", "").strip()
+        elif s.startswith("#"):
+            section = re.sub(r"^#+\s*", "", s).strip()
+            continue
+
+        m = re.match(r"^\s*[-*]\s*\[([ xX])\]\s*(.*)$", line)
+        if not m:
+            continue
+        checked = (m.group(1).lower() == "x")
+        body = m.group(2).strip()
+        sec_low = section.lower()
+
+        if checked or "🏆" in body or "completed" in sec_low:
+            status = "completed"
+        elif "🧪" in body or "waiting for qa" in sec_low:
+            status = "qa"
+        elif "🛠️" in body or "🩹" in body or "🏗️" in body or "current work" in sec_low or "active sprint" in sec_low or "fin fest" in sec_low:
+            status = "in_progress"
+        else:
+            status = "roadmap"
+
+        priority = body.count("🔥")
+        title, desc = _extract_task_fields(body)
+        items.append({
+            "target": target_name,
+            "lineIndex": idx,
+            "rawLine": line,
+            "checked": checked,
+            "status": status,
+            "section": section,
+            "priority": priority,
+            "title": title,
+            "desc": desc
+        })
+    return items, version
+
+def get_all_tasks_payload():
+    pub_items, version = parse_tasks_file(TASKS_FILE, "public")
+    priv_items, _ = parse_tasks_file(PRIV_TASKS_FILE, "private")
+    all_items = pub_items + priv_items
+
+    counts = {"qa": 0, "in_progress": 0, "roadmap": 0, "completed": 0}
+    for it in all_items:
+        st = it["status"]
+        if st in counts:
+            counts[st] += 1
+
+    # Include archived counts from COMPLETED.md / privCompleted.md
+    archived = 0
+    for cfile in (COMPLETED_FILE, PRIV_COMPLETED_FILE):
+        if os.path.exists(cfile):
+            with open(cfile, "r", encoding="utf-8", errors="ignore") as f:
+                archived += len(re.findall(r"^\s*[-*]\s*\[[xX]\]", f.read(), re.M))
+
+    return {
+        "version": version,
+        "counts": counts,
+        "archived_count": archived,
+        "items": all_items,
+        "updated_at": datetime.now().isoformat()
+    }
+
+def handle_task_action(payload):
+    target = payload.get("target", "public")
+    action = payload.get("action", "toggle_check")
+    line_index = payload.get("lineIndex")
+    raw_line = payload.get("rawLine", "")
+
+    tasks_path = PRIV_TASKS_FILE if target == "private" else TASKS_FILE
+    completed_path = PRIV_COMPLETED_FILE if target == "private" else COMPLETED_FILE
+
+    if not os.path.exists(tasks_path):
+        return {"ok": False, "error": f"{os.path.basename(tasks_path)} not found"}
+
+    with open(tasks_path, "r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+
+    match_idx = None
+    if isinstance(line_index, int) and 0 <= line_index < len(lines):
+        if not raw_line or lines[line_index].strip() == raw_line.strip():
+            match_idx = line_index
+    if match_idx is None and raw_line:
+        for i, l in enumerate(lines):
+            if l.strip() == raw_line.strip():
+                match_idx = i
+                break
+
+    if match_idx is None:
+        return {"ok": False, "error": "Matching task line not found"}
+
+    target_line = lines[match_idx]
+
+    if action == "toggle_check":
+        if re.match(r"^(\s*[-*]\s*)\[\s*\]", target_line):
+            lines[match_idx] = re.sub(r"^(\s*[-*]\s*)\[\s*\]", r"\1[x]", target_line, count=1)
+        elif re.match(r"^(\s*[-*]\s*)\[[xX]\]", target_line):
+            lines[match_idx] = re.sub(r"^(\s*[-*]\s*)\[[xX]\]", r"\1[ ]", target_line, count=1)
+        with open(tasks_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+    elif action == "promote_to_qa":
+        new_line = re.sub(r"^(\s*[-*]\s*)\[[ xX]\](\s*(?:🧪|🛠️|🩹|🏗️|🔬|📤|☀️|🧭|🐾|📇|🧩|💻|🌌|✨|🌕|📚)?\s*)", r"\1[ ] 🧪 ", target_line, count=1)
+        if "🧪" not in new_line:
+            new_line = re.sub(r"^(\s*[-*]\s*)\[[ xX]\]\s*", r"\1[ ] 🧪 ", target_line, count=1)
+        if target == "public":
+            lines.pop(match_idx)
+            qa_idx = next((i for i, l in enumerate(lines) if "## 🧪" in l), None)
+            if qa_idx is not None:
+                lines.insert(qa_idx + 1, new_line)
+            else:
+                lines.insert(0, new_line)
+        else:
+            lines[match_idx] = new_line
+        with open(tasks_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+    elif action == "confirm_qa":
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        promoted = re.sub(r"^(\s*[-*]\s*)\[[ xX]\]\s*(?:🧪|🛠️|🩹|🏗️)?\s*", r"\1[x] 🏆 ", target_line, count=1)
+        if "🏆" not in promoted:
+            promoted = re.sub(r"^(\s*[-*]\s*)\[[ xX]\]\s*", r"\1[x] 🏆 ", target_line, count=1)
+        promoted = f"{promoted.rstrip()} *(HITL QA Confirmed {timestamp})*"
+        lines.pop(match_idx)
+        with open(tasks_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+        existing_comp = ""
+        if os.path.exists(completed_path):
+            with open(completed_path, "r", encoding="utf-8") as f:
+                existing_comp = f.read().rstrip()
+        with open(completed_path, "w", encoding="utf-8") as f:
+            f.write(f"{existing_comp}\n{promoted}\n")
+    else:
+        return {"ok": False, "error": f"Unknown action: {action}"}
+
+    return {"ok": True, "tasks": get_all_tasks_payload()}
+
 class LunarServerHandler(http.server.SimpleHTTPRequestHandler):
     extensions_map = http.server.SimpleHTTPRequestHandler.extensions_map.copy()
     extensions_map.update({
@@ -139,6 +317,20 @@ class LunarServerHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         clean_path = self.path.split("?")[0]
+        if clean_path == "/api/tasks":
+            try:
+                payload = get_all_tasks_payload()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8"))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": False, "error": str(e)}).encode("utf-8"))
+            return
         if clean_path == "/api/checklist":
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -159,6 +351,26 @@ class LunarServerHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         clean_path = self.path.split("?")[0]
+
+        # 0. Interactive Task Ledger Action (/api/task-action)
+        if clean_path == "/api/task-action":
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                post_data = self.rfile.read(content_length)
+                payload = json.loads(post_data.decode("utf-8")) if post_data else {}
+                res = handle_task_action(payload)
+                self.send_response(200 if res.get("ok") else 400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps(res, ensure_ascii=False).encode("utf-8"))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": False, "error": str(e)}).encode("utf-8"))
+                return
 
         # 1. Checklist Persistence
         if clean_path == "/api/checklist":

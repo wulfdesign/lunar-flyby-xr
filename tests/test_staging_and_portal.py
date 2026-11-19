@@ -748,6 +748,8 @@ class TestPromotionAndServer(unittest.TestCase):
 
         required_endpoints = [
             "/api/checklist",
+            "/api/tasks",
+            "/api/task-action",
             "/api/promote",
             "/api/rollback"
         ]
@@ -782,30 +784,58 @@ class TestPromotionAndServer(unittest.TestCase):
 
     def test_server_live_api_checklist_routing(self):
         """
-        Tests live REST API routing: boots server.py on ephemeral port (0),
-        queries GET /api/checklist, and verifies 200 OK + valid JSON.
+        Tests live REST API routing & tasks ledger parsing (/api/checklist, /api/tasks),
+        preserving and restoring private/checklist_status.json on disk.
         """
+        checklist_file = os.path.join(LUNAR_ROOT, "private", "checklist_status.json")
+        backup_bytes = None
+        if os.path.isfile(checklist_file):
+            with open(checklist_file, "rb") as f:
+                backup_bytes = f.read()
+
         code = (
-            "from server import DEFAULT_CHECKLIST, LunarServerHandler\n"
-            "assert 'items' in DEFAULT_CHECKLIST and hasattr(LunarServerHandler, 'do_GET')\n"
-            "print('LIVE_API_CHECKLIST_OK')\n"
+            "import json, math\n"
+            "import server\n"
+            "assert 'items' in server.DEFAULT_CHECKLIST and hasattr(server.LunarServerHandler, 'do_GET')\n"
+            "tasks = server.get_all_tasks_payload()\n"
+            "assert tasks['counts']['qa'] >= 1 and len(tasks['items']) >= 10, 'Expected live Tasks.md items'\n"
+            "print('LIVE_API_CHECKLIST_AND_TASKS_OK')\n"
         )
 
-        proc = subprocess.run(
-            [sys.executable, "-c", code],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            cwd=LUNAR_ROOT
-        )
+        try:
+            proc = subprocess.run(
+                [sys.executable, "-c", code],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                cwd=LUNAR_ROOT
+            )
 
-        self.assertEqual(
-            proc.returncode,
-            0,
-            f"Live API routing test failed for /api/checklist:\nReturnCode: {proc.returncode}\nStderr:\n{proc.stderr}\nStdout:\n{proc.stdout}"
-        )
-        self.assertIn("LIVE_API_CHECKLIST_OK", proc.stdout)
+            self.assertEqual(
+                proc.returncode,
+                0,
+                f"Live API routing test failed for /api/checklist & /api/tasks:\nReturnCode: {proc.returncode}\nStderr:\n{proc.stderr}\nStdout:\n{proc.stdout}"
+            )
+            self.assertIn("LIVE_API_CHECKLIST_AND_TASKS_OK", proc.stdout)
+        finally:
+            if backup_bytes is not None:
+                with open(checklist_file, "wb") as f:
+                    f.write(backup_bytes)
+
+    def test_dev_lunar_tidal_lock_and_real_starfield_present(self):
+        """
+        Dev sandboxes (private/dev_site/sim.html & dev/index.html) must enforce 1:1 lunar tidal locking,
+        calibrated anti-washout crater relief, real J2000 stars, 5 naked-eye planets & Sirius Fin beacon.
+        """
+        for path in (DEV_SIM, os.path.join(LUNAR_ROOT, "dev", "index.html")):
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                c = f.read()
+            self.assertIn("moon.rotation.y = Math.PI - moonAngle", c, f"Missing tidal locking in {path}")
+            self.assertIn("0xb8b8b4", c, f"Missing anti-washout lunar albedo in {path}")
+            self.assertIn("NAV_STARS_CATALOG", c, f"Missing J2000 star catalog in {path}")
+            self.assertIn("NAV_PLANETS_CATALOG", c, f"Missing naked-eye planets in {path}")
+            self.assertIn("In Honor of Fin", c, f"Missing Sirius Fin tribute beacon in {path}")
 
 
 # ===========================================================================

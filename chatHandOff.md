@@ -1,15 +1,23 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.29)
-> *Artemis: The Free Return | Post-Tour Documentation Sync, Physics Forensic Audit & Fin Fest / Blue Origin Prep*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.32-dev)
+> *Artemis: The Free Return | Fin Fest Showcase Prep, 1:1 Lunar Tidal Locking, Real Astronomical Starfield & Live Task Dashboard*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DOCUMENTATION & ROADMAP SYNCED (`v2.1.29`) • PRODUCTION `sim.html` UNTOUCHED AT `v2.1.19` BASELINE • DEV STAGING READY FOR TIDAL MOON & REAL STARFIELD** 🚀📚🌕✨
+**Status:** **DEV STAGING UPGRADED (`v2.1.32-dev`) • PRODUCTION `sim.html` UNTOUCHED AT `v2.1.19` BASELINE • 29/29 E2E TESTS PASSING** 🚀🌕✨🎛️
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.29)
-1. **Cross-Project Post-Tour Documentation & Architecture Confirmation (`v2.1.29`):**
+## ✅ Alchemical Victories (v2.1.25 – v2.1.32-dev)
+1. **Lunar 1:1 Tidal Locking & Anti-Washout Crater Relief (`v2.1.30-dev` in `private/dev_site/sim.html` & `dev/index.html`):**
+   - Applied `moon.rotation.y = Math.PI - moonAngle` in `resetMission()` and `updatePhysics(dt)` so the Lunar Near Side (`u = 0.5` maria) permanently faces Earth while the cratered Far Side greets the perilune pass.
+   - Calibrated `moonMat` (`color: 0xb8b8b4`, `roughness: 0.96`, `bumpMap: tex`, `bumpScale: 0.012`) and balanced scene lighting (`sunLight: 1.35`, `AmbientLight: 0x282c38`) to prevent white wash-out on lunar approach.
+2. **Performant Real Astronomical Starfield & 5 Naked-Eye Planets (`v2.1.31-dev` in `private/dev_site/sim.html` & `dev/index.html`):**
+   - Ported `projects/poly-zone` subpixel anti-flicker radial sprite (`createStarPointTexture()`), infinity parallax lock, and Pogson + Planck Blackbody $B-V$ color distribution across **3 `THREE.Points` draw calls** (`59` J2000 Apollo Navigation/Constellation Stars, `5` Naked-Eye Planets, `2,950` deterministic Milky Way / field stars).
+   - Added `1.8°` crosshair HUD inspection (`celestialTargetAnchor`) including **"⭐ SIRIUS (α CMa) — Apollo Nav Star #18 • The Dog Star — In Honor of Fin 🐾"**.
+3. **Operator Dev Dashboard Interactive Task Ledger & Test Cleanup (`v2.1.32-dev`):**
+   - Added `GET /api/tasks` & `POST /api/task-action` (`server.py` v2.1.32) and Live Project Tasks & HITL QA Command Deck in `private/dev_dashboard/index.html`; restored 8-item `private/checklist_status.json`; verified `29/29` E2E tests passing in `tests/test_staging_and_portal.py` (with root `sim.html` SHA-256 `5ecfaa50...` 100% intact).
+4. **Cross-Project Post-Tour Documentation & Architecture Confirmation (`v2.1.29`):**
    - Verified production `sim.html` remains untouched byte-for-byte at `v2.1.19` (`SHA256: 5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`) alongside Mission Control portal `index.html` / `landing.html` (`v2.1.28`) and air-gapped dev staging (`private/dev_site/`).
    - Consolidated 2026 showcase history across SLICE, SiM PAX West Kickoff, Seattle Space Week, KremFest XR, and GeekGirlCon 2026 (including Blue Origin engineer follow-up lead).
    - Completed 5-point Physics & Flight Computer Mathematical Forensic Audit (analysis documented before code remediation) and logged new roadmap items: Secure Flight Log JSON Upload Validator, Sun Corona Differentiation, Celestial Optical Navigation (OpNav / Space Sextant), and Fin Fest / Blue Origin showcase alignment.
