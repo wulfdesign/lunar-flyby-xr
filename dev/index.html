@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.30-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.31-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -178,7 +178,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.30-dev</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.31-dev</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -301,7 +301,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.30";
+        const SIM_VERSION = "2.1.31";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -643,14 +643,230 @@
         const moon = new THREE.Mesh(new THREE.SphereGeometry(radMoon * renderScale, 64, 64), moonMat);
         moon.name = "THE MOON"; scene.add(moon);
 
-        const starGeo = new THREE.BufferGeometry();
-        const starVerts = new Float32Array(5000 * 3);
-        for(let i=0; i < 5000 * 3; i+=3) {
-            let r = 50000000; let theta = Math.random() * 2 * Math.PI; let phi = Math.acos((Math.random() * 2) - 1);
-            starVerts[i] = r * Math.sin(phi) * Math.cos(theta); starVerts[i+1] = r * Math.sin(phi) * Math.sin(theta); starVerts[i+2] = r * Math.cos(phi);
+        // --- REAL ASTRONOMICAL CELESTIAL SPHERE (POLY-ZONE + APOLLO NAV CATALOG) ---
+        // Ported anti-flicker subpixel radial star sprite, J2000 equatorial mapping, Planck B-V chromaticity,
+        // and infinity parallax lock (3 GPU draw calls total for 3,000+ stars & 5 naked-eye planets).
+        function createStarPointTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+            grad.addColorStop(0.55, 'rgba(255, 255, 255, 0.95)');
+            grad.addColorStop(0.80, 'rgba(255, 255, 255, 0.35)');
+            grad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 32, 32);
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            return texture;
         }
-        starGeo.setAttribute('position', new THREE.BufferAttribute(starVerts, 3));
-        scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 1.5, sizeAttenuation: false})));
+
+        function bvToRgb(bv, intensity) {
+            let r = 1.0, g = 1.0, b = 1.0;
+            if (bv < -0.10) { r = 0.64; g = 0.80; b = 1.00; }        // Hot O/B Blue-White
+            else if (bv < 0.25) { r = 0.94; g = 0.97; b = 1.00; }   // A0 Pure Brilliant White
+            else if (bv < 0.60) { r = 1.00; g = 0.97; b = 0.90; }   // F/G Yellow-White
+            else if (bv < 1.15) { r = 1.00; g = 0.86; b = 0.65; }   // G/K Golden-Orange
+            else { r = 1.00; g = 0.62; b = 0.40; }                  // K/M Deep Orange-Red
+            return [r * intensity, g * intensity, b * intensity];
+        }
+
+        function raDecToCartesian(raHours, decDeg, radius) {
+            const alpha = raHours * (Math.PI / 12.0);
+            const delta = THREE.MathUtils.degToRad(decDeg);
+            return new THREE.Vector3(
+                radius * Math.cos(delta) * Math.cos(alpha),
+                radius * Math.sin(delta),
+                -radius * Math.cos(delta) * Math.sin(alpha)
+            );
+        }
+
+        function formatRaDec(raHours, decDeg) {
+            const h = Math.floor(raHours);
+            const m = Math.round((raHours - h) * 60);
+            const sign = decDeg >= 0 ? '+' : '';
+            return `RA ${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m, Dec ${sign}${decDeg.toFixed(1)}°`;
+        }
+
+        // J2000 Brightest Navigational Stars & Apollo Command Module Optical Unit Catalog
+        // [raHours, decDeg, vMag, bvIndex, displayName, roleHint]
+        const NAV_STARS_CATALOG = [
+            [6.752, -16.716, -1.46, 0.00, "SIRIUS (α CMa)", "Apollo Nav Star #18 • The Dog Star — In Honor of Fin 🐾"],
+            [6.399, -52.696, -0.74, 0.15, "CANOPUS (α Car)", "Apollo Primary Roll Reference • Carina"],
+            [14.660, -60.834, -0.27, 0.71, "ALPHA CENTAURI (α Cen)", "Apollo Nav Star #27 • Nearest Stellar System"],
+            [14.261, 19.182, -0.05, 1.23, "ARCTURUS (α Boo)", "Apollo Nav Star #26 • Boötes Orange Giant"],
+            [18.616, 38.784, 0.03, 0.00, "VEGA (α Lyr)", "Apollo Nav Star #31 • Lyra Navigation Beacon"],
+            [5.278, 45.998, 0.08, 0.80, "CAPELLA (α Aur)", "Apollo Nav Star #12 • Auriga Beacon"],
+            [5.242, -8.202, 0.13, -0.03, "RIGEL (β Ori)", "Apollo Nav Star #11 • Orion Blue Supergiant"],
+            [7.655, 5.225, 0.34, 0.42, "PROCYON (α CMi)", "Apollo Nav Star #19 • Little Dog Star"],
+            [1.629, -57.237, 0.46, -0.16, "ACHERNAR (α Eri)", "Apollo Nav Star #04 • Southern Eridanus"],
+            [5.919, 7.407, 0.50, 1.85, "BETELGEUSE (α Ori)", "Orion Red Supergiant Shoulder"],
+            [14.064, -60.373, 0.61, -0.23, "HADAR (β Cen)", "Centaurus Southern Cross Pointer"],
+            [19.846, 8.868, 0.76, 0.22, "ALTAIR (α Aql)", "Apollo Nav Star #33 • Aquila Eagle"],
+            [12.443, -63.099, 0.77, -0.24, "ACRUX (α Cru)", "Apollo Nav Star #23 • Southern Cross Base"],
+            [4.599, 16.509, 0.86, 1.54, "ALDEBARAN (α Tau)", "Apollo Nav Star #10 • Eye of Taurus"],
+            [16.490, -26.432, 0.96, 1.83, "ANTARES (α Sco)", "Apollo Nav Star #28 • Heart of Scorpius"],
+            [13.420, -11.161, 0.97, -0.23, "SPICA (α Vir)", "Apollo Nav Star #25 • Virgo Ecliptic Reference"],
+            [7.755, 28.026, 1.14, 1.00, "POLLUX (β Gem)", "Gemini Twin Navigation Star"],
+            [22.961, -29.622, 1.16, 0.09, "FOMALHAUT (α PsA)", "Apollo Nav Star #36 • Southern Autumn Beacon"],
+            [20.690, 45.280, 1.25, 0.09, "DENEB (α Cyg)", "Apollo Nav Star #34 • Cygnus Swan Tail"],
+            [12.795, -59.689, 1.25, -0.23, "MIMOSA (β Cru)", "Southern Cross Eastern Arm"],
+            [10.139, 11.967, 1.35, -0.11, "REGULUS (α Leo)", "Apollo Nav Star #21 • Heart of Leo (Ecliptic)"],
+            [6.977, -28.972, 1.50, -0.21, "ADHARA (ε CMa)", "Canis Major Bright Beacon"],
+            [7.577, 31.888, 1.58, 0.03, "CASTOR (α Gem)", "Gemini Western Twin"],
+            [12.519, -57.113, 1.63, 1.59, "GACRUX (γ Cru)", "Apollo Nav Star #24 • Southern Cross Apex"],
+            [17.560, -37.104, 1.62, -0.22, "SHAULA (λ Sco)", "Scorpius Stinger Reference"],
+            [5.419, 6.350, 1.64, -0.22, "BELLATRIX (γ Ori)", "Orion Western Shoulder"],
+            [5.438, 28.608, 1.65, -0.13, "ELNATH (β Tau)", "Taurus Northern Horn"],
+            [9.220, -69.717, 1.67, 0.00, "MIAPLACIDUS (β Car)", "Carina Southern Keel"],
+            [5.604, -1.202, 1.69, -0.19, "ALNILAM (ε Ori)", "Apollo Nav Star #15 • Orion's Belt Center"],
+            [22.137, -46.961, 1.74, -0.13, "ALNAIR (α Gru)", "Apollo Nav Star #35 • Grus Wing"],
+            [5.679, -1.943, 1.77, -0.19, "ALNITAK (ζ Ori)", "Orion's Belt Eastern Star"],
+            [5.533, -0.299, 2.23, -0.22, "MINTAKA (δ Ori)", "Orion's Belt Western Star"],
+            [12.900, 55.960, 1.77, -0.02, "ALIOTH (ε UMa)", "Big Dipper Handle • Ursa Major"],
+            [11.062, 61.751, 1.79, 1.07, "DUBHE (α UMa)", "Big Dipper Pointer Star to Polaris"],
+            [11.031, 56.382, 2.37, -0.02, "MERAK (β UMa)", "Big Dipper Bowl Lower Pointer"],
+            [11.897, 53.695, 2.44, 0.00, "PHECDA (γ UMa)", "Big Dipper Bowl Inner Star"],
+            [12.257, 57.033, 3.31, 0.08, "MEGREZ (δ UMa)", "Big Dipper Bowl Hinge"],
+            [13.399, 54.925, 2.27, 0.02, "MIZAR (ζ UMa)", "Big Dipper Visual Binary"],
+            [13.792, 49.313, 1.86, -0.19, "ALKAID (η UMa)", "Big Dipper Handle Tip • Ursa Major"],
+            [3.405, 49.861, 1.80, 0.48, "MIRFAK (α Per)", "Perseus Supergiant Core"],
+            [7.140, -26.393, 1.83, 0.67, "WEZEN (δ CMa)", "Canis Major Wing"],
+            [18.403, -34.385, 1.85, -0.03, "KAUS AUSTRALIS (ε Sgr)", "Apollo Nav Star #30 • Sagittarius Bow"],
+            [16.811, -69.028, 1.91, 1.44, "ATRIA (α TrA)", "Triangulum Australe Apex"],
+            [20.427, -56.735, 1.94, -0.20, "PEACOCK (α Pav)", "Pavo Southern Navigation Star"],
+            [2.530, 89.264, 1.98, 0.60, "POLARIS (α UMi)", "North Celestial Pole Reference Star"],
+            [0.945, 60.717, 2.47, -0.15, "NAVI (γ Cas)", "Apollo Nav Star #03 • Cassiopeia Center (Gus Grissom)"],
+            [0.675, 56.537, 2.23, 1.17, "SCHEDAR (α Cas)", "Cassiopeia W Alpha"],
+            [0.153, 59.150, 2.27, 0.34, "CAPH (β Cas)", "Cassiopeia W Western Wing"],
+            [1.430, 60.235, 2.68, 0.13, "RUCHBAH (δ Cas)", "Cassiopeia W Lower Vertex"],
+            [1.907, 63.670, 3.38, -0.13, "SEGIN (ε Cas)", "Cassiopeia W Eastern Wing"],
+            [8.999, 47.157, 3.14, 0.00, "DNOCES (ι UMa)", "Apollo Nav Star • Ursa Major (Ed White)"],
+            [14.111, -36.370, 2.06, 1.01, "MENKENT (θ Cen)", "Centaurus Shoulder"],
+            [11.818, 14.572, 2.14, 0.09, "DENEBOLA (β Leo)", "Leo Tail Beacon"],
+            [2.120, 23.462, 2.00, 1.15, "HAMAL (α Ari)", "Apollo Nav Star #06 • Aries Head"],
+            [0.726, -17.987, 2.04, 1.02, "DIPHDA (β Cet)", "Apollo Nav Star #02 • Cetus Tail"],
+            [0.140, 29.091, 2.06, -0.11, "ALPHERATZ (α And)", "Apollo Nav Star #01 • Pegasus Corner"],
+            [23.079, 15.205, 2.49, -0.04, "MARKAB (α Peg)", "Apollo Nav Star #37 • Pegasus Saddle"],
+            [21.736, 9.875, 2.39, 1.52, "ENIF (ε Peg)", "Apollo Nav Star #35B • Pegasus Nose"],
+            [18.921, -26.297, 2.05, -0.22, "NUNKI (σ Sgr)", "Apollo Nav Star #32 • Sagittarius"]
+        ];
+
+        const NAV_PLANETS_CATALOG = [
+            { name: "PLANET VENUS", ra: 2.15, dec: 13.5, v: -4.2, color: 0xfff6d5, role: "Inner Ecliptic Beacon • Brilliance Mag -4.2" },
+            { name: "PLANET JUPITER", ra: 5.45, dec: 22.8, v: -2.6, color: 0xffe2b8, role: "Jovian Gas Giant • Ecliptic Waypoint" },
+            { name: "PLANET MARS", ra: 8.10, dec: 21.2, v: -0.8, color: 0xff7b52, role: "The Red Planet • Inner Ecliptic Beacon" },
+            { name: "PLANET SATURN", ra: 23.20, dec: -7.5, v: 0.4, color: 0xf4d59e, role: "Ringed Outer Giant • Ecliptic Reference" },
+            { name: "PLANET MERCURY", ra: 11.20, dec: 4.5, v: -0.3, color: 0xd8d2c8, role: "Innermost Terrestrial Planet" }
+        ];
+
+        const SKY_RADIUS = 50000000;
+        const starPointTexture = createStarPointTexture();
+        const celestialGroup = new THREE.Group();
+        const celestialTargetAnchor = new THREE.Object3D();
+        celestialGroup.add(celestialTargetAnchor);
+        const celestialBeacons = [];
+
+        (function buildRealCelestialSphere() {
+            const tier1Pos = [], tier1Col = []; // Planets + 1st Mag Beacons (V <= 1.35)
+            const tier2Pos = [], tier2Col = []; // Apollo / Constellation Stars + Mid-Tier Stars
+            const tier3Pos = [], tier3Col = []; // 2,700 Deep Sky & Milky Way Field
+
+            // Planets in Tier 1
+            NAV_PLANETS_CATALOG.forEach(p => {
+                const pos = raDecToCartesian(p.ra, p.dec, SKY_RADIUS);
+                const c = new THREE.Color(p.color);
+                tier1Pos.push(pos.x, pos.y, pos.z);
+                tier1Col.push(c.r, c.g, c.b);
+                celestialBeacons.push({ name: p.name, pos: pos, dir: pos.clone().normalize(), meta: `Mag ${p.v.toFixed(1)} • ${formatRaDec(p.ra, p.dec)}`, role: p.role, isPlanet: true });
+            });
+
+            // Named Navigational & Constellation Stars
+            NAV_STARS_CATALOG.forEach(s => {
+                const [ra, dec, vMag, bv, name, role] = s;
+                const pos = raDecToCartesian(ra, dec, SKY_RADIUS);
+                const bright = THREE.MathUtils.clamp(1.08 - 0.14 * vMag, 0.55, 1.0);
+                const [r, g, b] = bvToRgb(bv, bright);
+                if (vMag <= 1.35) {
+                    tier1Pos.push(pos.x, pos.y, pos.z);
+                    tier1Col.push(r, g, b);
+                } else {
+                    tier2Pos.push(pos.x, pos.y, pos.z);
+                    tier2Col.push(r, g, b);
+                }
+                celestialBeacons.push({ name: name, pos: pos, dir: pos.clone().normalize(), meta: `Mag ${vMag.toFixed(2)} • ${formatRaDec(ra, dec)}`, role: role, isPlanet: false });
+            });
+
+            // Deterministic Mulberry32 PRNG for repeatable 3,000-star catalog distribution (Poly-Zone 1/9/90 Pogson pattern)
+            let seed = 0x41525445;
+            function rand() {
+                seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+                let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            }
+
+            // 250 Tier-2 Primary Field Stars (Mag 2.6 - 4.0)
+            for (let i = 0; i < 250; i++) {
+                const ra = rand() * 24.0;
+                const dec = THREE.MathUtils.radToDeg(Math.asin(2.0 * rand() - 1.0));
+                const pos = raDecToCartesian(ra, dec, SKY_RADIUS);
+                const [r, g, b] = bvToRgb(rand() * 1.9 - 0.2, 0.50 + rand() * 0.25);
+                tier2Pos.push(pos.x, pos.y, pos.z);
+                tier2Col.push(r, g, b);
+            }
+
+            // 2,700 Tier-3 Deep Sky Field (35% concentrated along inclined Milky Way Galactic Plane ~62 deg)
+            const galTilt = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.MathUtils.degToRad(62.87), THREE.MathUtils.degToRad(28.0), 0));
+            const tmpGal = new THREE.Vector3();
+            for (let i = 0; i < 2700; i++) {
+                if (i < 950) {
+                    const lon = rand() * Math.PI * 2.0;
+                    const lat = (rand() + rand() - 1.0) * 0.20; // Concentrated galactic equator bulge
+                    tmpGal.set(
+                        SKY_RADIUS * Math.cos(lat) * Math.cos(lon),
+                        SKY_RADIUS * Math.sin(lat),
+                        SKY_RADIUS * Math.cos(lat) * Math.sin(lon)
+                    ).applyQuaternion(galTilt);
+                    tier3Pos.push(tmpGal.x, tmpGal.y, tmpGal.z);
+                } else {
+                    const ra = rand() * 24.0;
+                    const dec = THREE.MathUtils.radToDeg(Math.asin(2.0 * rand() - 1.0));
+                    const pos = raDecToCartesian(ra, dec, SKY_RADIUS);
+                    tier3Pos.push(pos.x, pos.y, pos.z);
+                }
+                const [r, g, b] = bvToRgb(rand() * 1.8 - 0.2, 0.20 + rand() * 0.24);
+                tier3Col.push(r, g, b);
+            }
+
+            function addStarLayer(posArr, colArr, sizePx) {
+                const geo = new THREE.BufferGeometry();
+                geo.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
+                geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3));
+                const mat = new THREE.PointsMaterial({
+                    vertexColors: true,
+                    size: sizePx,
+                    sizeAttenuation: false,
+                    map: starPointTexture,
+                    transparent: true,
+                    alphaTest: 0.01,
+                    depthTest: true,
+                    depthWrite: false
+                });
+                const pts = new THREE.Points(geo, mat);
+                pts.frustumCulled = false;
+                celestialGroup.add(pts);
+            }
+
+            addStarLayer(tier1Pos, tier1Col, 5.2);
+            addStarLayer(tier2Pos, tier2Col, 3.4);
+            addStarLayer(tier3Pos, tier3Col, 1.9);
+            scene.add(celestialGroup);
+        })();
 
         const sunPosition = new THREE.Vector3(-1000, 200, 0).normalize().multiplyScalar(15000000); 
         const sunLight = new THREE.DirectionalLight(0xffffff, 1.35); sunLight.position.copy(sunPosition); scene.add(sunLight);
@@ -1155,6 +1371,7 @@
                 let telemetry = null;
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
                 metSeconds += simSecondsToProcess;
+                celestialGroup.position.copy(shipGroup.position);
                 
                 if (distM < globalMinMoonDist && distM > 0) globalMinMoonDist = distM;
                 
@@ -1230,6 +1447,25 @@
                         else if (target.name === "THE SUN") { safeSetText('target-dist', "149,597,870 km"); safeSetText('target-hint', "Solar Array Charging Nominal."); }
                         if (popup) popup.style.display = 'block';
                     }
+                } else if (!isDraggingView) {
+                    camera.getWorldDirection(_camDir);
+                    let bestDot = Math.cos(THREE.MathUtils.degToRad(1.8));
+                    let bestBeacon = null;
+                    for (let i = 0; i < celestialBeacons.length; i++) {
+                        let d = _camDir.dot(celestialBeacons[i].dir);
+                        if (d > bestDot) { bestDot = d; bestBeacon = celestialBeacons[i]; }
+                    }
+                    if (bestBeacon) {
+                        if (!isTrackingTarget) {
+                            celestialTargetAnchor.position.copy(bestBeacon.pos);
+                            celestialTargetAnchor.name = bestBeacon.name;
+                            currentTargetObj = celestialTargetAnchor;
+                        }
+                        safeSetText('target-name', (bestBeacon.isPlanet ? '🪐 ' : '⭐ ') + bestBeacon.name);
+                        safeSetText('target-dist', bestBeacon.meta);
+                        safeSetText('target-hint', bestBeacon.role);
+                        if (popup) popup.style.display = 'block';
+                    } else { if (popup) popup.style.display = 'none'; }
                 } else { if (popup) popup.style.display = 'none'; }
 
                 let altE = shipPos.length() - radEarth; distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
