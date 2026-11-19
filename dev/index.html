@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.19-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.30-dev)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -178,7 +178,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.19-dev</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.30-dev</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -301,7 +301,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.19";
+        const SIM_VERSION = "2.1.30";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -632,12 +632,12 @@
         const earth = new THREE.Mesh(new THREE.SphereGeometry(radEarth * renderScale, 64, 64), earthMat);
         earth.name = "EARTH"; scene.add(earth);
 
-        const moonMat = new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0.0 });
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xb8b8b4, roughness: 0.96, metalness: 0.0, bumpScale: 0.012 });
         textureLoader.load('textures/moon_1024.jpg', (tex) => {
-            moonMat.map = tex; moonMat.needsUpdate = true;
+            moonMat.map = tex; moonMat.bumpMap = tex; moonMat.needsUpdate = true;
         }, undefined, () => {
             textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/moon_1024.jpg', (tex) => {
-                moonMat.map = tex; moonMat.needsUpdate = true;
+                moonMat.map = tex; moonMat.bumpMap = tex; moonMat.needsUpdate = true;
             });
         });
         const moon = new THREE.Mesh(new THREE.SphereGeometry(radMoon * renderScale, 64, 64), moonMat);
@@ -653,10 +653,10 @@
         scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 1.5, sizeAttenuation: false})));
 
         const sunPosition = new THREE.Vector3(-1000, 200, 0).normalize().multiplyScalar(15000000); 
-        const sunLight = new THREE.DirectionalLight(0xffffff, 2.0); sunLight.position.copy(sunPosition); scene.add(sunLight);
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.35); sunLight.position.copy(sunPosition); scene.add(sunLight);
         const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(70000, 32, 32), new THREE.MeshBasicMaterial({color: 0xffffee}));
         sunMesh.position.copy(sunPosition); sunMesh.name = "THE SUN"; scene.add(sunMesh);
-        scene.add(new THREE.AmbientLight(0x666677)); 
+        scene.add(new THREE.AmbientLight(0x282c38)); 
 
         const shipGroup = new THREE.Group();
         shipGroup.add(new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.005, 0.005), new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide})));
@@ -681,6 +681,8 @@
 
         function resetMission() {
             let startRadius = radEarth + 400; let vOrbit = Math.sqrt(muEarth / startRadius); moonAngle = 0; 
+            moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
+            moon.rotation.y = Math.PI - moonAngle;
             const targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
             const offsetAngle = 120 * ((vOrbit / startRadius) - Math.sqrt(muEarth / Math.pow(distMoon, 3))); 
             const startShipAngle = targetPhaseAngle - offsetAngle; 
@@ -943,6 +945,9 @@
             if (shipPos.length() - radEarth <= 0) return { timeToWindow: 0, isTliCoast: false, estimatedBurnTime: 0, magEarth: muEarth/(radEarth*radEarth), magMoon: 0, flightPathAngle: 0 };
 
             const moonAngularVel = Math.sqrt(muEarth / Math.pow(distMoon, 3)); moonAngle += moonAngularVel * dt; moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
+            // 1:1 Tidal Locking: Three.js SphereGeometry maps u=0.5 (0° lon Lunar Near Side) to local +X.
+            // Rotating around Y by (PI - moonAngle) points local +X continuously toward Earth at (0,0,0).
+            moon.rotation.y = Math.PI - moonAngle;
             let r = shipPos.length(); let currentVelMag = shipVel.length(); _moonPos.copy(moon.position).divideScalar(renderScale); let distToMoon = shipPos.distanceTo(_moonPos);
 
             let activeWaypoints = isReturningHome ? MISSION_WAYPOINTS_RETURN : MISSION_WAYPOINTS_OUTBOUND;
