@@ -6,6 +6,29 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 15:25] - v2.1.29: Post-Showcase Tour Documentation Sync, Physics Forensic Audit & Fin Fest Roadmap 📚🔬🐾✨**
+
+📝 **Summary**
+1. **Air-Gapped Production vs. Staging Architecture Verification:**
+   - Verified that `sim.html` matches `snapshots/index_v2.1.19_sim_backup.html` byte-for-byte (`128,025 bytes`, `SHA-256: 5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`), confirming zero unverified code edits occurred on the public simulation after KremFest XR.
+   - Confirmed Mission Control Landing Portal (`index.html` & `landing.html`), dedicated standalone Google Form (`1xXvRkRHuk9pd-wzqjvie041JZfQ4E0C98WKatoQk4fw`) with Apps Script receipt (`v2.1.28`), and air-gapped dev staging (`private/dev_site/`) + Operator Dashboard (`private/dev_dashboard/index.html`) are intact.
+2. **2026 Showcase Tour History Consolidated:**
+   - Reconciled cross-project notes from `projects/GeekGirlCon`, `projects/kremfest-xr`, `projects/games-industry-network` (SLICE & SiM PAX West Kickoff), Seattle Space Week, `projects/poly-zone` (star catalog blueprint), `projects/ai-resume`, and `projects/auto-income`.
+   - Captured GeekGirlCon 2026 floor validation (multi-modal laptop + Quest 3 funnel, KSP fan feedback, Blue Origin Houston-relocated aerospace engineer lead) alongside upcoming Fin Fest charity houseboat showcase preparation.
+3. **5-Point Physics & Flight Computer Mathematical Forensic Audit (Analysis Only — No Sim Edits Yet):**
+   - Diagnosed and documented five concrete root causes of occasional trajectory deviations during repeated/continuous autonomous runs:
+     1. `resetMission()` omits resetting `wp.passed = false` on `MISSION_WAYPOINTS_OUTBOUND` / `RETURN`, disabling all 5 MCC maneuvers on Flight #2+ after `ABORT / RESTART`.
+     2. LEO `stepSize = 0.5s` causes up to `13.95 m/s` (`±57,900 km` apogee) TLI MECO energy overshoot depending on substep timing.
+     3. Return MCC solver in `executeAutopilotBurn()` only searches `+transverseDir`, breaking at `i = 0` (`dV = 0`) when trajectory is already shallow (`rp > 40 km`).
+     4. Final MCC substep applies full acceleration when `mccBurnRemainingTime < dt_step` and clears `isMccBurning` before Verlet half-step 2, while 8s Hermite gear downshifts span `~20,000 km`.
+     5. `updatePhysics(dt)` advances `moonAngle` to $t + \Delta t$ prior to evaluating $\mathbf{a}(t)$.
+4. **New Roadmap Tasks Logged (`Tasks.md` & `private/privTasks.md`):**
+   - Queued secure JSON flight log upload validator, solar photosphere/corona differentiation, Celestial Optical Navigation (Space Sextant / Star Tracker), Fin Fest / Blue Origin showcase prep, lunar tidal locking (`v2.1.30-dev`), Poly-Zone real starfield port (`v2.1.31-dev`), and Operator Dashboard live task tracking upgrade (`v2.1.32-dev`).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-10-22 17:44] - v2.1.28: Pre-Filled Google Form Backup Link, Recorded Payload Summary & Platform-Neutral Wording 📬💻📱✨**
 
 📝 **Summary**

@@ -1,15 +1,19 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.28)
-> *Artemis: The Free Return | Mission Control Portal, Dedicated Google Form Intake, Apps Script Email Receipt & Air-Gapped Staging*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.29)
+> *Artemis: The Free Return | Post-Tour Documentation Sync, Physics Forensic Audit & Fin Fest / Blue Origin Prep*
 
-**Date:** 2026-10-22  
+**Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
-**Alchemical Steward:** 🐈 Hermes  
-**Status:** **MISSION CONTROL PORTAL, DEDICATED GOOGLE FORM INTAKE & APPS SCRIPT EMAIL RECEIPT LIVE ON GITHUB PAGES (`v2.1.28`)** 🚀📬💻📱🥽🌕✨
+**Alchemical Steward:** 🐈 Orchestrator  
+**Status:** **DOCUMENTATION & ROADMAP SYNCED (`v2.1.29`) • PRODUCTION `sim.html` UNTOUCHED AT `v2.1.19` BASELINE • DEV STAGING READY FOR TIDAL MOON & REAL STARFIELD** 🚀📚🌕✨
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.28)
-1. **Air-Gapped Private Dev Staging & 1-Click Promotion Pipeline (`private/dev_site/` & `private/promote_to_production.py`):**
+## ✅ Alchemical Victories (v2.1.25 – v2.1.29)
+1. **Cross-Project Post-Tour Documentation & Architecture Confirmation (`v2.1.29`):**
+   - Verified production `sim.html` remains untouched byte-for-byte at `v2.1.19` (`SHA256: 5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`) alongside Mission Control portal `index.html` / `landing.html` (`v2.1.28`) and air-gapped dev staging (`private/dev_site/`).
+   - Consolidated 2026 showcase history across SLICE, SiM PAX West Kickoff, Seattle Space Week, KremFest XR, and GeekGirlCon 2026 (including Blue Origin engineer follow-up lead).
+   - Completed 5-point Physics & Flight Computer Mathematical Forensic Audit (analysis documented before code remediation) and logged new roadmap items: Secure Flight Log JSON Upload Validator, Sun Corona Differentiation, Celestial Optical Navigation (OpNav / Space Sextant), and Fin Fest / Blue Origin showcase alignment.
+2. **Air-Gapped Private Dev Staging & 1-Click Promotion Pipeline (`private/dev_site/` & `private/promote_to_production.py`):**
    - Isolated landing page (`private/dev_site/index.html`) and 3D simulation (`private/dev_site/sim.html`) with two-tier relative asset pathing (`../../vendor/three.min.js`, `../../textures/`, `../../images/`).
    - Preserved byte-for-byte baseline snapshot `snapshots/index_v2.1.19_sim_backup.html` (`SHA256: 5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`) and promoted simulation to root `sim.html` while promoting the Mission Control Portal to root `index.html` & `landing.html`.
    - Upgraded `server.py` on Port `3550` (`ThreadingTCPServer`, `allow_reuse_address = False`, `/api/checklist`, `/api/promote`, `/api/rollback`) and Operator Dashboard (`private/dev_dashboard/index.html`).
