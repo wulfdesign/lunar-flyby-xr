@@ -96,61 +96,78 @@ def extract_image_references(html_content: str) -> List[Tuple[int, str]]:
 # ===========================================================================
 class TestPublicRootProtection(unittest.TestCase):
     """
-    Verifies that either the public root `index.html` (pre-promotion) OR `sim.html`
-    (post-promotion) remains byte-for-byte identical to the baseline v2.1.19 simulation snapshot.
+    Verifies that the 2026 Festival Tour baseline (`v2.1.19`) remains archived intact
+    in BOTH `snapshots/index_v2.1.19_sim_backup.html` and `sim_v2.1.19_showcase_2026.html`,
+    and that root `sim.html` matches the promoted `snapshots/index_v2.2.0_fin_fest_sim_backup.html` release.
     """
 
     def test_root_index_exists(self):
-        """Root index.html must exist."""
+        """Root index.html and sim.html must exist."""
         self.assertTrue(
             os.path.isfile(ROOT_INDEX),
             f"Public root file missing at: {ROOT_INDEX}"
         )
+        self.assertTrue(
+            os.path.isfile(os.path.join(LUNAR_ROOT, "sim.html")),
+            "Public production simulation missing at root sim.html."
+        )
 
     def test_baseline_snapshot_exists(self):
-        """Baseline snapshot snapshots/index_v2.1.19_sim_backup.html must exist."""
+        """Baseline snapshot snapshots/index_v2.1.19_sim_backup.html and public 2026 tour archive must exist."""
         self.assertTrue(
             os.path.isfile(SNAPSHOT_FILE),
-            f"Baseline snapshot file missing at: {SNAPSHOT_FILE}. "
-            "A pristine copy of index.html must be archived as snapshots/index_v2.1.19_sim_backup.html."
+            f"Baseline snapshot file missing at: {SNAPSHOT_FILE}."
+        )
+        tour_archive = os.path.join(LUNAR_ROOT, "sim_v2.1.19_showcase_2026.html")
+        self.assertTrue(
+            os.path.isfile(tour_archive),
+            f"2026 Festival Tour snapshot missing at: {tour_archive}."
         )
 
     def test_root_index_identical_to_baseline_snapshot(self):
-        """Either root index.html (pre-promotion) or root sim.html (post-promotion) must match baseline snapshot."""
-        if not os.path.isfile(ROOT_INDEX) or not os.path.isfile(SNAPSHOT_FILE):
-            self.skipTest("Missing root index.html or baseline snapshot file.")
-
+        """Preserved 2026 Tour archive must match v2.1.19 baseline SHA-256, and root sim.html must match v2.2.0 snapshot."""
+        tour_archive = os.path.join(LUNAR_ROOT, "sim_v2.1.19_showcase_2026.html")
+        fin_fest_snap = os.path.join(LUNAR_ROOT, "snapshots", "index_v2.2.0_fin_fest_sim_backup.html")
         root_sim = os.path.join(LUNAR_ROOT, "sim.html")
-        target_sim_file = root_sim if os.path.isfile(root_sim) else ROOT_INDEX
+        if not os.path.isfile(tour_archive) or not os.path.isfile(SNAPSHOT_FILE):
+            self.skipTest("Missing 2026 Festival Tour snapshot or baseline file.")
 
-        with open(target_sim_file, "rb") as f_root:
-            root_bytes = f_root.read()
-        with open(SNAPSHOT_FILE, "rb") as f_snap:
-            snap_bytes = f_snap.read()
+        with open(tour_archive, "rb") as f_arch, open(SNAPSHOT_FILE, "rb") as f_snap:
+            self.assertEqual(
+                hashlib.sha256(f_arch.read()).hexdigest(),
+                hashlib.sha256(f_snap.read()).hexdigest(),
+                "2026 Festival Tour archive sim_v2.1.19_showcase_2026.html must remain byte-identical to v2.1.19 baseline."
+            )
 
-        root_hash = hashlib.sha256(root_bytes).hexdigest()
-        snap_hash = hashlib.sha256(snap_bytes).hexdigest()
-
-        self.assertEqual(
-            root_hash,
-            snap_hash,
-            f"INTEGRITY VIOLATION: {os.path.basename(target_sim_file)} ({len(root_bytes)} bytes, SHA: {root_hash[:12]}) "
-            f"does not match baseline snapshot ({len(snap_bytes)} bytes, SHA: {snap_hash[:12]})."
-        )
+        if os.path.isfile(fin_fest_snap) and os.path.isfile(root_sim):
+            with open(root_sim, "rb") as f_root, open(fin_fest_snap, "rb") as f_fin:
+                self.assertEqual(
+                    hashlib.sha256(f_root.read()).hexdigest(),
+                    hashlib.sha256(f_fin.read()).hexdigest(),
+                    "Root sim.html does not match snapshots/index_v2.2.0_fin_fest_sim_backup.html."
+                )
 
     def test_root_index_sim_version_nominal(self):
-        """Active root simulation (sim.html or index.html) must contain nominal v2.1.19 simulation markers."""
+        """Root sim.html must run production v2.2.0 Fin Fest Edition and archive must retain v2.1.19."""
         root_sim = os.path.join(LUNAR_ROOT, "sim.html")
-        target_sim_file = root_sim if os.path.isfile(root_sim) else ROOT_INDEX
-        if not os.path.isfile(target_sim_file):
-            self.skipTest("Root simulation file missing.")
-
-        with open(target_sim_file, "r", encoding="utf-8", errors="replace") as f:
+        tour_archive = os.path.join(LUNAR_ROOT, "sim_v2.1.19_showcase_2026.html")
+        with open(root_sim, "r", encoding="utf-8", errors="replace") as f:
             content = f.read()
+        self.assertIn("const SIM_VERSION = \"2.2.0\";", content)
+        self.assertIn("const IS_DEV = false;", content)
+        self.assertIn("updateAstronomicalEphemeris", content)
+        self.assertIn("moon_lro_2k.jpg", content)
+        self.assertIn("In Honor of Fin", content)
 
-        self.assertIn("v2.1.19", content, "Root simulation does not contain expected version string 'v2.1.19'.")
-        self.assertIn("<title>Artemis: Lunar Flyby VR - Educational Edition", content)
-        self.assertIn("const SIM_VERSION = \"2.1.19\";", content)
+        with open(tour_archive, "r", encoding="utf-8", errors="replace") as f_arch:
+            arch_content = f_arch.read()
+        self.assertIn("const SIM_VERSION = \"2.1.19\";", arch_content)
+
+        for portal in (ROOT_INDEX, ROOT_LANDING):
+            with open(portal, "r", encoding="utf-8", errors="replace") as f_p:
+                p_txt = f_p.read()
+            self.assertIn("sim.html", p_txt)
+            self.assertIn("sim_v2.1.19_showcase_2026.html", p_txt)
 
 
 # ===========================================================================

@@ -39,7 +39,7 @@ if sys.platform == "win32":
         pass
 
 PORT = 3550
-SERVER_VERSION = "2.1.32"
+SERVER_VERSION = "2.2.0"
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PRIVATE_DIR = os.path.join(ROOT_DIR, "private")
 CHECKLIST_FILE = os.path.join(PRIVATE_DIR, "checklist_status.json")
@@ -74,7 +74,7 @@ def get_local_ip():
 DEFAULT_CHECKLIST = {
     "updated_at": "2026-11-19T23:30:00Z",
     "updated_by": "default_seed",
-    "version": "v2.1.32-dev",
+    "version": "v2.2.0-dev",
     "items": {
         "sim-tidal-moon": {
             "title": "Lunar 1:1 Tidal Locking & Anti-Washout Crater Relief (v2.1.30-dev)",
@@ -140,7 +140,7 @@ def _extract_task_fields(raw_line):
 
 def parse_tasks_file(filepath, target_name):
     items = []
-    version = "v2.1.32-dev"
+    version = "v2.2.0-dev"
     if not os.path.exists(filepath):
         return items, version
 

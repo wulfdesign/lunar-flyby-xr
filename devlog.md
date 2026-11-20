@@ -6,6 +6,24 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 18:28] - v2.2.0: Fin Fest – Dog Star Edition Release — Real-Time UTC Epoch & J2000 Ephemeris, Soft Ocean Sheen, 2026 Tour Archive & Production Promotion 🚀🐾🌌**
+
+📝 **Summary**
+1. **Toned-Down Earth Ocean Specular Reflection (`earth_roughness_2k.jpg` & `meshphysical_frag` `onBeforeCompile`):**
+   - Diagnosed why ocean highlights appeared too large/bright (`earth_roughness_2k.jpg` set water to `0.17` with `metalness: 0.08`, and `MeshStandardMaterial` uses `meshphysical_frag` which includes `reflectedLight.directSpecular`).
+   - Remapped `earth_roughness_2k.jpg` water to `135/255 ≈ 0.53` and land to `242/255 ≈ 0.95`, set `metalness: 0.0`, matched the exact `meshphysical_frag` `outgoingLight` line, and attenuated `reflectedLight.directSpecular * 0.25` — producing a subtle, realistic orbital ocean reflection alongside dark-side Suomi NPP city lights across the terminator.
+2. **Real-Time UTC Launch Clock & Live Astronomical J2000 Ephemeris (`updateAstronomicalEphemeris`):**
+   - Added live advancing `Epoch (UTC)` telemetry row (`#epoch-utc-time`) and `launch_epoch_utc` / `epoch_utc` stamps inside exported flight logs (`logEvent`).
+   - Implemented J2000 Julian ephemeris solver initializing Earth's sidereal `GMST` angle, real Moon ecliptic longitude (`moonAngle`), live **Sun** vector (Earth/Moon moving continuously forward around the Sun across `MET`), and live heliocentric $\to$ geocentric positions + AU distances for **Mercury, Venus, Mars, Jupiter, and Saturn** — while preserving rotationally invariant cislunar free-return mechanics (`1,557.67 km` perilune, `-6.29°` corridor, `9.0 m/s` splashdown).
+3. **2026 Festival Tour Snapshot Preserved (`v2.1.19`) + `v2.2.0` Production Promotion:**
+   - Preserved the exact 2026 showcase build (*SLICE, SiM PAX West, Seattle Space Week, KremFest XR, GeekGirlCon 2026*) at `sim_v2.1.19_showcase_2026.html` (`SHA-256: 5ecfaa50...`) & `snapshots/index_v2.1.19_sim_backup.html`, linked directly from the Hero CTA and Showcase Pedigree on `index.html` / `landing.html`.
+   - Upgraded `promote_to_production.py` (`IS_DEV = false` for root production), `server.py` (`SERVER_VERSION = "2.2.0"`), and `private/dev_dashboard/index.html` (`v2.2.0`); archived `snapshots/index_v2.2.0_fin_fest_sim_backup.html` and promoted `v2.2.0` Fin Fest – Dog Star Edition to `sim.html`, `index.html`, and `landing.html`.
+   - Verified all 7 re-entry stages (`verify_v2140_reentry.js`), `verify_v2135_steering.js`, `29/29` E2E tests (`tests/test_staging_and_portal.py`), and live Chromium QA across `/index.html`, `/sim_v2.1.19_showcase_2026.html`, `/private/dev_dashboard/index.html`, and `/sim.html` (`14.0x` Earth with live `Epoch (UTC)` matching real-world daylight/night terminator geography over Asia/Pacific, Saturn at `RA 00h 32m, Dec +0.6° (8.78 AU)`, `0` console/WebGL errors; zero `git push`).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 18:04] - v2.1.40-dev: Pre-MCC Return Gating & 4-Stage Atmospheric Re-Entry & Landing Sub-Mission Deck 🔥🪂🌊**
 
 📝 **Summary**

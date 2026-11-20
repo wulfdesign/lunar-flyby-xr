@@ -1,14 +1,18 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.40-dev — Finster / Fin Fest Update 🐾)
-> *Artemis: The Free Return | 4-Stage Atmospheric Re-Entry Sub-Mission, NASA LRO/LOLA Moon & Earth Ocean/Night Shader, Telescopic 5 Planets, Bulletproof Mouse Look & 3D Hover*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.2.0 — Fin Fest – Dog Star Edition 🐾)
+> *Artemis: The Free Return | Live UTC J2000 Ephemeris, Soft Ocean Glint & NASA Night Lights, Telescopic 5 Planets, 4-Stage Re-Entry Sub-Mission & 2026 Tour Archive*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.40-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • 4-STAGE RE-ENTRY SUB-MISSION & NASA SHADERS VERIFIED • 29/29 TESTS PASSING** 🚀🌕✨🐾🔥🪂
+**Status:** **LOCAL PRODUCTION PROMOTED (`v2.2.0` Fin Fest – Dog Star Edition `sim.html` / `index.html`) • 2026 TOUR ARCHIVED AT `sim_v2.1.19_showcase_2026.html` • 29/29 TESTS PASSING • ZERO `git push`** 🚀🌕✨🐾🌌
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.40-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.2.0)
+- **Fin Fest – Dog Star Edition (`v2.2.0`), Live J2000 Ephemeris, Soft Ocean Reflection & 2026 Tour Archive (Ready for Final Operator QA 🧪):**
+  - **Soft Ocean Glint:** Corrected `earthMat.onBeforeCompile` to `meshphysical_frag`, remapped `earth_roughness_2k.jpg` oceans to `0.53` (`135/255`) / land to `0.95`, set `metalness: 0.0`, and scaled `directSpecular * 0.25`.
+  - **Live UTC Epoch & J2000 Astronomical Ephemeris (`updateAstronomicalEphemeris`):** Added `#epoch-utc-time` HUD timestamp + log epochs and real-time J2000 solar/Earth-GMST/lunar/planetary Keplerian ephemeris advancing cleanly over `MET` (confirmed live Saturn `RA 00h 32m, Dec +0.6°, 8.78 AU` and accurate Asia/Pacific terminator lighting at `07:32 UTC`).
+  - **2026 Tour Snapshot Archive & Promotion:** Preserved byte-identical `v2.1.19` showcase at `sim_v2.1.19_showcase_2026.html` (`SHA-256: 5ecfaa50...`), archived `snapshots/index_v2.2.0_fin_fest_sim_backup.html`, updated `promote_to_production.py` (`IS_DEV = false`), `server.py` v2.2.0, `private/dev_dashboard/index.html` v2.2.0, and promoted `index.html`, `landing.html`, & `sim.html` locally (verified `29/29` E2E tests, 7-stage reentry audit, and live Chromium `0` console/WebGL errors).
 - **Pre-MCC Return Gating & 4-Stage Atmospheric Re-Entry & Landing Sub-Mission Deck (`v2.1.40-dev` — Ready for QA 🧪):**
   - Gated early return 2-body perigee warnings (`PENDING MCC` / `CISLUNAR RETURN`, Green prograde vector) until active Return MCC (`192,200 km` / `42,164 km`) or `< 36,000 km` final approach.
   - Upgraded `#reentry-controls` (`altE <= 122 km`) into a progressive 4-stage Safe-Zone Sub-Mission Deck (`🔥 ATMOSPHERIC RE-ENTRY` $\to$ `🪂 LANDING SUB-MISSION` post-plasma Safe Zone $\to$ Drogue Chutes `7.3 km` $\to$ `🌊 SPLASHDOWN SUB-MISSION` Main Chutes `3.0 km` $\to$ `SPLASHDOWN (SAFE)` / `MISSION ACCOMPLISHED`), eliminating false `LETHAL DESCENT (USE LIFT)` warnings below `35 km`.

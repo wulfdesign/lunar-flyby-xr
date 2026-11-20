@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.40-dev • Fin Fest Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.2.0-dev • Fin Fest – Dog Star Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none; }
         canvas { display: block; cursor: grab; }
@@ -226,11 +226,12 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.40-dev (Fin Fest 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.2.0-dev (Fin Fest • Dog Star 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Mission Elapsed Time: Total duration since the simulation began.">MET:</span> <span id="met-time">00:00:00:00</span></p>
+                <p><span class="tooltip" title="Real-world UTC launch date and live clock advancing with Mission Elapsed Time (J2000 Ephemeris epoch).">Epoch (UTC):</span> <span id="epoch-utc-time" class="nominal" style="font-size:0.74rem;">2026-11-20 00:00:00Z</span></p>
                 <p><span class="tooltip" title="Real-world elapsed duration of this simulation run. Track your speedrun and best mission times!">Sim Flight Time:</span> <span id="sim-flight-time" class="nominal">00:00.0</span></p>
                 <hr style="border-color: #00ffff; opacity: 0.3;">
                 <p><span class="tooltip" title="Altitude above Earth's sea level.">Alt (Earth):</span> <span id="alt-earth">400 km</span></p>
@@ -396,12 +397,12 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.40";
+        const SIM_VERSION = "2.2.0";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
             if (badge) {
-                badge.textContent = IS_DEV ? `v${SIM_VERSION}-dev (Fin Fest 🐾)` : `v${SIM_VERSION} (Production)`;
+                badge.textContent = IS_DEV ? `v${SIM_VERSION}-dev (Fin Fest • Dog Star 🐾)` : `v${SIM_VERSION} (Fin Fest • Dog Star 🐾)`;
             }
         });
 
@@ -763,15 +764,15 @@
         // NASA Visible Earth Blue Marble + MODIS Ocean Specular + SRTM Topo Bump + Black Marble Night Lights
         const earthMat = new THREE.MeshStandardMaterial({
             roughness: 1.0,
-            metalness: 0.08,
+            metalness: 0.0,
             bumpScale: 0.015,
             emissive: new THREE.Color(0xffd89b),
             emissiveIntensity: 0.92
         });
         earthMat.onBeforeCompile = (shader) => {
             shader.fragmentShader = shader.fragmentShader.replace(
-                'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;',
-                'float dayIllum = dot(reflectedLight.directDiffuse, vec3(0.3333)); float nightMask = 1.0 - smoothstep(0.004, 0.085, dayIllum); vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + (totalEmissiveRadiance * nightMask);'
+                'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;',
+                'float dayIllum = dot(reflectedLight.directDiffuse, vec3(0.3333)); float nightMask = 1.0 - smoothstep(0.004, 0.085, dayIllum); vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + (reflectedLight.directSpecular * 0.25) + reflectedLight.indirectSpecular + (totalEmissiveRadiance * nightMask);'
             );
         };
 
@@ -982,12 +983,14 @@
             [18.921, -26.297, 2.05, -0.22, "NUNKI (σ Sgr)", "Apollo Nav Star #32 • Sagittarius"]
         ];
 
+        // JPL J2000 Mean Keplerian Orbital Elements (a in AU, e, i deg, node deg, peri deg, L0 deg, dL deg/day)
+        const EARTH_ORBIT_ELEM = { a: 1.00000261, e: 0.01671123, i: -0.00001531, node: 0.0, peri: 102.93768193, L0: 100.46457166, dL: 0.98560910 };
         const NAV_PLANETS_CATALOG = [
-            { key: "VENUS", name: "PLANET VENUS", ra: 2.15, dec: 13.5, v: -4.2, color: 0xfff6d5, nakedScale: 680000, teleScale: 720000, role: "Inner Ecliptic Beacon • Sulfuric Cloud Deck (Scroll to Zoom)" },
-            { key: "JUPITER", name: "PLANET JUPITER", ra: 5.45, dec: 22.8, v: -2.6, color: 0xffe2b8, nakedScale: 720000, teleScale: 1080000, role: "Jovian Gas Giant • Cloud Belts, Great Red Spot & 4 Galilean Moons (Zoom)" },
-            { key: "MARS", name: "PLANET MARS", ra: 8.10, dec: 21.2, v: -0.8, color: 0xff7b52, nakedScale: 600000, teleScale: 640000, role: "The Red Planet • Syrtis Major & North Polar Ice Cap (Scroll to Zoom)" },
-            { key: "SATURN", name: "PLANET SATURN", ra: 23.20, dec: -7.5, v: 0.4, color: 0xf4d59e, nakedScale: 780000, teleScale: 1220000, role: "Ringed Outer Giant • Tilted Cassini Ring System (Scroll to Zoom)" },
-            { key: "MERCURY", name: "PLANET MERCURY", ra: 11.20, dec: 4.5, v: -0.3, color: 0xd8d2c8, nakedScale: 540000, teleScale: 560000, role: "Innermost Terrestrial Planet • Cratered Gibbous Disc (Scroll to Zoom)" }
+            { key: "VENUS", name: "PLANET VENUS", ra: 2.15, dec: 13.5, v: -4.2, color: 0xfff6d5, nakedScale: 680000, teleScale: 720000, elem: { a: 0.72333566, e: 0.00677672, i: 3.39467605, node: 76.67984255, peri: 131.60246718, L0: 181.97909950, dL: 1.6021302244 }, role: "Inner Ecliptic Beacon • Sulfuric Cloud Deck (Scroll to Zoom)" },
+            { key: "JUPITER", name: "PLANET JUPITER", ra: 5.45, dec: 22.8, v: -2.6, color: 0xffe2b8, nakedScale: 720000, teleScale: 1080000, elem: { a: 5.20288700, e: 0.04838624, i: 1.30439695, node: 100.47390909, peri: 14.72847983, L0: 34.39644051, dL: 0.0830853001 }, role: "Jovian Gas Giant • Cloud Belts, Great Red Spot & 4 Galilean Moons (Zoom)" },
+            { key: "MARS", name: "PLANET MARS", ra: 8.10, dec: 21.2, v: -0.8, color: 0xff7b52, nakedScale: 600000, teleScale: 640000, elem: { a: 1.52371034, e: 0.09339410, i: 1.84969142, node: 49.55953891, peri: -23.94362959, L0: -4.55343205, dL: 0.5240207766 }, role: "The Red Planet • Syrtis Major & North Polar Ice Cap (Scroll to Zoom)" },
+            { key: "SATURN", name: "PLANET SATURN", ra: 23.20, dec: -7.5, v: 0.4, color: 0xf4d59e, nakedScale: 780000, teleScale: 1220000, elem: { a: 9.53667594, e: 0.05386179, i: 2.48599187, node: 113.66242448, peri: 92.59887831, L0: 49.95424423, dL: 0.0334442282 }, role: "Ringed Outer Giant • Tilted Cassini Ring System (Scroll to Zoom)" },
+            { key: "MERCURY", name: "PLANET MERCURY", ra: 11.20, dec: 4.5, v: -0.3, color: 0xd8d2c8, nakedScale: 540000, teleScale: 560000, elem: { a: 0.38709927, e: 0.20563593, i: 7.00497902, node: 48.33076593, peri: 77.45779628, L0: 252.25032350, dL: 4.0923344368 }, role: "Innermost Terrestrial Planet • Cratered Gibbous Disc (Scroll to Zoom)" }
         ];
 
         const SKY_RADIUS = 50000000;
@@ -1229,8 +1232,9 @@
                 sprite.scale.set(p.nakedScale, p.nakedScale, 1);
                 sprite.name = p.name;
                 celestialGroup.add(sprite);
-                planetSprites.push({ sprite, nakedScale: p.nakedScale, teleScale: p.teleScale });
-                celestialBeacons.push({ name: p.name, pos: pos, dir: pos.clone().normalize(), meta: `Mag ${p.v.toFixed(1)} • ${formatRaDec(p.ra, p.dec)}`, role: p.role, isPlanet: true });
+                const beaconObj = { name: p.name, pos: pos.clone(), dir: pos.clone().normalize(), meta: `Mag ${p.v.toFixed(1)} • ${formatRaDec(p.ra, p.dec)}`, role: p.role, isPlanet: true };
+                planetSprites.push({ sprite, beaconRef: beaconObj, elem: p.elem, v: p.v, nakedScale: p.nakedScale, teleScale: p.teleScale });
+                celestialBeacons.push(beaconObj);
             });
 
             // Named Navigational & Constellation Stars
@@ -1373,7 +1377,93 @@
         sunCoronaSprite.name = "THE SUN";
         sunMesh.add(sunCoronaSprite);
         scene.add(sunMesh);
-        scene.add(new THREE.AmbientLight(0x282c38)); 
+        scene.add(new THREE.AmbientLight(0x282c38));
+
+        let missionStartEpochMs = Date.now();
+        let lastPlanetEphemerisMet = -999;
+
+        function formatEpochUtc(ms) {
+            return new Date(ms).toISOString().replace('T', ' ').slice(0, 19) + 'Z';
+        }
+
+        function computeHeliocentricEcliptic(elem, d) {
+            const L = elem.L0 + elem.dL * d;
+            const w = elem.peri - elem.node;
+            let Mdeg = ((L - elem.peri) % 360 + 360) % 360;
+            if (Mdeg > 180) Mdeg -= 360;
+            const M = THREE.MathUtils.degToRad(Mdeg);
+            let E = M + elem.e * Math.sin(M);
+            for (let iter = 0; iter < 5; iter++) {
+                const dM = M - (E - elem.e * Math.sin(E));
+                E += dM / (1 - elem.e * Math.cos(E));
+            }
+            const xp = elem.a * (Math.cos(E) - elem.e);
+            const yp = elem.a * Math.sqrt(Math.max(0, 1 - elem.e * elem.e)) * Math.sin(E);
+            const om = THREE.MathUtils.degToRad(elem.node);
+            const wRad = THREE.MathUtils.degToRad(w);
+            const inc = THREE.MathUtils.degToRad(elem.i);
+            const cw = Math.cos(wRad), sw = Math.sin(wRad);
+            const co = Math.cos(om), so = Math.sin(om);
+            const ci = Math.cos(inc), si = Math.sin(inc);
+            return {
+                x: (cw * co - sw * so * ci) * xp + (-sw * co - cw * so * ci) * yp,
+                y: (cw * so + sw * co * ci) * xp + (-sw * so + cw * co * ci) * yp,
+                z: (sw * si) * xp + (cw * si) * yp
+            };
+        }
+
+        function updateAstronomicalEphemeris(epochMs, isInitialReset = false) {
+            const jd = epochMs / 86400000 + 2440587.5;
+            const d = jd - 2451545.0;
+            const eps = THREE.MathUtils.degToRad(23.43929 - 0.00000036 * d);
+            const cosEps = Math.cos(eps), sinEps = Math.sin(eps);
+
+            // 1. Live Solar Vector (Earth & Moon orbit around the Sun over MET)
+            const gSun = THREE.MathUtils.degToRad(((357.5291 + 0.98560028 * d) % 360 + 360) % 360);
+            const qSun = ((280.459 + 0.98564736 * d) % 360 + 360) % 360;
+            const lamSun = THREE.MathUtils.degToRad(qSun + 1.915 * Math.sin(gSun) + 0.020 * Math.sin(2 * gSun));
+            sunPosition.set(Math.cos(lamSun), Math.sin(lamSun) * sinEps, -Math.sin(lamSun) * cosEps).multiplyScalar(15000000);
+            sunLight.position.copy(sunPosition);
+            sunMesh.position.copy(sunPosition);
+
+            // 2. Initial Launch Orientation: Earth GMST Spin & Real-Time Moon Ecliptic Longitude
+            if (isInitialReset) {
+                const gmstDeg = ((280.46061837 + 360.98564736629 * d) % 360 + 360) % 360;
+                earth.rotation.y = THREE.MathUtils.degToRad(gmstDeg);
+                const lmDeg = 218.316 + 13.176396 * d;
+                const mmRad = THREE.MathUtils.degToRad(((134.963 + 13.064993 * d) % 360 + 360) % 360);
+                const lamMoonRad = THREE.MathUtils.degToRad(((lmDeg + 6.289 * Math.sin(mmRad)) % 360 + 360) % 360);
+                moonAngle = ((-lamMoonRad) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+            }
+
+            // 3. Live J2000 Geocentric Positions of All 5 Naked-Eye Planets
+            if (isInitialReset || Math.abs(metSeconds - lastPlanetEphemerisMet) >= 30) {
+                lastPlanetEphemerisMet = metSeconds;
+                const rEarthHelio = computeHeliocentricEcliptic(EARTH_ORBIT_ELEM, d);
+                const planetSkyR = SKY_RADIUS * 0.98;
+                for (let i = 0; i < planetSprites.length; i++) {
+                    const ps = planetSprites[i];
+                    if (!ps.elem) continue;
+                    const rP = computeHeliocentricEcliptic(ps.elem, d);
+                    const gx = rP.x - rEarthHelio.x;
+                    const gy = rP.y - rEarthHelio.y;
+                    const gz = rP.z - rEarthHelio.z;
+                    const distAU = Math.sqrt(gx * gx + gy * gy + gz * gz);
+                    const eqX = gx;
+                    const eqY = gy * cosEps - gz * sinEps;
+                    const eqZ = gy * sinEps + gz * cosEps;
+                    const raRad = ((Math.atan2(eqY, eqX) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+                    const raHours = raRad * (12.0 / Math.PI);
+                    const decDeg = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(eqZ / Math.max(1e-9, distAU), -1, 1)));
+                    ps.sprite.position.set(eqX / distAU * planetSkyR, eqZ / distAU * planetSkyR, -eqY / distAU * planetSkyR);
+                    if (ps.beaconRef) {
+                        ps.beaconRef.pos.copy(ps.sprite.position);
+                        ps.beaconRef.dir.copy(ps.sprite.position).normalize();
+                        ps.beaconRef.meta = `Mag ${ps.v.toFixed(1)} • ${formatRaDec(raHours, decDeg)} (${distAU.toFixed(2)} AU)`;
+                    }
+                }
+            }
+        } 
 
         const shipGroup = new THREE.Group();
         shipGroup.add(new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.005, 0.005), new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide})));
@@ -1464,7 +1554,11 @@
         document.addEventListener('touchmove', (e) => { if (isDraggingView && !isTrackingTarget) { const dragScale = 0.3 * Math.max(0.06, Math.min(1.4, camera.fov / 70)); lookLon -= (e.touches[0].clientX - prevMousePos.x) * dragScale; lookLat = Math.max(-85, Math.min(85, lookLat - (e.touches[0].clientY - prevMousePos.y) * dragScale)); prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; if (e.cancelable) e.preventDefault(); } }, { passive: false });
 
         function resetMission() {
-            let startRadius = radEarth + 400; let vOrbit = Math.sqrt(muEarth / startRadius); moonAngle = 0; 
+            missionStartEpochMs = Date.now();
+            metSeconds = 0;
+            lastPlanetEphemerisMet = -999;
+            updateAstronomicalEphemeris(missionStartEpochMs, true);
+            let startRadius = radEarth + 400; let vOrbit = Math.sqrt(muEarth / startRadius);
             moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
             moon.rotation.y = Math.PI - moonAngle;
             const targetPhaseAngle = (moonAngle + Math.PI + MISSION_LEAD_ANGLE) % (Math.PI * 2);
@@ -1561,6 +1655,8 @@
 
             flightLog.push({ 
                 version: SIM_VERSION, timestamp_real: new Date().toISOString(),
+                launch_epoch_utc: new Date(missionStartEpochMs).toISOString(),
+                epoch_utc: new Date(missionStartEpochMs + metSeconds * 1000).toISOString(),
                 sim_flight_time: formatSimFlightTime(simFlightSeconds),
                 sim_flight_seconds: Number(simFlightSeconds.toFixed(1)),
                 met: metSeconds, met_formatted: formatTime(metSeconds),
@@ -2122,7 +2218,7 @@
                 _tempVec1.copy(shipVel).normalize(); _lookTarget.copy(shipGroup.position).sub(_tempVec1); shipGroup.lookAt(_lookTarget); 
                 camera.rotation.order = 'YXZ'; camera.rotation.y = THREE.MathUtils.degToRad(lookLon); camera.rotation.x = THREE.MathUtils.degToRad(lookLat);
             }
-            earth.rotation.y += 0.0000727 * dt;
+            earth.rotation.y += 0.00007292115 * dt;
 
             if (isReturningHome && !cinematicActive && !playbackActive) {
                 let is1xMandatory = (altE > 35 && altE <= 200) || 
@@ -2558,6 +2654,9 @@
                 if (altE > globalMaxAlt) globalMaxAlt = altE;
 
                 safeSetText('met-time', formatTime(metSeconds));
+                const liveEpochMs = missionStartEpochMs + metSeconds * 1000;
+                safeSetText('epoch-utc-time', formatEpochUtc(liveEpochMs));
+                updateAstronomicalEphemeris(liveEpochMs, false);
                 if (altE < 10 && altE > 0) { safeSetText('alt-earth', altE.toFixed(3) + " km"); safeSetText('velocity', (shipVel.length() * 1000).toFixed(1) + " m/s"); } 
                 else { safeSetText('alt-earth', altE.toLocaleString(undefined, {maximumFractionDigits: 0}) + " km"); safeSetText('velocity', shipVel.length().toFixed(2) + " km/s"); }
                 
