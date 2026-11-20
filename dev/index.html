@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.31-dev)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.33-dev • Fin Fest Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -178,7 +178,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.31-dev</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.33-dev (Fin Fest 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -301,12 +301,12 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.31";
+        const SIM_VERSION = "2.1.33";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
             if (badge) {
-                badge.textContent = IS_DEV ? `v${SIM_VERSION}-dev` : `v${SIM_VERSION} (Production)`;
+                badge.textContent = IS_DEV ? `v${SIM_VERSION}-dev (Fin Fest 🐾)` : `v${SIM_VERSION} (Production)`;
             }
         });
 
@@ -914,6 +914,8 @@
             isMccBurning = false; mccBurnRemainingTime = 0; mccBurnAccel.set(0,0,0); mccFuelRate = 0;
             
             for (let key in milestoneLatches) milestoneLatches[key] = false;
+            for (let wp of MISSION_WAYPOINTS_OUTBOUND) wp.passed = false;
+            for (let wp of MISSION_WAYPOINTS_RETURN) wp.passed = false;
             lookLon = 0; lookLat = 0; baseFov = 70; camera.fov = baseFov; camera.updateProjectionMatrix(); document.getElementById('zoom-indicator').innerHTML = `FOV: 70&deg; (1.0x Zoom)`;
             updateWarpUI(1); flightLog = []; logEvent("Mission Started - System initialized in LEO.", { magEarth: muEarth/Math.pow(radEarth+400, 2), magMoon: 0 });
             
@@ -1149,7 +1151,7 @@
             });
         });
 
-        const _aEarth = new THREE.Vector3(), _aMoon = new THREE.Vector3(), _dirMoon = new THREE.Vector3(), _moonPos = new THREE.Vector3(), _accel = new THREE.Vector3(), _nextAccel = new THREE.Vector3(), _thrustAcc = new THREE.Vector3(), _nextThrustAcc = new THREE.Vector3(), _totalAccel = new THREE.Vector3(), _nextTotalAccel = new THREE.Vector3(), _tempVec1 = new THREE.Vector3(), _tempVec2 = new THREE.Vector3(), _camDir = new THREE.Vector3(), _dirToMoon = new THREE.Vector3(), _lookTarget = new THREE.Vector3();
+        const _aEarth = new THREE.Vector3(), _aMoon = new THREE.Vector3(), _dirMoon = new THREE.Vector3(), _moonPos = new THREE.Vector3(), _accel = new THREE.Vector3(), _nextAccel = new THREE.Vector3(), _thrustAcc = new THREE.Vector3(), _nextThrustAcc = new THREE.Vector3(), _totalAccel = new THREE.Vector3(), _nextTotalAccel = new THREE.Vector3(), _tempVec1 = new THREE.Vector3(), _tempVec2 = new THREE.Vector3(), _camDir = new THREE.Vector3(), _dirToMoon = new THREE.Vector3(), _lookTarget = new THREE.Vector3(), _burnDirVec = new THREE.Vector3();
 
         function getAcceleration(pos, accelOut) {
             let rEarth = pos.length(); let magEarth = muEarth / (rEarth * rEarth); _aEarth.copy(pos).multiplyScalar(-muEarth / (rEarth * rEarth * rEarth));
@@ -1160,7 +1162,10 @@
         function updatePhysics(dt) {
             if (shipPos.length() - radEarth <= 0) return { timeToWindow: 0, isTliCoast: false, estimatedBurnTime: 0, magEarth: muEarth/(radEarth*radEarth), magMoon: 0, flightPathAngle: 0 };
 
-            const moonAngularVel = Math.sqrt(muEarth / Math.pow(distMoon, 3)); moonAngle += moonAngularVel * dt; moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
+            // Keep lunar ephemeris at time t for Velocity Verlet acceleration a(t);
+            // moonAngle advances strictly after r(t + dt) before evaluating a(t + dt).
+            const moonAngularVel = Math.sqrt(muEarth / Math.pow(distMoon, 3));
+            moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
             // 1:1 Tidal Locking: Three.js SphereGeometry maps u=0.5 (0° lon Lunar Near Side) to local +X.
             // Rotating around Y by (PI - moonAngle) points local +X continuously toward Earth at (0,0,0).
             moon.rotation.y = Math.PI - moonAngle;
@@ -1253,27 +1258,33 @@
                 liftAccMag = maxLiftAccMag * Math.abs(liftFraction);
             }
 
+            let tliStepThrustAccMag = 0;
+            let mccStepScale = 0;
+            let mccEndedThisStep = false;
             currentGForce = 0; _thrustAcc.set(0,0,0);
             if (isMccBurning) {
-                _thrustAcc.copy(mccBurnAccel);
-                fuel = Math.max(0, fuel - mccFuelRate * dt);
+                mccStepScale = Math.min(1.0, Math.max(0, mccBurnRemainingTime) / Math.max(0.00001, dt));
+                _thrustAcc.copy(mccBurnAccel).multiplyScalar(mccStepScale);
+                fuel = Math.max(0, fuel - mccFuelRate * dt * mccStepScale);
                 mccBurnRemainingTime -= dt;
-                currentGForce = mccBurnAccel.length() / 0.00980665;
+                currentGForce = _thrustAcc.length() / 0.00980665;
                 if (mccBurnRemainingTime <= 0) {
-                    isMccBurning = false;
-                    isBurning = false;
-                    burnEndTime = metSeconds;
-                    shiftWarp(1);
-                    activeMCCWaypoint = null;
-                    logEvent("MCC CUTOFF: Maneuver Complete. Trajectory Nominal.");
-                    showNavMsg(`MCC COMPLETE: TRAJECTORY NOMINAL — OBSERVATION HOLD (${FLIGHT_TIMERS.postBurnRampDelay}s)`, 4000, "nominal");
+                    mccEndedThisStep = true;
                 }
             } else if (isBurning && fuel > 0) { 
-                let thrustAccMag = (thrustForce / currentMass); 
-                _thrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); 
-                fuel -= (massFlowRate * dt); 
+                _burnDirVec.copy(shipVel).normalize();
+                let throttleScale = (typeof manualThrottlePct !== 'undefined' ? manualThrottlePct : 1.0);
+                let rawThrustAccMag = (thrustForce * throttleScale) / currentMass;
+                tliStepThrustAccMag = rawThrustAccMag;
+                let stepFraction = 1.0;
+                if (autoBurnActive && dvRequired > 0 && rawThrustAccMag * dt >= dvRequired) {
+                    tliStepThrustAccMag = dvRequired / Math.max(0.00001, dt);
+                    stepFraction = tliStepThrustAccMag / Math.max(0.00001, rawThrustAccMag);
+                }
+                _thrustAcc.copy(_burnDirVec).multiplyScalar(tliStepThrustAccMag); 
+                fuel -= (massFlowRate * throttleScale * stepFraction * dt); 
                 if(fuel < 0) fuel = 0; 
-                currentGForce = thrustAccMag / 0.00980665; 
+                currentGForce = tliStepThrustAccMag / 0.00980665; 
             }
             
             if (isReentry) {
@@ -1296,6 +1307,11 @@
             // Calculating next position via zero-allocation pooling.
             // See context: /docs/physics.html#velocity-verlet AND /docs/physics.html#zero-allocation
             _tempVec1.copy(shipVel).multiplyScalar(dt); _tempVec2.copy(_totalAccel).multiplyScalar(0.5 * dt * dt); shipPos.add(_tempVec1).add(_tempVec2);
+
+            // Advance Moon to t + dt so Verlet second half-step a(t + dt) uses exact end-of-step lunar position
+            moonAngle += moonAngularVel * dt;
+            moon.position.set(Math.cos(moonAngle) * distMoon * renderScale, 0, Math.sin(moonAngle) * distMoon * renderScale);
+            moon.rotation.y = Math.PI - moonAngle;
             
             if (shipPos.length() - radEarth <= 0) {
                 shipPos.setLength(radEarth); 
@@ -1310,10 +1326,9 @@
             } else {
                 let nextAccelData = getAcceleration(shipPos, _nextAccel); _nextThrustAcc.set(0,0,0);
                 if (isMccBurning) {
-                    _nextThrustAcc.copy(mccBurnAccel);
+                    _nextThrustAcc.copy(mccBurnAccel).multiplyScalar(mccStepScale);
                 } else if (isBurning && fuel > 0) { 
-                    let thrustAccMag = (thrustForce / currentMass); 
-                    _nextThrustAcc.copy(shipVel).normalize().multiplyScalar(thrustAccMag); 
+                    _nextThrustAcc.copy(_burnDirVec).multiplyScalar(tliStepThrustAccMag); 
                 }
                 _nextTotalAccel.copy(_nextAccel).add(_nextThrustAcc);
                 if (isReentry && shipVel.length() > 0) { 
@@ -1325,6 +1340,16 @@
                     }
                 }
                 _tempVec1.addVectors(_totalAccel, _nextTotalAccel).multiplyScalar(0.5 * dt); shipVel.add(_tempVec1);
+            }
+
+            if (mccEndedThisStep) {
+                isMccBurning = false;
+                isBurning = false;
+                burnEndTime = metSeconds;
+                shiftWarp(1);
+                activeMCCWaypoint = null;
+                logEvent("MCC CUTOFF: Maneuver Complete. Trajectory Nominal.");
+                showNavMsg(`MCC COMPLETE: TRAJECTORY NOMINAL — OBSERVATION HOLD (${FLIGHT_TIMERS.postBurnRampDelay}s)`, 4000, "nominal");
             }
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
@@ -1366,7 +1391,7 @@
                 _moonPos.copy(moon.position).divideScalar(renderScale); let distM = shipPos.distanceTo(_moonPos) - radMoon;
                 let altE_cur = shipPos.length() - radEarth;
                 let stepSize = 0.5; if (distM < 60000) stepSize = 0.1; if (distM < 12000) stepSize = 0.01; 
-                if (isReentry || altE_cur < 122) stepSize = 0.01;
+                if (isReentry || altE_cur < 122 || isBurning || isMccBurning) stepSize = 0.01;
                 let steps = Math.max(1, Math.min(10000, Math.ceil(simSecondsToProcess / stepSize))); let dt_step = simSecondsToProcess / steps;
                 let telemetry = null;
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
@@ -1950,26 +1975,44 @@
                 return;
             }
             if (!activeMCCWaypoint) return;
+            if (timeWarp > 30 || targetWarp > 30) {
+                shiftWarp(30);
+                showNavMsg("WARP CLAMPED: 30x MAX DURING MCC BURN", 3000, "caution");
+            }
             let altE = shipPos.length() - radEarth;
             
             if (isReturningHome) {
                 let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel);
                 let transverseDir = new THREE.Vector3().crossVectors(h_vec, shipPos).normalize();
                 
-                let target_rp = radEarth + 40; 
+                let target_rp = radEarth + 40;
+                // Evaluate initial perigee rp_0 prior to burn
+                let h0 = h_vec.length();
+                let e0 = (shipVel.lengthSq() / 2) - (muEarth / shipPos.length());
+                let rp_0 = target_rp;
+                if (e0 < 0) {
+                    let a0 = -muEarth / (2 * e0);
+                    let ecc0 = Math.sqrt(Math.max(0, 1 + (2 * e0 * h0 * h0) / (muEarth * muEarth)));
+                    rp_0 = a0 * (1 - ecc0);
+                }
+                // Bidirectional search: if trajectory is too shallow (rp_0 > target_rp), burn in -transverseDir
+                let lowerPerigee = (rp_0 > target_rp);
+                if (lowerPerigee) {
+                    transverseDir.negate();
+                }
+
                 let dV = 0;
-                let step = 0.0005; 
-                
-                for(let i=0; i<3000; i++) {
+                let step = 0.0005;
+                for (let i = 0; i < 3000; i++) {
                     let testVel = shipVel.clone().add(transverseDir.clone().multiplyScalar(dV));
                     let h_test = new THREE.Vector3().crossVectors(shipPos, testVel).length();
                     let e_test = (testVel.lengthSq() / 2) - (muEarth / shipPos.length());
-                    if (e_test >= 0) break; 
+                    if (e_test >= 0) break;
                     let a_test = -muEarth / (2 * e_test);
                     let ecc_test = Math.sqrt(Math.max(0, 1 + (2 * e_test * h_test * h_test) / (muEarth * muEarth)));
                     let rp_test = a_test * (1 - ecc_test);
-                    
-                    if (rp_test >= target_rp) break;
+                    if (!lowerPerigee && rp_test >= target_rp) break;
+                    if (lowerPerigee && rp_test <= target_rp) break;
                     dV += step;
                 }
                 
@@ -1981,7 +2024,7 @@
                 mccFuelRate = fuelConsumed / mccBurnDuration;
                 isMccBurning = true;
                 isBurning = true;
-                logEvent(`MCC IGNITION: Return Trajectory Alignment (+${dV.toFixed(4)} km/s Radial over ${mccBurnDuration}s). Target Perigee: 40km. Fuel: ~${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
+                logEvent(`MCC IGNITION: Return Trajectory Alignment (${lowerPerigee ? '-' : '+'}${dV.toFixed(4)} km/s Transverse over ${mccBurnDuration}s). Target Perigee: 40km. Fuel: ~${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);
                 showNavMsg(`MCC IGNITION: TRAJECTORY ALIGNMENT BURN (${mccBurnDuration}s)`, 3000, "solid-green");
                 
             } else {
