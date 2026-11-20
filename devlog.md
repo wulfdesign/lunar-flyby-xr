@@ -6,6 +6,22 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 17:57] - v2.1.39-dev: NASA LRO/LOLA Moon, Visible Earth Ocean Specular / Night Lights Shader, Mobile-Safe `2K/4K` LOD & Credits 🌍🌕🌃**
+
+📝 **Summary**
+1. **Authentic Public-Domain NASA Planetary Textures Bundled Offline (`textures/` & `dev/textures/`):**
+   - **Moon (NASA GSFC SVS #4720 — *CGI Moon Kit* by Ernie Wright, LRO LROC WAC & LOLA):** Replaced `1024×512` self-bumped imagery with zero-shadow `moon_lro_2k.jpg` (`2048×1024`), `moon_lro_4k.jpg` (`4096×2048`), and laser-altimetry `moon_lola_bump_2k.jpg` (`2048×1024`, `bumpScale: 0.018`).
+   - **Earth (NASA Visible Earth *Blue Marble* + *MODIS Land–Water Mask* + *SRTM/ETOPO1* + *Black Marble*):** Generated `earth_day_2k.jpg`, `earth_roughness_2k.jpg` (`ocean ~0.17`, `land ~0.89`), `earth_topo_bump_2k.jpg` (`bumpScale: 0.015`), and `earth_night_2k.jpg` alongside existing `earth-blue-marble.jpg` (`4K`).
+2. **Terminator-Masked Night City Lights & Mobile-Safe Adaptive Distance/Zoom LOD (`IS_MOBILE_TIER`):**
+   - Added `earthMat.onBeforeCompile` shader injection masking Suomi NPP VIIRS city lights smoothly across the solar terminator (`1.0 - smoothstep(0.004, 0.085, dayIllum)`) so lights only shine on the dark side of Earth, plus `16×` anisotropic filtering (`maxAnisotropy`).
+   - Implemented `updatePlanetaryTextureLOD(altE, distM, fov, angleToMoon)`: constrains mobile/Quest headsets (`IS_MOBILE_TIER`) to `2K/1K` (~40% lower GPU VRAM than old static `4K` Earth!) while smoothly swapping desktop close-approach LODs (`altE < 35,000 km` Earth / `distM < 45,000 km` Moon) up to `4K` and updating `#target-popup` / `#hover-target-popup` hints with active NASA LOD tags.
+3. **Official NASA Scientific Attribution & Automated Verification:**
+   - Added public-domain NASA attribution (`17 U.S.C. § 105`) to `docs/physics.html#nasa-credits`, `README.md`, and `LICENSE_RATIONALE.md`. Verified `node --check`, `verify_v2135_steering.js`, and `29/29` E2E tests in `tests/test_staging_and_portal.py` (`sim.html` production untouched).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 17:30] - v2.1.38-dev: Telescopic 5-Planet Sprites (Saturn's Rings, Jupiter & 4 Galilean Moons, Venus, Mars, Mercury) & `7x–14x` Optical Zoom 🪐🔭✨**
 
 📝 **Summary**

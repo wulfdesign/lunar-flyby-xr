@@ -204,6 +204,15 @@ Inspired by the historic NASA Artemis missions and a lifelong passion for space 
 
 ---
 
+## **🛰️ Planetary & Celestial Data Credits (NASA Public Domain)**
+
+* **Lunar Surface & Elevation:** NASA Goddard Space Flight Center Scientific Visualization Studio (#4720) — *CGI Moon Kit* by Ernie Wright (*LRO LROC WAC* & *LOLA* Science Teams).
+* **Earth Day, Ocean Specular, Topography & Night Lights:** NASA Visible Earth / Earth Observatory — *Blue Marble: Next Generation* (Reto Stöckli), *MODIS Land–Water Mask*, *SRTM/ETOPO1 Topography*, and *Suomi NPP VIIRS Black Marble* (Roman et al.).
+* **Astronomical Starfield:** Yale Bright Star Catalog (BSC5 J2000) & Apollo 11–17 Command Module Optical Navigation Star Chart.
+* *All NASA datasets are public domain (`17 U.S.C. § 105`) and credited solely for scientific accuracy without implying NASA endorsement.*
+
+---
+
 ## **📜 License**
 
 Copyright (c) 2026 Larry James (Wulf Design Studios / UpLiftVR Studios). All Rights Reserved.  

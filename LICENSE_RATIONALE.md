@@ -43,3 +43,12 @@ Engineering real Newtonian N-body physics and aerodynamic lifting reentry in van
   Public, unattended kiosk installations and ticketed venue exhibitions require a formal **Institutional Exhibition License**. Please contact `wulfdesignstudios@gmail.com` to partner with us!
 * **Can I repackage this into a paid app on Steam, itch.io, or Meta Quest?**  
   **No.** Commercial distribution, standalone packaging, and resale are strictly reserved by Wulf Design Studios.
+
+---
+
+## 🛰️ Scientific & Public-Domain Attribution
+
+Planetary imagery and celestial datasets utilized in the simulation are sourced from public-domain archives under NASA Media Usage Guidelines (`17 U.S.C. § 105`, credited without implied endorsement):
+* **Moon:** NASA GSFC Scientific Visualization Studio (#4720, *CGI Moon Kit* — Ernie Wright / LRO LROC WAC & LOLA Science Teams).
+* **Earth:** NASA Visible Earth / Earth Observatory — *Blue Marble: Next Generation* (Reto Stöckli), *MODIS Land–Water Mask*, *SRTM/ETOPO1 Topography*, and *Suomi NPP VIIRS Black Marble Nighttime Lights* (Roman et al.).
+* **Stars & Navigation:** Yale Bright Star Catalog (BSC5 J2000) & Apollo Command Module Optical Navigation Star Chart.

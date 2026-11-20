@@ -1,14 +1,17 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.38-dev — Finster / Fin Fest Update 🐾)
-> *Artemis: The Free Return | Telescopic 5 Planets (Saturn's Rings & Jupiter's Moons), Bulletproof Mouse Look & 3D Hover, Zero-Scroll HUD & Physics Fixes*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.39-dev — Finster / Fin Fest Update 🐾)
+> *Artemis: The Free Return | NASA LRO/LOLA Moon & Earth Ocean/Night Shader, Telescopic 5 Planets, Bulletproof Mouse Look & 3D Hover, Zero-Scroll HUD*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.38-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • SATURN RINGS & 5 TELESCOPIC PLANETS READY FOR QA • 29/29 TESTS PASSING** 🚀🌕✨🐾🪐🔭
+**Status:** **DEV STAGING UPGRADED (`v2.1.39-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • NASA LRO/EARTH TEXTURES & LOD ACTIVE • 29/29 TESTS PASSING** 🚀🌕✨🐾🌍🌃
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.38-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.1.39-dev)
+- **NASA LRO/LOLA Moon, Visible Earth Ocean/Night Shader & Mobile-Safe `2K/4K` LOD (`v2.1.39-dev` — Ready for QA 🧪):**
+  - Bundled offline NASA SVS #4720 *CGI Moon Kit* (`moon_lro_2k.jpg`, `moon_lro_4k.jpg`, `moon_lola_bump_2k.jpg`) and Visible Earth / *Black Marble* maps (`earth_day_2k.jpg`, `earth_roughness_2k.jpg`, `earth_topo_bump_2k.jpg`, `earth_night_2k.jpg`) in `textures/` & `dev/textures/`.
+  - Added solar-terminator-masked dark-side city lights (`earthMat.onBeforeCompile`), ocean specular / matte landmass roughness, 16× anisotropy, `updatePlanetaryTextureLOD()` (`2K/1K` cap on mobile/Quest vs. `4K` close-body swap on desktop), and NASA credits in `docs/physics.html#nasa-credits`, `README.md`, and `LICENSE_RATIONALE.md`.
 - **Telescopic 5-Planet Sprites & `7.0x–14.0x` Optical Zoom (`v2.1.38-dev` — Ready for QA 🧪):**
   - Replaced fixed-pixel `tier1` dots for `NAV_PLANETS_CATALOG` with dedicated `256×256` procedural billboard `THREE.Sprite` maps (`createPlanetTexture`, `planetSprites`, `updatePlanetZoomScales`) scaling cleanly from crisp naked-eye points at `1.0x (70°)` to full planetary views at `7.0x (10°)` – `14.0x (5.0°)`: **Saturn** (`-26.7°` tilted A/B/C rings & Cassini Division), **Jupiter** (equatorial cloud belts, Great Red Spot & 4 Galilean Moons), **Venus** (sulfuric chevron clouds), **Mars** (*Syrtis Major* & North Polar Ice Cap), and **Mercury** (cratered gibbous phase).
   - Extended scroll zoom down to `FOV: 5.0° (14.0x Zoom)` with fine stepping, zoom-proportional drag sensitivity (`camera.fov / 70`), scaled beacon hover precision, and `max-width: 205px` on `#target-popup` so center reticle descriptions never clip behind `.desktop-bottom-right` at `1280×720`.
