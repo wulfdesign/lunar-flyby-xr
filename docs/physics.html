@@ -63,5 +63,20 @@
         <h2>4. Performance: Zero-Allocation Object Tracking</h2>
         <p>At a maximum <strong>7,200x time warp</strong>, allocating <code>new THREE.Vector3()</code> every frame would trigger massive JavaScript Garbage Collection pauses and destroy the frame rate. Instead, we globally declare <code>_tempVec</code> object pools and continually execute <code>.copy()</code> and <code>.add()</code> into them, allocating absolutely zero new memory during the multi-day flight loop.</p>
     </div>
+
+    <div id="celestial-opnav" class="section">
+        <h2>5. Celestial Optical Navigation (OpNav) &amp; Space Sextant Triangulation</h2>
+        <p>With real J2000 equatorial coordinates implemented for the <strong>59 Apollo Navigational Stars</strong> (including Nav Star #18 <code>SIRIUS</code> &mdash; The Dog Star in honor of Fin &#x1F43E;) and the <strong>5 naked-eye planets</strong>, a frequent question arises: <em>how can a spacecraft actually figure out its 3D position in cislunar space using stars and planets?</em></p>
+        <p><strong>Why Stars Alone Only Give Orientation:</strong> Even Alpha Centauri (4.24 light-years away) shifts by less than <code>0.002&Prime;</code> across the entire <code>384,400 km</code> Earth&ndash;Moon orbit. Because stars sit effectively at infinity, they provide a rock-solid <strong>3-Axis Inertial Attitude Quaternion</strong>, not translational distance.</p>
+        <ul>
+            <li><strong>Step 1 &mdash; Star-to-Horizon Sextant Angles (&theta;<sub>1</sub>, &theta;<sub>2</sub>):</strong> Like the Apollo Command Module Optical Unit (Scanning Telescope + 28x Space Sextant), measuring the angular separation between a foreground body (Earth or Moon limb) and two cataloged Nav Stars defines two 3D cones whose intersection solves the unit line-of-sight vector <code>u&#x0302;<sub>body</sub></code>.</li>
+            <li><strong>Step 2 &mdash; Apparent Angular Diameter Rangefinding (&alpha;):</strong> Measuring the apparent angular diameter <code>&alpha;</code> of Earth (<code>R<sub>E</sub> = 6,371 km</code>) or the Moon (<code>R<sub>M</sub> = 1,737 km</code>) yields exact distance <code>d = R<sub>body</sub> / sin(&alpha; / 2)</code>.</li>
+            <li><strong>Step 3 &mdash; Multi-Body Ephemeris Triangulation:</strong> Combining <code>r = -d<sub>E</sub> &middot; u&#x0302;<sub>E</sub></code> and cross-sighting the Moon and visible planets against Mission Elapsed Time (<code>MET</code>) determines your full 3D orbital state vector even during deep-space radio blackout.</li>
+        </ul>
+        <blockquote>Position Vector From Limb Sextant Sighting:<br><br>
+        <code>r<sub>craft</sub> = - [ R<sub>body</sub> / sin(&alpha; / 2) ] &middot; u&#x0302;<sub>body</sub></code></blockquote>
+        <h3 id="opnav-minigame" style="margin-top:20px; font-size:1.1rem;">Future Roadmap: Manual Space Sextant &amp; OpNav Minigame Mission</h3>
+        <p>Planned for future Mission Packs &amp; Training Modes (<a href="./celestial_navigation.md" style="color:#00ffff;">full design spec</a>): pilots will handle a simulated <strong>Deep-Space Telemetry Blackout</strong> by manually sighting two Apollo Nav Stars plus the Lunar/Earth limb in crosshair view to triangulate their state vector and compute their own manual Mid-Course Correction burn!</p>
+    </div>
 </body>
 </html>
