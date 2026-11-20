@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.35-dev • Fin Fest Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.36-dev • Fin Fest Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -11,12 +11,52 @@
         #ui-layer {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none; display: flex; justify-content: space-between;
-            padding: 20px; box-sizing: border-box; z-index: 10; overflow: hidden;
+            padding: 16px; box-sizing: border-box; z-index: 10; overflow: hidden;
         }
 
-        .desktop-top-left { position: absolute; top: 20px; left: 20px; max-height: calc(50% - 30px); margin-bottom: 0 !important; }
-        .desktop-bottom-left { position: absolute; bottom: 20px; left: 20px; max-height: calc(50% - 30px); margin-bottom: 0 !important; }
-        .desktop-bottom-right { position: absolute; bottom: 20px; right: 20px; max-height: calc(100% - 40px); margin-bottom: 0 !important; }
+        .desktop-top-left { position: absolute; top: 16px; left: 16px; max-height: calc(50% - 24px); margin-bottom: 0 !important; }
+        .desktop-bottom-left { position: absolute; bottom: 16px; left: 16px; max-height: calc(50% - 24px); margin-bottom: 0 !important; }
+        .panel.desktop-bottom-right {
+            position: absolute; top: 14px; right: 16px; bottom: auto;
+            width: 392px; padding: 9px 12px;
+            max-height: calc(100vh - 28px); margin-bottom: 0 !important;
+            overflow-x: hidden; overflow-y: hidden; box-sizing: border-box;
+        }
+        .desktop-bottom-right h1 { font-size: 0.92rem; margin: 0 0 3px 0; line-height: 18px; }
+        #nav-msg-box {
+            height: 17px; line-height: 17px; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; margin-bottom: 3px; white-space: nowrap;
+        }
+        #nav-msg {
+            color: #ff4444; font-size: 0.72rem; height: 17px; line-height: 17px; font-weight: bold;
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
+        }
+        .nav-kv-grid {
+            display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; row-gap: 2px;
+            font-size: 0.72rem; line-height: 15px;
+        }
+        .nav-kv-grid .kv {
+            display: flex; justify-content: space-between; align-items: center; gap: 4px;
+            height: 15px; min-width: 0; white-space: nowrap; overflow: hidden;
+        }
+        .nav-kv-grid .kv > span:last-child {
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right;
+        }
+        .nav-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 5px; }
+        .nav-mode-grid button { padding: 4px 6px; font-size: 0.71rem; line-height: 14px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .warp-grid {
+            display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px; margin-top: 5px;
+        }
+        .warp-grid button { padding: 4px 1px; font-size: 0.66rem; line-height: 14px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @media (max-height: 740px) and (min-width: 601px) {
+            .panel.desktop-bottom-right { top: 8px; right: 12px; padding: 7px 10px; width: 382px; max-height: calc(100vh - 16px); }
+            .desktop-bottom-right h1 { font-size: 0.85rem; margin-bottom: 2px; }
+            .nav-kv-grid { font-size: 0.68rem; row-gap: 1px; }
+            .nav-mode-grid button, .warp-grid button { padding: 3px 2px; font-size: 0.64rem; }
+        }
+        @media (max-height: 520px) and (min-width: 601px) {
+            .panel.desktop-bottom-right { overflow-y: auto; }
+        }
 
         #plasma-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -150,7 +190,7 @@
             ul.checklist li { font-size: 0.7rem; margin-bottom: 3px; }
         }
 
-        .flash-warning { animation: flash-red-bg 0.5s infinite; padding: 2px; border-radius: 4px; }
+        .flash-warning { animation: flash-red-bg 0.5s infinite; border-radius: 3px; }
         @keyframes flash-red-bg { 0% { background: rgba(255, 0, 0, 0); } 50% { background: rgba(255, 0, 0, 0.4); } 100% { background: rgba(255, 0, 0, 0); } }
 
         @media (max-height: 500px) and (orientation: landscape) {
@@ -162,7 +202,9 @@
             #zoom-indicator { bottom: 20px; }
         }
 
-        #mcc-container { min-height: 45px; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5px; }
+        #mcc-container { height: 50px; min-height: 50px; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 4px; width: 100%; margin: 5px 0 4px 0; }
+        #burn-guidance-indicator { height: 22px; line-height: 22px; padding: 0 6px; font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
+        #btn-autopilot-mcc { height: 24px; line-height: 22px; padding: 0 6px; font-size: 0.72rem; width: 100%; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; flex-grow: 0; }
     </style>
     <!-- Offline vendor library with automatic CDN fallback -->
     <script src="vendor/three.min.js"></script>
@@ -178,7 +220,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.35-dev (Fin Fest 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.36-dev (Fin Fest 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -222,18 +264,19 @@
 
         <div class="panel desktop-bottom-right" title="Ship control systems. Engage the autopilot or control the burn manually.">
                 <h1 title="Guidance, Navigation, and Control parameters">Orbital Navigation</h1>
-                <div style="min-height: 3.5rem; display: flex; flex-direction: column; justify-content: center;">
+                <div id="nav-msg-box">
                     <p id="cinematic-status" style="display:none; color:#ff4444; font-weight:bold; animation: flash 1s infinite; margin: 0; text-align: center;">[SEQUENCE RUNNING]</p>
-                    <div id="nav-msg" style="color:#ff4444; font-size:0.75rem; height:1.2rem; font-weight:bold; text-align:center;"></div>
+                    <div id="nav-msg"></div>
                 </div>
-                <p><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></p>
-                <p><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn.">Next Action:</span> <span id="window-timer" class="nominal">T- 02:00</span></p>
-                
-                <p><span class="tooltip" title="Flight Path Angle projected at 122km altitude. Target -6.5° for safe reentry.">Proj. Entry Angle:</span> <span id="entry-angle" class="nominal">N/A</span></p>
-                <p><span class="tooltip" title="Calculated trajectory status for Earth Return.">Corridor Status:</span> <span id="corridor-status" class="nominal">AWAITING TLI</span></p>
-                
-                <p><span class="tooltip" title="Flight Computer status. If ON, it will automatically execute trajectory maneuvers.">Autopilot:</span> <span id="autopilot-status" class="nominal">ENGAGED</span></p>
-                <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                <div class="nav-kv-grid">
+                    <div class="kv"><span class="tooltip" title="Overall safety assessment of current trajectory.">Status:</span> <span id="nav-status" class="nominal">ORBIT STABLE</span></div>
+                    <div class="kv"><span class="tooltip" title="Time remaining until the optimal window to execute the TLI burn.">Next:</span> <span id="window-timer" class="nominal">T- 02:00</span></div>
+                    <div class="kv"><span class="tooltip" title="Flight Path Angle projected at 122km altitude. Target -6.5° for safe reentry.">Entry:</span> <span id="entry-angle" class="nominal">N/A</span></div>
+                    <div class="kv"><span class="tooltip" title="Calculated trajectory status for Earth Return.">Corr:</span> <span id="corridor-status" class="nominal">AWAITING TLI</span></div>
+                    <div class="kv"><span class="tooltip" title="Flight Computer status. If ON, it will automatically execute trajectory maneuvers.">Auto:</span> <span id="autopilot-status" class="nominal">ENGAGED</span></div>
+                    <div class="kv"><span class="tooltip" title="Current / Maximum gravitational force felt by the crew.">G-Load:</span> <span><span id="g-force" class="nominal">0.00 G</span> / <span id="max-g-force" class="nominal">0.00 G</span></span></div>
+                </div>
+                <div class="controls nav-mode-grid">
                     <button id="btn-toggle-auto" class="active blink-blue" title="Arm / Disarm automated Trans-Lunar Injection (TLI) burn sequencer.">AUTOPILOT ON</button>
                     <button id="btn-skip-window" title="Warps time forward toward the next burn window.">SKIP TO ACTION</button>
                     <button id="btn-auto-warp" class="active safe-btn blink-green" title="Automatically ramps simulation speed back up to cruising warp after burns and transitions (Clamped to safe speeds).">AUTO WARP: ON</button>
@@ -241,15 +284,15 @@
                     <button id="btn-toggle-keyhole" class="active safe-btn" title="Toggle 3D Mission Keyhole / Target Objective Vector Reticle in cockpit view.">KEYHOLE: ON</button>
                     <button id="btn-toggle-maneuver" class="active" title="Show or hide the Trajectory Correction Sub-Mission Deck (Turn cues, Thrust Power %, Burn Timer).">MANEUVER DECK</button>
                 </div>
-                <hr style="border-color: #00ffff; opacity: 0.3; margin-top: 15px;">
-                <p><span class="tooltip" title="Estimated time the engines need to fire.">Target Burn:</span> <span id="burn-target" class="nominal">145.0 s</span></p>
-                <p><span class="tooltip" title="How long the engines have actually been firing.">Actual Burn:</span> <span id="burn-actual" class="nominal">0.0 s</span></p>
-                <p><span class="tooltip" title="Gravitational force currently felt by the crew.">G-Force:</span> <span><span id="g-force" class="nominal">0.00 G</span> (Max: <span id="max-g-force" class="nominal">0.00 G</span>)</span></p>
+                <hr style="border-color: #00ffff; opacity: 0.3; margin: 5px 0;">
+                <div class="nav-kv-grid">
+                    <div class="kv"><span class="tooltip" title="Estimated time the engines need to fire.">Tgt Burn:</span> <span id="burn-target" class="nominal">145.0 s</span></div>
+                    <div class="kv"><span class="tooltip" title="How long the engines have actually been firing.">Act Burn:</span> <span id="burn-actual" class="nominal">0.0 s</span></div>
+                    <div class="kv"><span class="tooltip" title="Current simulation speed.">Warp:</span> <span id="warp-text" class="nominal">1x (Realtime)</span></div>
+                    <div class="kv"><span class="tooltip" title="Propulsion system state.">Engines:</span> <span id="engine-status" class="nominal">STANDBY</span></div>
+                </div>
 
-                <p style="margin-top: 10px; white-space: nowrap;"><span class="tooltip" title="Current simulation speed.">Time Warp:</span> <span id="warp-text" class="nominal">1x (Realtime)</span></p>
-                <p><span class="tooltip" title="Propulsion system state.">Engines:</span> <span id="engine-status" class="nominal">STANDBY</span></p>
-
-                <div class="controls">
+                <div class="controls warp-grid">
                     <button id="btn-warp-1" class="active" title="Realtime (1s = 1s)">1x</button>
                     <button id="btn-warp-10" title="1s = 10s">10x</button>
                     <button id="btn-warp-30" title="1s = 30s">30x</button>
@@ -260,63 +303,71 @@
                     <button id="btn-warp-3600" title="1s = 1 Hour">3.6kx</button>
                     <button id="btn-warp-7200" title="1s = 2 Hours">7.2kx</button>
                 </div>
-                <div id="mcc-container" style="margin: 10px 0 6px 0; display: flex; flex-direction: column; gap: 6px;">
-                    <div id="burn-guidance-indicator" class="caution" style="background: rgba(0, 20, 35, 0.7); border: 1px solid rgba(0, 255, 255, 0.4); border-radius: 4px; padding: 6px 10px; font-size: 0.85rem; font-weight: bold; text-align: center; letter-spacing: 1px; min-height: 1.2rem; display: flex; justify-content: center; align-items: center;">
+                <div id="mcc-container">
+                    <div id="burn-guidance-indicator" class="caution" style="background: rgba(0, 20, 35, 0.7); border: 1px solid rgba(0, 255, 255, 0.4); border-radius: 4px; font-weight: bold; text-align: center; letter-spacing: 0.5px;">
                         TLI COUNTDOWN: T- 04:24 (AUTOPILOT ARMED)
                     </div>
-                    <button id="btn-autopilot-mcc" style="display: none; font-size: 0.85rem; width: 100%;" title="Execute trajectory alignment maneuver." onclick="executeAutopilotBurn()">EXECUTE TRAJECTORY ALIGNMENT</button>
+                    <button id="btn-autopilot-mcc" disabled title="Execute trajectory alignment maneuver." onclick="executeAutopilotBurn()">TRAJECTORY ALIGNMENT: STANDBY</button>
                 </div>
                 
-                <div id="standard-controls" class="controls">
-                    <button id="btn-thrust" class="danger-btn" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually along your nose vector at the set Thrust Power %. Disables autopilot.">MANUAL BURN OVERRIDE</button>
+                <div id="standard-controls" class="controls" style="margin-top: 4px;">
+                    <button id="btn-thrust" class="danger-btn" style="padding: 5px 8px; font-size: 0.75rem; line-height: 16px;" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually along your nose vector at the set Thrust Power %. Disables autopilot.">MANUAL BURN OVERRIDE</button>
                 </div>
-                <div id="maneuver-submission-panel" style="margin-top: 10px; padding: 10px; background: rgba(0, 25, 45, 0.72); border: 1px solid rgba(0, 255, 255, 0.45); border-radius: 6px; box-sizing: border-box;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid rgba(0,255,255,0.25); padding-bottom: 4px;">
-                        <span style="font-size: 0.74rem; font-weight: bold; color: #00ffff; letter-spacing: 0.8px;">🎯 TRAJECTORY SUB-MISSION</span>
-                        <span id="sub-mode-badge" class="nominal" style="font-size: 0.64rem; padding: 1px 5px; border: 1px solid currentColor; border-radius: 3px;">AUTO COMPUTER</span>
+                <div id="maneuver-submission-panel" style="margin-top: 5px; padding: 6px 8px; background: rgba(0, 25, 45, 0.72); border: 1px solid rgba(0, 255, 255, 0.45); border-radius: 6px; box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; border-bottom: 1px solid rgba(0,255,255,0.25); padding-bottom: 2px;">
+                        <span style="font-size: 0.70rem; font-weight: bold; color: #00ffff; letter-spacing: 0.6px;">🎯 TRAJECTORY SUB-MISSION</span>
+                        <span id="sub-mode-badge" class="nominal" style="font-size: 0.62rem; padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; line-height: 14px;">AUTO COMPUTER</span>
                     </div>
-                    <p style="font-size: 0.74rem; margin: 3px 0;"><span class="tooltip" title="Red = Adjustment Needed / Misaligned, Yellow = Close / Burn Window, Green = Nominal & Aligned.">Forward Vector:</span> <span id="vec-align-badge" class="nominal">GREEN (NOMINAL)</span></p>
-                    <p style="font-size: 0.72rem; margin: 3px 0;"><span class="tooltip" title="Active Mission Keyhole / Target Vector direction.">Keyhole Target:</span> <span id="vec-objective-name" style="color: #88eeff; font-weight: bold;">LEO PROGRADE</span></p>
-                    <p style="font-size: 0.73rem; margin: 3px 0;"><span class="tooltip" title="Turn direction required to align spacecraft thrust nose with the Mission Keyhole reticle.">Turn Cue:</span> <span id="vec-turn-cue" class="nominal">ALIGNED (Δ 0.0°)</span></p>
-                    <div id="manual-attitude-controls" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 7px 0;">
-                        <button id="btn-yaw-left" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Turn ship nose LEFT (+Yaw). Switches helm to Manual.">◀ L</button>
-                        <button id="btn-pitch-up" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Pitch ship nose UP (+Pitch). Switches helm to Manual.">▲ U</button>
-                        <button id="btn-auto-align" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Align spacecraft nose smoothly onto the active Mission Keyhole Vector.">🎯</button>
-                        <button id="btn-pitch-down" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Pitch ship nose DOWN (-Pitch). Switches helm to Manual.">▼ D</button>
-                        <button id="btn-yaw-right" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Turn ship nose RIGHT (-Yaw). Switches helm to Manual.">▶ R</button>
+                    <div class="nav-kv-grid" style="font-size: 0.69rem; line-height: 14px;">
+                        <div class="kv"><span class="tooltip" title="Red = Adjustment Needed / Misaligned, Yellow = Close / Burn Window, Green = Nominal & Aligned.">Vector:</span> <span id="vec-align-badge" class="nominal">GREEN (NOMINAL)</span></div>
+                        <div class="kv"><span class="tooltip" title="Active Mission Keyhole / Target Vector direction.">Target:</span> <span id="vec-objective-name" style="color: #88eeff; font-weight: bold;">LEO PROGRADE</span></div>
                     </div>
-                    <p style="font-size: 0.73rem; margin: 6px 0 3px 0;"><span class="tooltip" title="Main engine throttle power setting. Adjusts engine thrust and burn duration.">Thrust Power:</span> <span id="throttle-readout" class="nominal">100% (TARGET: 100%)</span></p>
-                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                        <input type="range" id="throttle-slider" min="10" max="100" step="5" value="100" style="flex: 1; accent-color: #00ffff; cursor: pointer; pointer-events: auto;">
-                        <button id="btn-thr-25" style="padding: 3px 5px; font-size: 0.64rem; min-width: 0; flex-grow: 0;">25%</button>
-                        <button id="btn-thr-50" style="padding: 3px 5px; font-size: 0.64rem; min-width: 0; flex-grow: 0;">50%</button>
-                        <button id="btn-thr-100" class="active" style="padding: 3px 5px; font-size: 0.64rem; min-width: 0; flex-grow: 0;">100%</button>
+                    <div class="kv" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.70rem; height: 15px; line-height: 15px; margin-top: 2px; white-space: nowrap; overflow: hidden;">
+                        <span class="tooltip" title="Turn direction required to align spacecraft thrust nose with the Mission Keyhole reticle.">Turn Cue:</span> <span id="vec-turn-cue" class="nominal" style="overflow: hidden; text-overflow: ellipsis;">ALIGNED (Δ 0.0°)</span>
                     </div>
-                    <p style="font-size: 0.72rem; margin: 3px 0;"><span class="tooltip" title="Required Delta-V and burn duration at your current Thrust Power %.">Burn Plan:</span> <span id="sub-dv-readout" class="nominal">ΔV 0.0 m/s • 0.0s</span></p>
-                    <div style="width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 255, 0.35); border-radius: 4px; overflow: hidden; margin-top: 4px;">
+                    <div id="manual-attitude-controls" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin: 4px 0;">
+                        <button id="btn-yaw-left" style="padding: 3px 2px; font-size: 0.66rem; line-height: 14px; min-width: 0;" title="Turn ship nose LEFT (+Yaw). Switches helm to Manual.">◀ L</button>
+                        <button id="btn-pitch-up" style="padding: 3px 2px; font-size: 0.66rem; line-height: 14px; min-width: 0;" title="Pitch ship nose UP (+Pitch). Switches helm to Manual.">▲ U</button>
+                        <button id="btn-auto-align" style="padding: 3px 2px; font-size: 0.66rem; line-height: 14px; min-width: 0;" title="Align spacecraft nose smoothly onto the active Mission Keyhole Vector.">🎯</button>
+                        <button id="btn-pitch-down" style="padding: 3px 2px; font-size: 0.66rem; line-height: 14px; min-width: 0;" title="Pitch ship nose DOWN (-Pitch). Switches helm to Manual.">▼ D</button>
+                        <button id="btn-yaw-right" style="padding: 3px 2px; font-size: 0.66rem; line-height: 14px; min-width: 0;" title="Turn ship nose RIGHT (-Yaw). Switches helm to Manual.">▶ R</button>
+                    </div>
+                    <div class="kv" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.69rem; height: 14px; line-height: 14px; margin: 2px 0; white-space: nowrap; overflow: hidden;">
+                        <span class="tooltip" title="Main engine throttle power setting. Adjusts engine thrust and burn duration.">Thrust Power:</span> <span id="throttle-readout" class="nominal">100% (TARGET: 100%)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 3px; height: 20px;">
+                        <input type="range" id="throttle-slider" min="10" max="100" step="5" value="100" style="flex: 1; height: 14px; margin: 0; accent-color: #00ffff; cursor: pointer; pointer-events: auto;">
+                        <button id="btn-thr-25" style="padding: 2px 4px; font-size: 0.62rem; line-height: 14px; min-width: 0; flex-grow: 0;">25%</button>
+                        <button id="btn-thr-50" style="padding: 2px 4px; font-size: 0.62rem; line-height: 14px; min-width: 0; flex-grow: 0;">50%</button>
+                        <button id="btn-thr-100" class="active" style="padding: 2px 4px; font-size: 0.62rem; line-height: 14px; min-width: 0; flex-grow: 0;">100%</button>
+                    </div>
+                    <div class="kv" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.69rem; height: 14px; line-height: 14px; margin: 1px 0; white-space: nowrap; overflow: hidden;">
+                        <span class="tooltip" title="Required Delta-V and burn duration at your current Thrust Power %.">Burn Plan:</span> <span id="sub-dv-readout" class="nominal">ΔV 0.0 m/s • 0.0s</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 255, 0.35); border-radius: 4px; overflow: hidden; margin-top: 3px;">
                         <div id="sub-burn-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ffff, #44ff44); transition: width 0.1s linear;"></div>
                     </div>
                 </div>
-                <div id="reentry-controls" style="display:none; flex-direction: column; width: 100%; margin-top: 15px;">
-                    <!-- Dynamic Attitude Trim & Bank Vector Gauge -->
-                    <div id="bank-gauge-container" style="width: 100%; margin-bottom: 8px; background: rgba(0, 30, 50, 0.5); padding: 8px; border-radius: 6px; border: 1px solid rgba(0, 255, 255, 0.3); box-sizing: border-box;">
-                        <p style="margin: 0 0 4px 0; font-size: 0.72rem; display: flex; justify-content: space-between;">
-                            <span class="tooltip" title="Capsule aerodynamic lift vector. Vectoring controlled via offset Center of Gravity (CoG) gimbaling / roll trim. See /docs/physics.html#aerodynamic-lift">Attitude Trim (Gimbal):</span>
-                            <span id="bank-angle-text" class="nominal">0° [NEUTRAL TRIM]</span>
+                <div id="reentry-controls" style="display:none; flex-direction: column; width: 100%; margin-top: 6px;">
+                    <!-- Dynamic Attitude Trim & Bank Vector Gauge (Zero-Jump Fixed Height Rows) -->
+                    <div id="bank-gauge-container" style="width: 100%; margin-bottom: 6px; background: rgba(0, 30, 50, 0.5); padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0, 255, 255, 0.3); box-sizing: border-box;">
+                        <p style="margin: 0 0 4px 0; font-size: 0.70rem; height: 15px; line-height: 15px; display: flex; justify-content: space-between; white-space: nowrap; overflow: hidden;">
+                            <span class="tooltip" title="Capsule aerodynamic lift vector. Vectoring controlled via offset Center of Gravity (CoG) gimbaling / roll trim. See /docs/physics.html#aerodynamic-lift">Attitude Trim:</span>
+                            <span id="bank-angle-text" class="nominal" style="overflow: hidden; text-overflow: ellipsis;">0° [NEUTRAL]</span>
                         </p>
-                        <div style="position: relative; width: 100%; height: 12px; border-radius: 6px; background: linear-gradient(to right, #ff4444 0%, #ffff44 22%, #44ff44 42%, #44ff44 58%, #ffff44 78%, #ff4444 100%); border: 1px solid rgba(0,255,255,0.4); box-sizing: border-box; overflow: hidden;">
+                        <div style="position: relative; width: 100%; height: 11px; border-radius: 6px; background: linear-gradient(to right, #ff4444 0%, #ffff44 22%, #44ff44 42%, #44ff44 58%, #ffff44 78%, #ff4444 100%); border: 1px solid rgba(0,255,255,0.4); box-sizing: border-box; overflow: hidden;">
                             <div id="bank-target-notch" style="position: absolute; top: 0; bottom: 0; width: 3px; background: #ffffff; box-shadow: 0 0 6px #fff; transform: translateX(-50%); left: 50%;" title="Computer Target Trim"></div>
                             <div id="bank-gauge-needle" style="position: absolute; top: 0; bottom: 0; width: 6px; background: #00ffff; border: 1px solid #000; box-shadow: 0 0 8px #00ffff; transform: translateX(-50%); left: 50%;" title="Current Attitude"></div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.62rem; color: #888; margin-top: 3px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.60rem; color: #888; margin-top: 2px; height: 12px; line-height: 12px;">
                             <span>-90° (DIVE)</span>
                             <span>0° (NEUTRAL)</span>
                             <span>+90° (MAX LIFT)</span>
                         </div>
                     </div>
-                    <div class="controls" style="margin-top: 0; gap: 8px;">
-                        <button id="btn-lift-up" class="safe-btn" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (REDUCE Gs)</button>
-                        <button id="btn-lift-down" class="danger-btn" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (STEEPEN)</button>
+                    <div class="controls" style="margin-top: 0; gap: 6px;">
+                        <button id="btn-lift-up" class="safe-btn" style="padding: 6px 8px; font-size: 0.72rem;" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (-Gs)</button>
+                        <button id="btn-lift-down" class="danger-btn" style="padding: 6px 8px; font-size: 0.72rem;" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (+DRAG)</button>
                     </div>
                 </div>
             </div>
@@ -330,7 +381,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.35";
+        const SIM_VERSION = "2.1.36";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -446,6 +497,17 @@
         let holdingPitchDown = false;
         let manualMccAccumDv = 0;
         let cachedMccSolution = { lowerPerigee: false, dV: 0, dir: new THREE.Vector3(0, 0, -1) };
+        let lastMccSolveTime = -999;
+
+        function setMccSlotState(isActive, labelText = "TRAJECTORY ALIGNMENT: STANDBY", classStr = "") {
+            const btn = document.getElementById('btn-autopilot-mcc');
+            if (!btn) return;
+            btn.style.display = 'block';
+            btn.style.visibility = 'visible';
+            btn.disabled = !isActive;
+            btn.className = isActive ? classStr : '';
+            btn.textContent = labelText;
+        }
 
         let actualBurnTime = 0;
         let initialTargetBurnTime = 0;
@@ -661,6 +723,8 @@
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
         document.addEventListener('wheel', (e) => {
+            const p = e.target && e.target.closest ? e.target.closest('.panel') : null;
+            if (p && p.scrollHeight > p.clientHeight + 2) return;
             baseFov += e.deltaY * 0.05; baseFov = Math.max(10, Math.min(100, baseFov)); camera.fov = baseFov; camera.updateProjectionMatrix();
             document.getElementById('zoom-indicator').innerHTML = `FOV: ${Math.round(baseFov)}&deg; (${(70 / baseFov).toFixed(1)}x Zoom)`;
         });
@@ -974,9 +1038,6 @@
 
         const shipGroup = new THREE.Group();
         shipGroup.add(new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.005, 0.005), new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide})));
-        
-        const hudVectorGroup = new THREE.Group();
-        scene.add(hudVectorGroup);
 
         const progradeMat = new THREE.MeshBasicMaterial({color: 0x00ff66, side: THREE.DoubleSide, transparent: true, opacity: 0.9});
         const progradeMesh = new THREE.Mesh(new THREE.RingGeometry(0.04, 0.052, 24), progradeMat);
@@ -986,9 +1047,9 @@
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.085, 0, 0), new THREE.Vector3(-0.042, 0, 0)]), pgLineMat));
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.085, 0, 0), new THREE.Vector3(0.042, 0, 0)]), pgLineMat));
         progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.085, 0), new THREE.Vector3(0, 0.042, 0)]), pgLineMat));
-        hudVectorGroup.add(progradeMesh);
+        shipGroup.add(progradeMesh);
 
-        // Ship Nose Thrust Boresight Cross (locked to shipGroup local -Z thrust axis)
+        // Ship Nose Thrust Boresight Cross (HUD overlay inside shipGroup — zero camera parent rotation)
         const noseMat = new THREE.LineBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.8});
         const noseHeadingMesh = new THREE.Group();
         noseHeadingMesh.position.set(0, 0, -2.9);
@@ -998,8 +1059,9 @@
         noseHeadingMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.032, 0), new THREE.Vector3(0, 0.012, 0)]), noseMat));
         shipGroup.add(noseHeadingMesh);
 
-        // Toggleable Mission Objective / Keyhole Target Vector Reticle
+        // Toggleable Mission Objective / Keyhole Target Vector Reticle (inside shipGroup HUD plane)
         const keyholeGroup = new THREE.Group();
+        keyholeGroup.position.set(0, 0, -3.05);
         const keyholeRingMat = new THREE.MeshBasicMaterial({color: 0xffd24c, side: THREE.DoubleSide, transparent: true, opacity: 0.85});
         const keyholeHitMesh = new THREE.Mesh(new THREE.RingGeometry(0.068, 0.092, 4), keyholeRingMat);
         keyholeHitMesh.rotation.z = Math.PI / 4; // Crisp diamond perimeter leaving center clear for prograde ring
@@ -1011,15 +1073,15 @@
             new THREE.Vector3(0, -0.105, 0), new THREE.Vector3(-0.105, 0, 0),
             new THREE.Vector3(0, 0.105, 0)
         ]), keyholeLineMat));
-        hudVectorGroup.add(keyholeGroup);
+        shipGroup.add(keyholeGroup);
 
         shipGroup.add(camera); scene.add(shipGroup);
 
         let lookLon = 0; let lookLat = 0; let isDraggingView = false; let prevMousePos = { x: 0, y: 0 };
-        document.addEventListener('mousedown', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; } });
+        document.addEventListener('mousedown', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !(e.target.closest && e.target.closest('.panel'))) { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; } });
         document.addEventListener('mouseup', () => isDraggingView = false);
         document.addEventListener('mousemove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.clientX - prevMousePos.x) * 0.2; lookLat = Math.max(-85, Math.min(85, lookLat - (e.clientY - prevMousePos.y) * 0.2)); prevMousePos = { x: e.clientX, y: e.clientY }; } });
-        document.addEventListener('touchstart', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') { isDraggingView = true; prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: false });
+        document.addEventListener('touchstart', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && !(e.target.closest && e.target.closest('.panel'))) { isDraggingView = true; prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: false });
         document.addEventListener('touchend', () => isDraggingView = false);
         document.addEventListener('touchmove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.touches[0].clientX - prevMousePos.x) * 0.3; lookLat = Math.max(-85, Math.min(85, lookLat - (e.touches[0].clientY - prevMousePos.y) * 0.3)); prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; if (e.cancelable) e.preventDefault(); } }, { passive: false });
 
@@ -1044,7 +1106,7 @@
             shipYawOffsetDeg = 0; shipPitchOffsetDeg = 0; targetYawOffsetDeg = 0; targetPitchOffsetDeg = 0;
             manualThrottlePct = 1.0; targetThrottlePct = 1.0;
             holdingYawLeft = false; holdingYawRight = false; holdingPitchUp = false; holdingPitchDown = false;
-            manualMccAccumDv = 0; cachedMccSolution = { lowerPerigee: false, dV: 0, dir: new THREE.Vector3(0, 0, -1) };
+            manualMccAccumDv = 0; cachedMccSolution = { lowerPerigee: false, dV: 0, dir: new THREE.Vector3(0, 0, -1) }; lastMccSolveTime = -999;
             keyholeGroup.visible = true;
             const btnKh = document.getElementById('btn-toggle-keyhole');
             if (btnKh) { btnKh.textContent = "KEYHOLE: ON"; btnKh.className = "active safe-btn"; }
@@ -1085,12 +1147,7 @@
                 setTimeout(() => autoWarpBtn.classList.remove('blink-green'), 5000);
             }
 
-            const btnMcc = document.getElementById('btn-autopilot-mcc');
-            if (btnMcc) {
-                btnMcc.style.display = 'none';
-                btnMcc.className = '';
-                btnMcc.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
-            }
+            setMccSlotState(false);
 
             const btnUp = document.getElementById('btn-lift-up');
             const btnDown = document.getElementById('btn-lift-down');
@@ -1099,6 +1156,8 @@
             
             document.getElementById('itin-tli').className = "active"; document.getElementById('itin-coast').className = ""; document.getElementById('itin-flyby').className = "";
             document.getElementById('standard-controls').style.display = 'flex';
+            const subPanel = document.getElementById('maneuver-submission-panel');
+            if (subPanel) subPanel.style.display = maneuverDeckOpen ? 'block' : 'none';
             document.getElementById('reentry-controls').style.display = 'none';
             document.getElementById('plasma-overlay').style.opacity = 0;
             
@@ -1478,6 +1537,14 @@
             return outSolution;
         }
 
+        function getCachedReturnMccSolution(forceNow = false) {
+            if (forceNow || (simFlightSeconds - lastMccSolveTime) >= 0.5) {
+                solveReturnMccVector(cachedMccSolution);
+                lastMccSolveTime = simFlightSeconds;
+            }
+            return cachedMccSolution;
+        }
+
         function getAcceleration(pos, accelOut) {
             let rEarth = pos.length(); let magEarth = muEarth / (rEarth * rEarth); _aEarth.copy(pos).multiplyScalar(-muEarth / (rEarth * rEarth * rEarth));
             _moonPos.copy(moon.position).divideScalar(renderScale); _dirMoon.subVectors(_moonPos, pos); let rMoon = Math.max(0.0001, _dirMoon.length()); let magMoon = muMoon / (rMoon * rMoon); _aMoon.copy(_dirMoon).multiplyScalar(muMoon / (rMoon * rMoon * rMoon));
@@ -1518,12 +1585,7 @@
                 } 
                 if (tliAutoCountdown === -1 && !isBurning) {
                     tliAutoCountdown = (autoPilotEngaged || autoWarpEnabled) ? FLIGHT_TIMERS.mccAutoAlignDelay : FLIGHT_TIMERS.mccCountdownManual;
-                    const mccBtn = document.getElementById('btn-autopilot-mcc');
-                    if (mccBtn) {
-                        mccBtn.style.display = 'block';
-                        mccBtn.className = 'caution-btn pulse-blue-glow';
-                        mccBtn.textContent = `EXECUTE AUTO-ALIGNMENT (${Math.ceil(tliAutoCountdown)}s)`;
-                    }
+                    setMccSlotState(true, `EXECUTE AUTO-ALIGNMENT (${Math.ceil(tliAutoCountdown)}s)`, 'caution-btn pulse-blue-glow');
                 }
             }
 
@@ -1532,11 +1594,8 @@
             if (autoBurnActive && !isTliCoast) isBurning = true; else if (autoPilotEngaged && isTliCoast && autoBurnActive) { isBurning = false; autoBurnActive = false; }
             if(isBurning && !wasBurning) { 
                 tliAutoCountdown = -999;
-                const mccBtn = document.getElementById('btn-autopilot-mcc');
-                if (mccBtn && !activeMCCWaypoint && !isMccBurning) {
-                    mccBtn.style.display = 'none';
-                    mccBtn.className = '';
-                    mccBtn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
+                if (!activeMCCWaypoint && !isMccBurning) {
+                    setMccSlotState(false);
                 }
                 logEvent("Main Engine Start (MES). Executing TLI Burn.", { magEarth: muEarth/(r*r), magMoon: muMoon/(distToMoon*distToMoon) }); 
                 if (timeWarp > 30 || targetWarp > 30) { 
@@ -1682,9 +1741,7 @@
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
             if (shipVel.lengthSq() > 0) {
-                _tempVec1.copy(shipVel).normalize(); _lookTarget.copy(shipGroup.position).sub(_tempVec1); shipGroup.lookAt(_lookTarget);
-                if (Math.abs(shipYawOffsetDeg) > 1e-4) shipGroup.rotateY(THREE.MathUtils.degToRad(shipYawOffsetDeg));
-                if (Math.abs(shipPitchOffsetDeg) > 1e-4) shipGroup.rotateX(THREE.MathUtils.degToRad(shipPitchOffsetDeg));
+                _tempVec1.copy(shipVel).normalize(); _lookTarget.copy(shipGroup.position).sub(_tempVec1); shipGroup.lookAt(_lookTarget); 
                 camera.rotation.order = 'YXZ'; camera.rotation.y = THREE.MathUtils.degToRad(lookLon); camera.rotation.x = THREE.MathUtils.degToRad(lookLat);
             }
             earth.rotation.y += 0.0000727 * dt;
@@ -1727,7 +1784,6 @@
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
                 metSeconds += simSecondsToProcess;
                 celestialGroup.position.copy(shipGroup.position);
-                hudVectorGroup.position.copy(shipGroup.position);
 
                 // --- ACTIVE MISSION KEYHOLE VECTOR, PROGRADE COLORING & SUB-MISSION DECK ---
                 if (holdingYawLeft) shipYawOffsetDeg += 45.0 * dt_real;
@@ -1743,8 +1799,6 @@
                 let _altENow = _rMagNow - radEarth;
                 if (_velMagNow > 0) {
                     _tempVec1.copy(shipVel).normalize();
-                    progradeMesh.position.copy(_tempVec1).multiplyScalar(3.0);
-                    progradeMesh.lookAt(shipGroup.position);
                 } else {
                     _tempVec1.set(0, 0, -1);
                 }
@@ -1772,10 +1826,10 @@
                     subNeedsAdj = true;
                 } else if (activeMCCWaypoint) {
                     if (isReturningHome) {
-                        solveReturnMccVector(cachedMccSolution);
-                        if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
-                        subObjLabel = cachedMccSolution.lowerPerigee ? "RETURN MCC (LOWER PERIGEE)" : "RETURN MCC (RAISE PERIGEE)";
-                        subReqDvMs = cachedMccSolution.dV * 1000;
+                        const mccSol = getCachedReturnMccSolution(false);
+                        if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                        subObjLabel = mccSol.lowerPerigee ? "RETURN MCC (LOWER PERIGEE)" : "RETURN MCC (RAISE PERIGEE)";
+                        subReqDvMs = mccSol.dV * 1000;
                     } else {
                         subObjLabel = "OUTBOUND MCC (+50 m/s)";
                         subReqDvMs = Math.max(0, 50.0 - manualMccAccumDv);
@@ -1791,9 +1845,9 @@
                         let r_ei_c = radEarth + 122;
                         if (rp_c > r_ei_c || rp_c < radEarth) {
                             subDangerCorridor = true;
-                            solveReturnMccVector(cachedMccSolution);
-                            if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
-                            subReqDvMs = cachedMccSolution.dV * 1000;
+                            const mccSol = getCachedReturnMccSolution(false);
+                            if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                            subReqDvMs = mccSol.dV * 1000;
                             subObjLabel = "OFF-CORRIDOR RECOVERY";
                         } else {
                             let v_ei_c = Math.sqrt(2 * (en_c + (muEarth / r_ei_c)));
@@ -1804,15 +1858,15 @@
                                     subObjLabel = "RE-ENTRY KEYHOLE (-6.5° NOMINAL)";
                                 } else if (g_deg < -4.5 && g_deg > -8.5) {
                                     subWarnCorridor = true;
-                                    solveReturnMccVector(cachedMccSolution);
-                                    if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
-                                    subReqDvMs = cachedMccSolution.dV * 1000;
+                                    const mccSol = getCachedReturnMccSolution(false);
+                                    if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                                    subReqDvMs = mccSol.dV * 1000;
                                     subObjLabel = "CORRIDOR FINE-TUNE";
                                 } else {
                                     subDangerCorridor = true;
-                                    solveReturnMccVector(cachedMccSolution);
-                                    if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
-                                    subReqDvMs = cachedMccSolution.dV * 1000;
+                                    const mccSol = getCachedReturnMccSolution(false);
+                                    if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                                    subReqDvMs = mccSol.dV * 1000;
                                     subObjLabel = "DANGER CORRIDOR ADJUST";
                                 }
                             }
@@ -1848,21 +1902,22 @@
                 if (deltaYawDeg < -180) deltaYawDeg += 360;
                 let deltaPitchDeg = targetPitchOffsetDeg - shipPitchOffsetDeg;
 
-                // Position Mission Keyhole Reticle
+                // Position nose boresight & Mission Keyhole inside shipGroup HUD plane (zero camera parent interference)
+                const visYawRad = THREE.MathUtils.degToRad(THREE.MathUtils.clamp(shipYawOffsetDeg, -35, 35));
+                const visPitchRad = THREE.MathUtils.degToRad(THREE.MathUtils.clamp(shipPitchOffsetDeg, -35, 35));
+                noseHeadingMesh.position.set(
+                    -2.9 * Math.cos(visPitchRad) * Math.sin(visYawRad),
+                     2.9 * Math.sin(visPitchRad),
+                    -2.9 * Math.cos(visPitchRad) * Math.cos(visYawRad)
+                );
                 keyholeGroup.visible = keyholeVisible && (_altENow > 0);
-                keyholeGroup.position.copy(_objDirVec).multiplyScalar(3.15);
-                keyholeGroup.lookAt(shipGroup.position);
-
-                // Re-apply nose rotation immediately before world matrix sync for pixel-accurate crosshair/raycast
-                if (_velMagNow > 0 && _altENow > 0) {
-                    _tempVec1.copy(shipVel).normalize();
-                    _lookTarget.copy(shipGroup.position).sub(_tempVec1);
-                    shipGroup.lookAt(_lookTarget);
-                    if (Math.abs(shipYawOffsetDeg) > 1e-4) shipGroup.rotateY(THREE.MathUtils.degToRad(shipYawOffsetDeg));
-                    if (Math.abs(shipPitchOffsetDeg) > 1e-4) shipGroup.rotateX(THREE.MathUtils.degToRad(shipPitchOffsetDeg));
-                }
-                shipGroup.updateMatrixWorld(true);
-                hudVectorGroup.updateMatrixWorld(true);
+                const khYawRad = THREE.MathUtils.degToRad(THREE.MathUtils.clamp(targetYawOffsetDeg, -35, 35));
+                const khPitchRad = THREE.MathUtils.degToRad(THREE.MathUtils.clamp(targetPitchOffsetDeg, -35, 35));
+                keyholeGroup.position.set(
+                    -3.05 * Math.cos(khPitchRad) * Math.sin(khYawRad),
+                     3.05 * Math.sin(khPitchRad),
+                    -3.05 * Math.cos(khPitchRad) * Math.cos(khYawRad)
+                );
 
                 // Determine Prograde Vector Red / Yellow / Green Alignment Color
                 let alignColorHex = 0x00ff66; // GREEN
@@ -1889,8 +1944,7 @@
                         activeMCCWaypoint = null;
                         manualMccAccumDv = 0;
                         mccAutoCountdown = -1;
-                        const btnMccDone = document.getElementById('btn-autopilot-mcc');
-                        if (btnMccDone) { btnMccDone.style.display = 'none'; btnMccDone.className = ''; }
+                        setMccSlotState(false);
                         showNavMsg("MANUAL MCC COMPLETE: TRAJECTORY NOMINAL 🟢", 4000, "nominal");
                     }
                 }
@@ -1951,23 +2005,13 @@
                 if (tliAutoCountdown > 0 && !telemetry.isTliCoast) {
                     if (isBurning) {
                         tliAutoCountdown = -999;
-                        const mccBtn = document.getElementById('btn-autopilot-mcc');
-                        if (mccBtn) {
-                            mccBtn.style.display = 'none';
-                            mccBtn.className = '';
-                            mccBtn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
-                        }
+                        setMccSlotState(false);
                     } else {
                         if (timeWarp > 30 || targetWarp > 30) { shiftWarp(30); }
                         tliAutoCountdown -= dt_real;
                         let remaining = Math.max(0, Math.ceil(tliAutoCountdown));
                         showNavMsg(autoPilotEngaged ? `AUTO-ALIGNMENT IN ${remaining}s` : `MANUAL TLI WINDOW READY (${remaining}s)`, 1000, "flash-warning");
-                        const mccBtn = document.getElementById('btn-autopilot-mcc');
-                        if (mccBtn) {
-                            mccBtn.style.display = 'block';
-                            mccBtn.className = "caution-btn pulse-blue-glow";
-                            mccBtn.textContent = autoPilotEngaged ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `COMPUTER ASSIST TLI`;
-                        }
+                        setMccSlotState(true, autoPilotEngaged ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `COMPUTER ASSIST TLI`, "caution-btn pulse-blue-glow");
                         if (tliAutoCountdown <= 0) {
                             if (autoPilotEngaged) alignAndIgniteTLI();
                             else tliAutoCountdown = -999;
@@ -1982,21 +2026,13 @@
                         mccAutoCountdown -= dt_real;
                         let remaining = Math.max(0, Math.ceil(mccAutoCountdown));
                         showNavMsg(autoPilotEngaged ? `AUTO-CORRECTION IN ${remaining}s` : `MANUAL MCC READY — ALIGN KEYHOLE & THRUST`, 1000, "flash-warning");
-                        const mccBtn = document.getElementById('btn-autopilot-mcc');
-                        if (mccBtn) { 
-                            mccBtn.style.display = 'block';
-                            mccBtn.className = "caution-btn pulse-blue-glow"; 
-                            mccBtn.textContent = autoPilotEngaged ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `COMPUTER ASSIST MCC`; 
-                        }
+                        setMccSlotState(true, autoPilotEngaged ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `COMPUTER ASSIST MCC`, "caution-btn pulse-blue-glow");
                     } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) {
                         if (autoPilotEngaged) executeAutopilotBurn();
                     }
                 } else if ((tliAutoCountdown <= 0 && tliAutoCountdown !== -1) || isBurning) {
-                    const mccBtn = document.getElementById('btn-autopilot-mcc');
-                    if (mccBtn && mccAutoCountdown === -1 && !activeMCCWaypoint && !isMccBurning) {
-                        mccBtn.style.display = 'none';
-                        mccBtn.className = '';
-                        mccBtn.textContent = "EXECUTE TRAJECTORY ALIGNMENT";
+                    if (mccAutoCountdown === -1 && !activeMCCWaypoint && !isMccBurning) {
+                        setMccSlotState(false);
                     }
                 }
 
@@ -2104,6 +2140,8 @@
                     if (altE <= 3.0 && !milestoneLatches.mains) { milestoneLatches.mains = true; logEvent("PARACHUTES: Main Chutes Deployed", telemetry); }
                     
                     document.getElementById('standard-controls').style.display = 'none';
+                    const subPanelRe = document.getElementById('maneuver-submission-panel');
+                    if (subPanelRe) subPanelRe.style.display = 'none';
                     const reentryCtl = document.getElementById('reentry-controls');
                     if (reentryCtl) reentryCtl.style.display = 'flex';
 
@@ -2190,19 +2228,19 @@
                         }
                         
                         let sign = capsuleBankAngle >= 0 ? '+' : '';
-                        let modeText = "NEUTRAL TRIM";
+                        let modeText = "NEUTRAL";
                         let colorClass = "nominal";
                         if (reentrySweetSpotReached) {
-                            modeText = "SWEET SPOT - ATTITUDE STABILIZED";
+                            modeText = "SWEET SPOT (LEVEL)";
                             colorClass = "nominal";
                         } else if (capsuleBankAngle > 20) {
-                            modeText = "LIFT UP (G-LIMITING)";
+                            modeText = "LIFT UP (-Gs)";
                             colorClass = "nominal";
                         } else if (capsuleBankAngle < -20) {
-                            modeText = "LIFT DOWN (STEEPENING)";
+                            modeText = "LIFT DOWN (+DRAG)";
                             colorClass = "caution";
                         } else {
-                            modeText = "NOMINAL CORRIDOR (LEVEL)";
+                            modeText = "NOMINAL (LEVEL)";
                             colorClass = "nominal";
                         }
                         if (Math.abs(capsuleBankAngle) > 75) colorClass = "danger";
@@ -2212,6 +2250,11 @@
                 } else {
                     const autoBtn = document.getElementById('btn-toggle-auto');
                     if (autoBtn) autoBtn.classList.remove('pulse-blue-glow');
+                    document.getElementById('standard-controls').style.display = 'flex';
+                    const subPanelOrb = document.getElementById('maneuver-submission-panel');
+                    if (subPanelOrb) subPanelOrb.style.display = maneuverDeckOpen ? 'block' : 'none';
+                    const reentryCtl = document.getElementById('reentry-controls');
+                    if (reentryCtl) reentryCtl.style.display = 'none';
                 }
 
                 let region = "Low Earth Orbit";
@@ -2485,12 +2528,7 @@
             activeMCCWaypoint = waypoint;
             manualMccAccumDv = 0;
             mccAutoCountdown = (autoPilotEngaged || autoWarpEnabled) ? FLIGHT_TIMERS.mccAutoAlignDelay : FLIGHT_TIMERS.mccCountdownManual;
-            const btn = document.getElementById('btn-autopilot-mcc');
-            if (btn) {
-                btn.style.display = 'block';
-                btn.className = 'caution-btn pulse-blue-glow';
-                btn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`;
-            }
+            setMccSlotState(true, (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${Math.ceil(mccAutoCountdown)}s)`, 'caution-btn pulse-blue-glow');
             showNavMsg(`CHECKPOINT: ${waypoint.name.toUpperCase()} — TRAJECTORY ALIGNMENT REQUIRED`, 5000, "flash-warning");
             logEvent(`CHECKPOINT REACHED: ${waypoint.name}`);
         }
@@ -2507,12 +2545,7 @@
                 autoBtn.className = "active";
             }
             safeSetText('autopilot-status', "ENGAGED", "nominal");
-            const btn = document.getElementById('btn-autopilot-mcc');
-            if (btn) {
-                btn.style.display = 'none';
-                btn.className = '';
-                btn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
-            }
+            setMccSlotState(false);
             logEvent("TLI AUTO-ALIGNMENT COMPLETE: Igniting main propulsion for Trans-Lunar Injection.");
             showNavMsg("TRAJECTORY ALIGNED — TLI ENGINES IGNITED", 3000, "solid-green");
         }
@@ -2564,12 +2597,7 @@
             
             mccAutoCountdown = -1;
             autoDecelerateTarget = -1;
-            const btn = document.getElementById('btn-autopilot-mcc');
-            if (btn) {
-                btn.style.display = 'none';
-                btn.className = '';
-                btn.textContent = 'EXECUTE TRAJECTORY ALIGNMENT';
-            }
+            setMccSlotState(false);
         }
     </script>
 </body>

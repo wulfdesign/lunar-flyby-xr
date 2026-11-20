@@ -6,6 +6,24 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 16:52] - v2.1.36-dev: Single-Screen Right Control Panel (`1280×720` Zero-Scroll), Zero-Jump Fixed Slots, Restored Mouse Look & New Roadmap Items 🎛️🖱️🌍☀️**
+
+📝 **Summary**
+1. **Mouse / Camera Look Restored to Exact `v2.1.34-dev` Behavior:**
+   - Diagnosed why `v2.1.35-dev` mouse controls felt off: rotating `shipGroup` directly via `shipYawOffsetDeg` / `shipPitchOffsetDeg` rotated the parent of `camera`, introducing Euler roll during panning and running `solveReturnMccVector()` every frame.
+   - Removed `shipGroup.rotateY/rotateX` and `hudVectorGroup`; restored `shipGroup` strictly locked to `shipVel` with `progradeMesh` at `(0, 0, -3)`, moved `noseHeadingMesh` and `keyholeGroup` onto a `±35°` HUD arc inside `shipGroup`, throttled `solveReturnMccVector` (`getCachedReturnMccSolution`, `>= 0.5s`), and guarded `mousedown`/`touchstart`/`wheel` inside `.panel` elements so HUD interactions never hijack canvas panning/zoom.
+2. **Single-Screen Right Panel (`1280×720` Zero Scroll) & Zero-Jump Fixed Slots (`#btn-autopilot-mcc` & `#reentry-controls`):**
+   - Redesigned `.panel.desktop-bottom-right` (`width: 392px` desktop / `382px` under `@media (max-height: 740px)`) with top anchoring (`top: 14px` / `top: 8px`), 2-column `.nav-kv-grid` cells (`height: 15px`, `white-space: nowrap; text-overflow: ellipsis`), a 3×2 mode grid, and a single-row 9-column `.warp-grid`.
+   - Extracted shared `setMccSlotState()` helper so `#btn-autopilot-mcc` occupies a permanent `24px` fixed slot (disabled `"TRAJECTORY ALIGNMENT: STANDBY"` when idle), removed `.flash-warning` padding shifts, shortened `#bank-angle-text` strings (`"LIFT UP (-Gs)"`, `"SWEET SPOT (LEVEL)"`, etc.), and auto-swapped `#maneuver-submission-panel` with `#reentry-controls` below `122 km`.
+   - Verified live on Port `3550` at both `1280×800` (`511 px` tall, bottom `525 px`) and `1280×720` (`497 px` tall, bottom `505 px`, `0` offscreen HUD nodes, `0` console/network errors), smooth canvas mouse drag + `RESET VIEW`, and `29/29` E2E tests passing (`sim.html` production untouched).
+3. **New Mission Roadmap Items Logged (`Tasks.md` & `private/privTasks.md`):**
+   - Added **Earth High-Res Near-Orbit Texture LOD (`4K/8K < 25,000 km`), Ocean Specular Reflection / Matte Landmass Masking, & Solar-Terminator Nighttime City Lights Shader**.
+   - Added **Solar Gravity ($\mu_{\odot}$) Perturbation & 4-Body Deep-Space / Asteroid Rendezvous Performance Analysis** across Desktop Browsers, Smartphones, and Standalone Mobile Headsets.
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 16:30] - v2.1.33-dev → v2.1.35-dev: The Finster / Fin Fest Update — 5-Point Orbital Remediation, Solar Corona, OpNav Wiki & Trajectory Sub-Mission HUD 🐾☀️🎯🚀**
 
 📝 **Summary**

@@ -1,14 +1,18 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.35-dev — Finster / Fin Fest Update 🐾)
-> *Artemis: The Free Return | Finster / Fin Fest Edition: 5-Point Physics Remediation, Solar G2V Corona, OpNav Wiki & Trajectory Sub-Mission HUD*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.36-dev — Finster / Fin Fest Update 🐾)
+> *Artemis: The Free Return | Zero-Scroll Single-Screen HUD, Zero-Jump Fixed Slots, Restored Mouse Look, 5-Point Physics Fixes & Solar Corona*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.35-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED AT `v2.1.19` BASELINE • 29/29 E2E TESTS + FULL-FLIGHT REGRESSION PASSING** 🚀🌕✨🐾🎯
+**Status:** **DEV STAGING UPGRADED (`v2.1.36-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • FITS 1280×720 ZERO SCROLL • 29/29 TESTS PASSING** 🚀🌕✨🐾🎛️
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.35-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.1.36-dev)
+0. **Single-Screen Right Panel (`497px @ 1280×720`), Zero-Jump Fixed Slots & Mouse Look Restoration (`v2.1.36-dev`):**
+   - Removed `shipGroup.rotateY/rotateX` parent rotation so mouse panning (`lookLon`/`lookLat`) matches `v2.1.34-dev` 100%, displaying `noseHeadingMesh` and `keyholeGroup` on a `±35°` HUD arc inside `shipGroup` + throttled `getCachedReturnMccSolution()` (`>= 0.5s`) + panel click/wheel guards.
+   - Compacted `.panel.desktop-bottom-right` (`511 px` @ `1280×800`, `497 px` @ `1280×720`, **zero vertical scrollbars**), locked `#btn-autopilot-mcc` into a permanent `24 px` slot (`setMccSlotState`), removed `.flash-warning` padding shifts, shortened `#bank-angle-text` strings, and auto-swapped `#maneuver-submission-panel` with `#reentry-controls` at `< 122 km`.
+   - Added roadmap items in `Tasks.md`: Earth high-res near-orbit LOD / ocean specular / matte land / night city lights shader + Solar gravity ($\mu_{\odot}$) 4-body deep-space/asteroid rendezvous analysis.
 1. **Launch Memories & Finster / Fin Fest Shelter Pledge (`private/LAUNCH_MEMORIES.md`):**
    - Recorded the Two Tears of Artemis (reclaiming the citizen space dream + `⭐ SIRIUS (α CMa) — Apollo Nav Star #18 • The Dog Star — In Honor of Fin 🐾`) and the pledge to donate a portion of future Early Adopter / Early Access purchases to the local animal shelter in Fin's honor; crystallized into Symbiot Memory Substrate (`finster_fin_fest_tribute_and_openspace_dream_genesis.md`).
 2. **5-Point Physics & Flight Computer Remediation (`v2.1.33-dev`):**
