@@ -1,14 +1,17 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.37-dev — Finster / Fin Fest Update 🐾)
-> *Artemis: The Free Return | Bulletproof Mouse Look, 3D Hover Inspection, Zero-Scroll Single-Screen HUD, Zero-Jump Slots, Physics Fixes & Solar Corona*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.38-dev — Finster / Fin Fest Update 🐾)
+> *Artemis: The Free Return | Telescopic 5 Planets (Saturn's Rings & Jupiter's Moons), Bulletproof Mouse Look & 3D Hover, Zero-Scroll HUD & Physics Fixes*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.37-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • MOUSE CONTROLS & 3D HOVER VERIFIED • 29/29 TESTS PASSING** 🚀🌕✨🐾🎛️🖱️
+**Status:** **DEV STAGING UPGRADED (`v2.1.38-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • SATURN RINGS & 5 TELESCOPIC PLANETS READY FOR QA • 29/29 TESTS PASSING** 🚀🌕✨🐾🪐🔭
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.37-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.1.38-dev)
+- **Telescopic 5-Planet Sprites & `7.0x–14.0x` Optical Zoom (`v2.1.38-dev` — Ready for QA 🧪):**
+  - Replaced fixed-pixel `tier1` dots for `NAV_PLANETS_CATALOG` with dedicated `256×256` procedural billboard `THREE.Sprite` maps (`createPlanetTexture`, `planetSprites`, `updatePlanetZoomScales`) scaling cleanly from crisp naked-eye points at `1.0x (70°)` to full planetary views at `7.0x (10°)` – `14.0x (5.0°)`: **Saturn** (`-26.7°` tilted A/B/C rings & Cassini Division), **Jupiter** (equatorial cloud belts, Great Red Spot & 4 Galilean Moons), **Venus** (sulfuric chevron clouds), **Mars** (*Syrtis Major* & North Polar Ice Cap), and **Mercury** (cratered gibbous phase).
+  - Extended scroll zoom down to `FOV: 5.0° (14.0x Zoom)` with fine stepping, zoom-proportional drag sensitivity (`camera.fov / 70`), scaled beacon hover precision, and `max-width: 205px` on `#target-popup` so center reticle descriptions never clip behind `.desktop-bottom-right` at `1280×720`.
 - **Bulletproof Click-and-Drag Mouse Look & 3D Mouse-Over Inspection (`v2.1.37-dev` — Verified Live by Magus Wulf):**
   - Hardened left-click-and-drag camera look (`e.button === 0`, `(e.buttons & 1) === 0` failsafe in `mousemove`, `stopViewDrag()` on `window`/`document` `mouseup`/`blur`/`mouseleave`/`dragstart`/`contextmenu`, `user-select: none`) so releasing the mouse button always stops rotation immediately and never disables center reticle inspection (`#target-popup`).
   - Added free 3D cursor hover inspection (`#hover-target-popup`, shared `inspectTargetWithRay(..., isTliCoast)`) for Earth, Moon, Sun, Prograde/Keyhole vectors, 59 J2000 Apollo Nav Stars, and 5 naked-eye planets without needing to aim the center reticle directly, while hiding cleanly over UI controls (`title` tooltips preserved) and providing tactile `grab` / `grabbing` / `pointer` cursors.

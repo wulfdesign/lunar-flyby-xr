@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.37-dev • Fin Fest Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.38-dev • Fin Fest Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none; }
         canvas { display: block; cursor: grab; }
@@ -168,7 +168,7 @@
         
         #target-popup {
             position: absolute; top: 52%; left: 52%; background: rgba(0, 40, 20, 0.9);
-            border: 1px solid #44ff44; padding: 10px; border-radius: 4px;
+            border: 1px solid #44ff44; padding: 10px; border-radius: 4px; max-width: 205px; box-sizing: border-box;
             color: #44ff44; font-size: 0.8rem; pointer-events: none; display: none; z-index: 5;
             box-shadow: 0 0 10px rgba(68, 255, 68, 0.3); backdrop-filter: blur(2px);
         }
@@ -226,7 +226,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.37-dev (Fin Fest 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.38-dev (Fin Fest 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -250,7 +250,7 @@
                 </div>
             </div>
 
-        <div id="zoom-indicator" title="Current camera zoom level. Use your mouse scroll wheel to zoom in and out.">FOV: 70&deg; (1.0x Zoom)</div>
+        <div id="zoom-indicator" title="Current camera zoom level. Scroll your mouse wheel to zoom in (up to 14.0x telescope magnification to view Saturn's rings, Jupiter's cloud belts & Galilean moons, and Mars/Venus/Mercury) and out.">FOV: 70&deg; (1.0x Zoom)</div>
         <div id="crosshair-view"></div>
         <div id="target-popup"><strong id="target-name">TARGET</strong><br>Dist: <span id="target-dist">0 km</span><br><span id="target-hint"></span></div>
         <div id="hover-target-popup"><strong id="hover-target-name">TARGET</strong><br><span id="hover-target-dist">0 km</span><br><span id="hover-target-hint" style="color:#aaddff; font-size:0.72rem;"></span></div>
@@ -388,7 +388,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.37";
+        const SIM_VERSION = "2.1.38";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -732,8 +732,9 @@
         document.addEventListener('wheel', (e) => {
             const p = e.target && e.target.closest ? e.target.closest('.panel') : null;
             if (p && p.scrollHeight > p.clientHeight + 2) return;
-            baseFov += e.deltaY * 0.05; baseFov = Math.max(10, Math.min(100, baseFov)); camera.fov = baseFov; camera.updateProjectionMatrix();
-            document.getElementById('zoom-indicator').innerHTML = `FOV: ${Math.round(baseFov)}&deg; (${(70 / baseFov).toFixed(1)}x Zoom)`;
+            const step = baseFov <= 20 ? 0.025 : 0.05;
+            baseFov += e.deltaY * step; baseFov = Math.max(5, Math.min(100, baseFov)); camera.fov = baseFov; camera.updateProjectionMatrix();
+            document.getElementById('zoom-indicator').innerHTML = `FOV: ${baseFov < 10 ? baseFov.toFixed(1) : Math.round(baseFov)}&deg; (${(70 / baseFov).toFixed(1)}x Zoom)`;
         });
 
         const textureLoader = new THREE.TextureLoader();
@@ -873,11 +874,11 @@
         ];
 
         const NAV_PLANETS_CATALOG = [
-            { name: "PLANET VENUS", ra: 2.15, dec: 13.5, v: -4.2, color: 0xfff6d5, role: "Inner Ecliptic Beacon • Brilliance Mag -4.2" },
-            { name: "PLANET JUPITER", ra: 5.45, dec: 22.8, v: -2.6, color: 0xffe2b8, role: "Jovian Gas Giant • Ecliptic Waypoint" },
-            { name: "PLANET MARS", ra: 8.10, dec: 21.2, v: -0.8, color: 0xff7b52, role: "The Red Planet • Inner Ecliptic Beacon" },
-            { name: "PLANET SATURN", ra: 23.20, dec: -7.5, v: 0.4, color: 0xf4d59e, role: "Ringed Outer Giant • Ecliptic Reference" },
-            { name: "PLANET MERCURY", ra: 11.20, dec: 4.5, v: -0.3, color: 0xd8d2c8, role: "Innermost Terrestrial Planet" }
+            { key: "VENUS", name: "PLANET VENUS", ra: 2.15, dec: 13.5, v: -4.2, color: 0xfff6d5, nakedScale: 680000, teleScale: 720000, role: "Inner Ecliptic Beacon • Sulfuric Cloud Deck (Scroll to Zoom)" },
+            { key: "JUPITER", name: "PLANET JUPITER", ra: 5.45, dec: 22.8, v: -2.6, color: 0xffe2b8, nakedScale: 720000, teleScale: 1080000, role: "Jovian Gas Giant • Cloud Belts, Great Red Spot & 4 Galilean Moons (Zoom)" },
+            { key: "MARS", name: "PLANET MARS", ra: 8.10, dec: 21.2, v: -0.8, color: 0xff7b52, nakedScale: 600000, teleScale: 640000, role: "The Red Planet • Syrtis Major & North Polar Ice Cap (Scroll to Zoom)" },
+            { key: "SATURN", name: "PLANET SATURN", ra: 23.20, dec: -7.5, v: 0.4, color: 0xf4d59e, nakedScale: 780000, teleScale: 1220000, role: "Ringed Outer Giant • Tilted Cassini Ring System (Scroll to Zoom)" },
+            { key: "MERCURY", name: "PLANET MERCURY", ra: 11.20, dec: 4.5, v: -0.3, color: 0xd8d2c8, nakedScale: 540000, teleScale: 560000, role: "Innermost Terrestrial Planet • Cratered Gibbous Disc (Scroll to Zoom)" }
         ];
 
         const SKY_RADIUS = 50000000;
@@ -886,18 +887,240 @@
         const celestialTargetAnchor = new THREE.Object3D();
         celestialGroup.add(celestialTargetAnchor);
         const celestialBeacons = [];
+        const planetSprites = [];
+
+        function createPlanetTexture(planet) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            const cx = 128, cy = 128;
+
+            const c = new THREE.Color(planet.color);
+            const r = Math.round(c.r * 255), g = Math.round(c.g * 255), b = Math.round(c.b * 255);
+            const halo = ctx.createRadialGradient(cx, cy, 8, cx, cy, 118);
+            halo.addColorStop(0.0, `rgba(${r}, ${g}, ${b}, 0.55)`);
+            halo.addColorStop(0.32, `rgba(${r}, ${g}, ${b}, 0.16)`);
+            halo.addColorStop(1.0, `rgba(${r}, ${g}, ${b}, 0.0)`);
+            ctx.fillStyle = halo;
+            ctx.fillRect(0, 0, 256, 256);
+
+            if (planet.key === 'SATURN') {
+                const tilt = -0.466;
+                const drawRings = (startA, endA) => {
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(tilt);
+                    ctx.scale(1.0, 0.38);
+                    const ringBands = [
+                        { rad: 97, width: 17, col: 'rgba(226, 200, 152, 0.84)' },
+                        { rad: 85, width: 6,  col: 'rgba(14, 12, 10, 0.94)' },
+                        { rad: 71, width: 22, col: 'rgba(250, 226, 176, 0.96)' },
+                        { rad: 54, width: 11, col: 'rgba(186, 162, 122, 0.42)' }
+                    ];
+                    for (let i = 0; i < ringBands.length; i++) {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, ringBands[i].rad, startA, endA);
+                        ctx.strokeStyle = ringBands[i].col;
+                        ctx.lineWidth = ringBands[i].width;
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                };
+                drawRings(Math.PI, Math.PI * 2);
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(tilt);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 38, 34, 0, 0, Math.PI * 2);
+                ctx.clip();
+                const bandGrad = ctx.createLinearGradient(0, -34, 0, 34);
+                bandGrad.addColorStop(0.00, '#a89668');
+                bandGrad.addColorStop(0.22, '#e2c58a');
+                bandGrad.addColorStop(0.42, '#f9e3b2');
+                bandGrad.addColorStop(0.55, '#fff0c8');
+                bandGrad.addColorStop(0.76, '#d9ba80');
+                bandGrad.addColorStop(1.00, '#96845a');
+                ctx.fillStyle = bandGrad;
+                ctx.fillRect(-40, -36, 80, 72);
+                ctx.fillStyle = 'rgba(20, 14, 8, 0.28)';
+                ctx.fillRect(-40, -14, 80, 5);
+                const limb = ctx.createRadialGradient(-10, -10, 4, 0, 0, 42);
+                limb.addColorStop(0.0, 'rgba(255, 250, 230, 0.14)');
+                limb.addColorStop(0.72, 'rgba(0, 0, 0, 0.0)');
+                limb.addColorStop(1.0, 'rgba(10, 6, 2, 0.65)');
+                ctx.fillStyle = limb;
+                ctx.fillRect(-40, -36, 80, 72);
+                ctx.restore();
+
+                drawRings(0, Math.PI);
+            } else if (planet.key === 'JUPITER') {
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(-0.21);
+                const moons = [-108, -74, 82, 114];
+                for (let i = 0; i < moons.length; i++) {
+                    const mx = moons[i];
+                    const mg = ctx.createRadialGradient(mx, 0, 0, mx, 0, 5);
+                    mg.addColorStop(0.0, 'rgba(255, 248, 225, 1.0)');
+                    mg.addColorStop(0.45, 'rgba(255, 226, 175, 0.65)');
+                    mg.addColorStop(1.0, 'rgba(255, 220, 160, 0.0)');
+                    ctx.fillStyle = mg;
+                    ctx.beginPath();
+                    ctx.arc(mx, 0, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 56, 52, 0, 0, Math.PI * 2);
+                ctx.clip();
+                const jGrad = ctx.createLinearGradient(0, -52, 0, 52);
+                jGrad.addColorStop(0.00, '#8f7d68');
+                jGrad.addColorStop(0.18, '#e8d7b9');
+                jGrad.addColorStop(0.28, '#be7a52');
+                jGrad.addColorStop(0.36, '#f6e7cb');
+                jGrad.addColorStop(0.45, '#b65b36');
+                jGrad.addColorStop(0.54, '#fff2d8');
+                jGrad.addColorStop(0.65, '#c26942');
+                jGrad.addColorStop(0.75, '#eed9b8');
+                jGrad.addColorStop(0.84, '#b88b64');
+                jGrad.addColorStop(1.00, '#887662');
+                ctx.fillStyle = jGrad;
+                ctx.fillRect(-58, -54, 116, 108);
+
+                ctx.beginPath();
+                ctx.ellipse(16, 17, 10, 6.5, 0.05, 0, Math.PI * 2);
+                ctx.fillStyle = '#d95432';
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = 'rgba(255, 232, 200, 0.65)';
+                ctx.stroke();
+
+                const jLimb = ctx.createRadialGradient(-16, -14, 8, 0, 0, 58);
+                jLimb.addColorStop(0.0, 'rgba(255, 250, 235, 0.15)');
+                jLimb.addColorStop(0.70, 'rgba(0, 0, 0, 0.0)');
+                jLimb.addColorStop(1.0, 'rgba(15, 8, 4, 0.68)');
+                ctx.fillStyle = jLimb;
+                ctx.fillRect(-58, -54, 116, 108);
+                ctx.restore();
+            } else if (planet.key === 'VENUS') {
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.beginPath();
+                ctx.arc(0, 0, 70, 0, Math.PI * 2);
+                ctx.clip();
+                const vGrad = ctx.createRadialGradient(-22, -18, 6, 0, 0, 78);
+                vGrad.addColorStop(0.0, '#ffffff');
+                vGrad.addColorStop(0.45, '#fff4cf');
+                vGrad.addColorStop(0.82, '#e2be76');
+                vGrad.addColorStop(1.0, '#9e7c3e');
+                ctx.fillStyle = vGrad;
+                ctx.fillRect(-72, -72, 144, 144);
+                ctx.strokeStyle = 'rgba(210, 175, 110, 0.35)';
+                ctx.lineWidth = 9;
+                ctx.beginPath(); ctx.arc(-28, 0, 68, -0.8, 0.8); ctx.stroke();
+                ctx.beginPath(); ctx.arc(-5, -18, 72, -0.5, 0.7); ctx.stroke();
+                const vPhase = ctx.createLinearGradient(-30, 0, 74, 14);
+                vPhase.addColorStop(0.0, 'rgba(0,0,0,0)');
+                vPhase.addColorStop(0.68, 'rgba(20, 14, 6, 0.18)');
+                vPhase.addColorStop(1.0, 'rgba(10, 8, 4, 0.72)');
+                ctx.fillStyle = vPhase;
+                ctx.fillRect(-72, -72, 144, 144);
+                ctx.restore();
+            } else if (planet.key === 'MARS') {
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.beginPath();
+                ctx.arc(0, 0, 66, 0, Math.PI * 2);
+                ctx.clip();
+                const mGrad = ctx.createRadialGradient(-18, -16, 6, 0, 0, 72);
+                mGrad.addColorStop(0.0, '#ffae7e');
+                mGrad.addColorStop(0.45, '#e26a3c');
+                mGrad.addColorStop(0.85, '#a8361c');
+                mGrad.addColorStop(1.0, '#5a190a');
+                ctx.fillStyle = mGrad;
+                ctx.fillRect(-68, -68, 136, 136);
+                ctx.fillStyle = 'rgba(72, 22, 12, 0.48)';
+                ctx.beginPath(); ctx.ellipse(-10, 8, 22, 15, 0.35, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(22, -4, 15, 22, -0.25, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(-28, -16, 12, 8, -0.4, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(255, 248, 244, 0.92)';
+                ctx.beginPath(); ctx.ellipse(-2, -57, 20, 9, 0, 0, Math.PI * 2); ctx.fill();
+                const mLimb = ctx.createRadialGradient(-16, -14, 12, 0, 0, 68);
+                mLimb.addColorStop(0.65, 'rgba(0,0,0,0)');
+                mLimb.addColorStop(1.0, 'rgba(18, 4, 2, 0.65)');
+                ctx.fillStyle = mLimb;
+                ctx.fillRect(-68, -68, 136, 136);
+                ctx.restore();
+            } else {
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.beginPath();
+                ctx.arc(0, 0, 60, 0, Math.PI * 2);
+                ctx.clip();
+                const meGrad = ctx.createRadialGradient(-20, -14, 6, 0, 0, 66);
+                meGrad.addColorStop(0.0, '#efeae2');
+                meGrad.addColorStop(0.5, '#bfb7ac');
+                meGrad.addColorStop(0.88, '#7a746c');
+                meGrad.addColorStop(1.0, '#3e3a36');
+                ctx.fillStyle = meGrad;
+                ctx.fillRect(-62, -62, 124, 124);
+                const craters = [[-18, -14, 11], [6, 16, 9], [-26, 20, 7], [-6, -32, 6], [14, -18, 8]];
+                for (let i = 0; i < craters.length; i++) {
+                    ctx.fillStyle = 'rgba(55, 50, 46, 0.35)';
+                    ctx.beginPath(); ctx.arc(craters[i][0], craters[i][1], craters[i][2], 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = 'rgba(240, 236, 228, 0.30)';
+                    ctx.lineWidth = 1.4;
+                    ctx.stroke();
+                }
+                const mePhase = ctx.createLinearGradient(-15, 0, 62, 8);
+                mePhase.addColorStop(0.0, 'rgba(0,0,0,0)');
+                mePhase.addColorStop(0.55, 'rgba(10, 10, 12, 0.35)');
+                mePhase.addColorStop(1.0, 'rgba(4, 4, 6, 0.88)');
+                ctx.fillStyle = mePhase;
+                ctx.fillRect(-62, -62, 124, 124);
+                ctx.restore();
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.minFilter = THREE.LinearFilter;
+            tex.magFilter = THREE.LinearFilter;
+            return tex;
+        }
+
+        function updatePlanetZoomScales(fov) {
+            const t = THREE.MathUtils.clamp((70 - fov) / 60, 0, 1);
+            const ease = t * t * (3 - 2 * t);
+            const boost = fov < 10 ? 1.0 + 0.15 * THREE.MathUtils.clamp((10 - fov) / 5, 0, 1) : 1.0;
+            for (let i = 0; i < planetSprites.length; i++) {
+                const ps = planetSprites[i];
+                const s = (ps.nakedScale + (ps.teleScale - ps.nakedScale) * ease) * boost;
+                ps.sprite.scale.set(s, s, 1);
+            }
+        }
 
         (function buildRealCelestialSphere() {
-            const tier1Pos = [], tier1Col = []; // Planets + 1st Mag Beacons (V <= 1.35)
+            const tier1Pos = [], tier1Col = []; // 1st Mag Beacons (V <= 1.35)
             const tier2Pos = [], tier2Col = []; // Apollo / Constellation Stars + Mid-Tier Stars
             const tier3Pos = [], tier3Col = []; // 2,700 Deep Sky & Milky Way Field
 
-            // Planets in Tier 1
+            // Dedicated perspective telescopic billboard sprites for the 5 Naked-Eye Planets
             NAV_PLANETS_CATALOG.forEach(p => {
-                const pos = raDecToCartesian(p.ra, p.dec, SKY_RADIUS);
-                const c = new THREE.Color(p.color);
-                tier1Pos.push(pos.x, pos.y, pos.z);
-                tier1Col.push(c.r, c.g, c.b);
+                const pos = raDecToCartesian(p.ra, p.dec, SKY_RADIUS * 0.98);
+                const mat = new THREE.SpriteMaterial({
+                    map: createPlanetTexture(p),
+                    transparent: true,
+                    alphaTest: 0.01,
+                    depthTest: true,
+                    depthWrite: false
+                });
+                const sprite = new THREE.Sprite(mat);
+                sprite.position.copy(pos);
+                sprite.scale.set(p.nakedScale, p.nakedScale, 1);
+                sprite.name = p.name;
+                celestialGroup.add(sprite);
+                planetSprites.push({ sprite, nakedScale: p.nakedScale, teleScale: p.teleScale });
                 celestialBeacons.push({ name: p.name, pos: pos, dir: pos.clone().normalize(), meta: `Mag ${p.v.toFixed(1)} • ${formatRaDec(p.ra, p.dec)}`, role: p.role, isPlanet: true });
             });
 
@@ -1120,15 +1343,16 @@
                 return;
             }
             if (isDraggingView && !isTrackingTarget) {
-                lookLon -= (e.clientX - prevMousePos.x) * 0.2;
-                lookLat = Math.max(-85, Math.min(85, lookLat - (e.clientY - prevMousePos.y) * 0.2));
+                const dragScale = 0.2 * Math.max(0.06, Math.min(1.4, camera.fov / 70));
+                lookLon -= (e.clientX - prevMousePos.x) * dragScale;
+                lookLat = Math.max(-85, Math.min(85, lookLat - (e.clientY - prevMousePos.y) * dragScale));
                 prevMousePos = { x: e.clientX, y: e.clientY };
             }
         });
         document.addEventListener('touchstart', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && !(e.target.closest && e.target.closest('.panel'))) { isDraggingView = true; prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: false });
         document.addEventListener('touchend', () => isDraggingView = false);
         document.addEventListener('touchcancel', () => isDraggingView = false);
-        document.addEventListener('touchmove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.touches[0].clientX - prevMousePos.x) * 0.3; lookLat = Math.max(-85, Math.min(85, lookLat - (e.touches[0].clientY - prevMousePos.y) * 0.3)); prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; if (e.cancelable) e.preventDefault(); } }, { passive: false });
+        document.addEventListener('touchmove', (e) => { if (isDraggingView && !isTrackingTarget) { const dragScale = 0.3 * Math.max(0.06, Math.min(1.4, camera.fov / 70)); lookLon -= (e.touches[0].clientX - prevMousePos.x) * dragScale; lookLat = Math.max(-85, Math.min(85, lookLat - (e.touches[0].clientY - prevMousePos.y) * dragScale)); prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; if (e.cancelable) e.preventDefault(); } }, { passive: false });
 
         function resetMission() {
             let startRadius = radEarth + 400; let vOrbit = Math.sqrt(muEarth / startRadius); moonAngle = 0; 
@@ -1866,7 +2090,8 @@
                 }
             }
 
-            let bestDot = Math.cos(THREE.MathUtils.degToRad(beaconDegThreshold));
+            const scaledBeaconDeg = beaconDegThreshold * Math.min(1.0, Math.max(0.32, camera.fov / 70));
+            let bestDot = Math.cos(THREE.MathUtils.degToRad(scaledBeaconDeg));
             let bestBeacon = null;
             for (let i = 0; i < celestialBeacons.length; i++) {
                 const d = raycaster.ray.direction.dot(celestialBeacons[i].dir);
@@ -2159,6 +2384,7 @@
                     lookLat = THREE.MathUtils.lerp(lookLat, THREE.MathUtils.radToDeg(Math.asin(localTarget.y)), 0.05);
                 }
 
+                updatePlanetZoomScales(camera.fov);
                 const rayTargets = [earth, moon, sunMesh, progradeMesh]; if (keyholeGroup.visible) rayTargets.push(keyholeHitMesh);
                 const popup = document.getElementById('target-popup');
                 const hoverPopup = document.getElementById('hover-target-popup');

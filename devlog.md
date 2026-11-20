@@ -6,6 +6,26 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 17:30] - v2.1.38-dev: Telescopic 5-Planet Sprites (Saturn's Rings, Jupiter & 4 Galilean Moons, Venus, Mars, Mercury) & `7x–14x` Optical Zoom 🪐🔭✨**
+
+📝 **Summary**
+1. **Why 7x Zoom Left Planets as Dots (`tier1` `sizeAttenuation: false`):**
+   - Previously all 5 naked-eye planets lived inside the `tier1Pos` `THREE.Points` layer (`size: 5.2, sizeAttenuation: false`), locking them to `5.2 px` regardless of `camera.fov`.
+2. **Telescopic `256×256` Procedural Sprites for All 5 Visible-Eye Planets (`createPlanetTexture`, `planetSprites`, `updatePlanetZoomScales`):**
+   - Removed the 5 planets from `tier1Pos` and spawned dedicated `THREE.Sprite` billboards at `0.98 * SKY_RADIUS` with smooth optical scaling between `FOV: 70° (1.0x)` naked-eye brilliance and `FOV: 10° (7.0x)` / `FOV: 5.0° (14.0x)` telescope views:
+     - **🪐 SATURN:** `-26.7°` tilted concentric ring system (outer A-ring, dark **Cassini Division**, bright B-ring, translucent C-ring) rendered behind and in front of an oblate banded Saturn globe.
+     - **🪐 JUPITER:** Oblate banded gas giant with **North & South Equatorial Belts**, **Great Red Spot**, and **4 aligned Galilean Moons** (`Io`, `Europa`, `Ganymede`, `Callisto`).
+     - **🪐 VENUS:** Brilliant golden-cream sulfuric cloud shroud with chevron bands and evening gibbous phase shading.
+     - **🪐 MARS:** Iron-oxide terracotta disc with dark basaltic *Syrtis Major* albedo regions and a bright white **North Polar Ice Cap**.
+     - **🪐 MERCURY:** Cratered warm-slate terrestrial disc with solar-phase terminator shading.
+3. **Zoom & Reticle Ergonomics (`5.0° / 14.0x` + `#target-popup` `205px` Wrap):**
+   - Extended mouse-wheel zoom down to `FOV: 5.0° (14.0x Zoom)` with finer `0.025` scroll steps inside `FOV <= 20°`, scaled camera drag speed proportionally to `camera.fov / 70`, scaled star/planet hover radius at high zoom (`Math.max(0.32, camera.fov / 70)`), and constrained `#target-popup` `max-width: 205px` so center reticle descriptions never clip behind `.desktop-bottom-right` at `1280×720`.
+   - Verified live on Port `3550` (`0` console/network errors across zoomed `14.0x` Saturn, Jupiter, and Mars), headless regression (`verify_v2135_steering.js`), and `29/29` E2E tests in `tests/test_staging_and_portal.py` (`sim.html` production untouched).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 17:06] - v2.1.37-dev: Bulletproof Click-and-Drag Mouse Look & 3D Mouse-Over Inspection (`#hover-target-popup`) 🖱️🔍✨**
 
 📝 **Summary**
