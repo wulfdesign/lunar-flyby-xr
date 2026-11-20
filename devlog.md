@@ -6,6 +6,31 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 16:30] - v2.1.33-dev → v2.1.35-dev: The Finster / Fin Fest Update — 5-Point Orbital Remediation, Solar Corona, OpNav Wiki & Trajectory Sub-Mission HUD 🐾☀️🎯🚀**
+
+📝 **Summary**
+1. **Launch Memories & Finster / Fin Fest Animal Shelter Pledge (`private/LAUNCH_MEMORIES.md` & Memory Substrate):**
+   - Documented the Two Tears of Artemis (reclaiming the citizen space dream from UAF/Near Space/*MicroLaunchers*/*#dearMoon* to a consumer deep-space CubeSat + seeing `⭐ SIRIUS (α CMa) — Apollo Nav Star #18 • The Dog Star — In Honor of Fin 🐾`) and recorded the pledge donating a portion of future Early Adopter / Early Access purchases to the local animal shelter in Fin's honor.
+   - Crystallized into `C:/AI/memory/concepts/finster_fin_fest_tribute_and_openspace_dream_genesis.md` and rebuilt Symbiot Memory index (`C:/AI/memory/index.json`).
+2. **5-Point Physics & Flight Computer Remediation (`v2.1.33-dev` — Dev Staging Only):**
+   - Reset `MISSION_WAYPOINTS_OUTBOUND` and `MISSION_WAYPOINTS_RETURN` `.passed` flags inside `resetMission()`.
+   - Enforced `stepSize = 0.01s` during active burns and clamped final TLI substep acceleration to exact `dvRequired` (`dE = 0.000000 km^2/s^2` across `dt = 0.01/0.02`).
+   - Upgraded Return MCC solver (`solveReturnMccVector` / `executeAutopilotBurn`) to search bidirectionally (`±transverseDir`) around the `40 km` perigee keyhole + clamped warp `<= 30x`.
+   - Clamped final MCC substep duration (`mccStepScale`) symmetrically across both Velocity Verlet half-steps before clearing `isMccBurning`.
+   - Fixed symplectic lunar ephemeris ordering so `moonAngle` advances strictly between $\mathbf{a}(t)$ and $\mathbf{a}(t + \Delta t)$ evaluations.
+3. **Option A Solar G2V Photosphere & Additive Corona + Optical Navigation Wiki (`v2.1.34-dev`):**
+   - Upgraded `sunMesh` (`0xfff5cc`) with a $256 \times 256$ multi-stop golden corona & 12-streamer radial sprite (`THREE.AdditiveBlending`, `depthWrite: false`), cleanly differentiating the Sun from the Moon (empirically confirmed live by Magus Wulf alongside Moon facing and Starfield).
+   - Added Educational Wiki Section 5 (`docs/physics.html#celestial-opnav`) & full spec (`docs/celestial_navigation.md`) covering Celestial Optical Navigation (OpNav), Space Sextant star-to-limb triangulation, apparent angular diameter rangefinding, and the future Space Sextant minigame mission roadmap.
+4. **Forward Vector Audit, Red/Yellow/Green Prograde Coloring, Toggleable Mission Keyhole & Trajectory Correction Sub-Mission HUD Deck (`v2.1.35-dev`):**
+   - Decoupled `progradeMesh` into world-tracked `hudVectorGroup` and added `noseHeadingMesh` + `keyholeGroup` (`"MISSION KEYHOLE VECTOR"`, toggleable via `#btn-toggle-keyhole`) so pilots see true velocity heading vs. ship nose thrust axis vs. active burn/corridor target.
+   - Colored `progradeMat`, `pgLineMat`, and `#vec-align-badge` **Green** (nominal & aligned $\le 2.5^\circ$), **Yellow** (close $2.5^\circ\text{–}8.0^\circ$ or executing/approaching burn), and **Red** (off-corridor or misaligned $> 8.0^\circ$).
+   - Built interactive **Trajectory Correction Sub-Mission HUD Deck** (`#maneuver-submission-panel`, `#btn-toggle-maneuver`) exposing turn cues & RCS attitude D-pad (`◀ L`, `▲ U`, `▼ D`, `▶ R`, `🎯`), Thrust Power `%` slider/presets (`10%–100%`), and $\Delta v$ / burn duration countdown & progress bar — running visibly in hands-off Autopilot and interactively in Manual Helm.
+   - Verified `0.000000°` spherical attitude round-trip, full cislunar autopilot flight (`1,557.67 km` perilune, `12.24 G` max G, `0.00 m/s` splashdown), and `29/29` E2E tests in `tests/test_staging_and_portal.py` (`sim.html` production untouched).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 15:30] - v2.1.32-dev: Lunar 1:1 Tidal Locking, Anti-Washout Crater Relief, Real Astronomical Starfield & Interactive Task Dashboard 🌕✨🧭🎛️**
 
 📝 **Summary**

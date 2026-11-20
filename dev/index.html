@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.34-dev • Fin Fest Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.35-dev • Fin Fest Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
         canvas { display: block; }
@@ -178,7 +178,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.34-dev (Fin Fest 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.35-dev (Fin Fest 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -238,6 +238,8 @@
                     <button id="btn-skip-window" title="Warps time forward toward the next burn window.">SKIP TO ACTION</button>
                     <button id="btn-auto-warp" class="active safe-btn blink-green" title="Automatically ramps simulation speed back up to cruising warp after burns and transitions (Clamped to safe speeds).">AUTO WARP: ON</button>
                     <button id="btn-track-target" title="Automatically keep the current target centered in view.">TRACK TARGET: OFF</button>
+                    <button id="btn-toggle-keyhole" class="active safe-btn" title="Toggle 3D Mission Keyhole / Target Objective Vector Reticle in cockpit view.">KEYHOLE: ON</button>
+                    <button id="btn-toggle-maneuver" class="active" title="Show or hide the Trajectory Correction Sub-Mission Deck (Turn cues, Thrust Power %, Burn Timer).">MANEUVER DECK</button>
                 </div>
                 <hr style="border-color: #00ffff; opacity: 0.3; margin-top: 15px;">
                 <p><span class="tooltip" title="Estimated time the engines need to fire.">Target Burn:</span> <span id="burn-target" class="nominal">145.0 s</span></p>
@@ -266,7 +268,34 @@
                 </div>
                 
                 <div id="standard-controls" class="controls">
-                    <button id="btn-thrust" class="danger-btn" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually. Disables autopilot.">MANUAL BURN OVERRIDE</button>
+                    <button id="btn-thrust" class="danger-btn" onmousedown="startManualBurn()" onmouseup="stopManualBurn()" ontouchstart="startManualBurn()" ontouchend="stopManualBurn()" title="Click and hold to fire the main engines manually along your nose vector at the set Thrust Power %. Disables autopilot.">MANUAL BURN OVERRIDE</button>
+                </div>
+                <div id="maneuver-submission-panel" style="margin-top: 10px; padding: 10px; background: rgba(0, 25, 45, 0.72); border: 1px solid rgba(0, 255, 255, 0.45); border-radius: 6px; box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid rgba(0,255,255,0.25); padding-bottom: 4px;">
+                        <span style="font-size: 0.74rem; font-weight: bold; color: #00ffff; letter-spacing: 0.8px;">🎯 TRAJECTORY SUB-MISSION</span>
+                        <span id="sub-mode-badge" class="nominal" style="font-size: 0.64rem; padding: 1px 5px; border: 1px solid currentColor; border-radius: 3px;">AUTO COMPUTER</span>
+                    </div>
+                    <p style="font-size: 0.74rem; margin: 3px 0;"><span class="tooltip" title="Red = Adjustment Needed / Misaligned, Yellow = Close / Burn Window, Green = Nominal & Aligned.">Forward Vector:</span> <span id="vec-align-badge" class="nominal">GREEN (NOMINAL)</span></p>
+                    <p style="font-size: 0.72rem; margin: 3px 0;"><span class="tooltip" title="Active Mission Keyhole / Target Vector direction.">Keyhole Target:</span> <span id="vec-objective-name" style="color: #88eeff; font-weight: bold;">LEO PROGRADE</span></p>
+                    <p style="font-size: 0.73rem; margin: 3px 0;"><span class="tooltip" title="Turn direction required to align spacecraft thrust nose with the Mission Keyhole reticle.">Turn Cue:</span> <span id="vec-turn-cue" class="nominal">ALIGNED (Δ 0.0°)</span></p>
+                    <div id="manual-attitude-controls" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 7px 0;">
+                        <button id="btn-yaw-left" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Turn ship nose LEFT (+Yaw). Switches helm to Manual.">◀ L</button>
+                        <button id="btn-pitch-up" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Pitch ship nose UP (+Pitch). Switches helm to Manual.">▲ U</button>
+                        <button id="btn-auto-align" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Align spacecraft nose smoothly onto the active Mission Keyhole Vector.">🎯</button>
+                        <button id="btn-pitch-down" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Pitch ship nose DOWN (-Pitch). Switches helm to Manual.">▼ D</button>
+                        <button id="btn-yaw-right" style="padding: 5px 4px; font-size: 0.68rem; min-width: 0;" title="Turn ship nose RIGHT (-Yaw). Switches helm to Manual.">▶ R</button>
+                    </div>
+                    <p style="font-size: 0.73rem; margin: 6px 0 3px 0;"><span class="tooltip" title="Main engine throttle power setting. Adjusts engine thrust and burn duration.">Thrust Power:</span> <span id="throttle-readout" class="nominal">100% (TARGET: 100%)</span></p>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                        <input type="range" id="throttle-slider" min="10" max="100" step="5" value="100" style="flex: 1; accent-color: #00ffff; cursor: pointer; pointer-events: auto;">
+                        <button id="btn-thr-25" style="padding: 3px 5px; font-size: 0.64rem; min-width: 0; flex-grow: 0;">25%</button>
+                        <button id="btn-thr-50" style="padding: 3px 5px; font-size: 0.64rem; min-width: 0; flex-grow: 0;">50%</button>
+                        <button id="btn-thr-100" class="active" style="padding: 3px 5px; font-size: 0.64rem; min-width: 0; flex-grow: 0;">100%</button>
+                    </div>
+                    <p style="font-size: 0.72rem; margin: 3px 0;"><span class="tooltip" title="Required Delta-V and burn duration at your current Thrust Power %.">Burn Plan:</span> <span id="sub-dv-readout" class="nominal">ΔV 0.0 m/s • 0.0s</span></p>
+                    <div style="width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 255, 255, 0.35); border-radius: 4px; overflow: hidden; margin-top: 4px;">
+                        <div id="sub-burn-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ffff, #44ff44); transition: width 0.1s linear;"></div>
+                    </div>
                 </div>
                 <div id="reentry-controls" style="display:none; flex-direction: column; width: 100%; margin-top: 15px;">
                     <!-- Dynamic Attitude Trim & Bank Vector Gauge -->
@@ -301,7 +330,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.34";
+        const SIM_VERSION = "2.1.35";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -401,6 +430,22 @@
         let mccBurnDuration = 4.0;
         let mccBurnAccel = new THREE.Vector3();
         let mccFuelRate = 0;
+
+        // Trajectory Correction Sub-Mission, Ship Attitude & Keyhole Vector Controls (v2.1.35)
+        let keyholeVisible = true;
+        let maneuverDeckOpen = true;
+        let shipYawOffsetDeg = 0;      // Nose yaw relative to velocity vector (+ Left, - Right)
+        let shipPitchOffsetDeg = 0;    // Nose pitch relative to velocity vector (+ Up, - Down)
+        let targetYawOffsetDeg = 0;
+        let targetPitchOffsetDeg = 0;
+        let manualThrottlePct = 1.0;   // 0.10 .. 1.00
+        let targetThrottlePct = 1.0;
+        let holdingYawLeft = false;
+        let holdingYawRight = false;
+        let holdingPitchUp = false;
+        let holdingPitchDown = false;
+        let manualMccAccumDv = 0;
+        let cachedMccSolution = { lowerPerigee: false, dV: 0, dir: new THREE.Vector3(0, 0, -1) };
 
         let actualBurnTime = 0;
         let initialTargetBurnTime = 0;
@@ -930,21 +975,51 @@
         const shipGroup = new THREE.Group();
         shipGroup.add(new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.005, 0.005), new THREE.MeshStandardMaterial({color: 0x111111, side: THREE.BackSide})));
         
-        const progradeMat = new THREE.MeshBasicMaterial({color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.8});
-        const progradeMesh = new THREE.Mesh(new THREE.RingGeometry(0.04, 0.05, 16), progradeMat);
+        const hudVectorGroup = new THREE.Group();
+        scene.add(hudVectorGroup);
+
+        const progradeMat = new THREE.MeshBasicMaterial({color: 0x00ff66, side: THREE.DoubleSide, transparent: true, opacity: 0.9});
+        const progradeMesh = new THREE.Mesh(new THREE.RingGeometry(0.04, 0.052, 24), progradeMat);
         progradeMesh.name = "PROGRADE VECTOR"; 
         progradeMesh.position.set(0, 0, -3); 
-        const pgLineMat = new THREE.LineBasicMaterial({color: 0x00ff00});
-        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.08, 0, 0), new THREE.Vector3(-0.04, 0, 0)]), pgLineMat));
-        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.08, 0, 0), new THREE.Vector3(0.04, 0, 0)]), pgLineMat));
-        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.08, 0), new THREE.Vector3(0, 0.04, 0)]), pgLineMat));
-        shipGroup.add(progradeMesh); shipGroup.add(camera); scene.add(shipGroup);
+        const pgLineMat = new THREE.LineBasicMaterial({color: 0x00ff66});
+        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.085, 0, 0), new THREE.Vector3(-0.042, 0, 0)]), pgLineMat));
+        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.085, 0, 0), new THREE.Vector3(0.042, 0, 0)]), pgLineMat));
+        progradeMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.085, 0), new THREE.Vector3(0, 0.042, 0)]), pgLineMat));
+        hudVectorGroup.add(progradeMesh);
+
+        // Ship Nose Thrust Boresight Cross (locked to shipGroup local -Z thrust axis)
+        const noseMat = new THREE.LineBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.8});
+        const noseHeadingMesh = new THREE.Group();
+        noseHeadingMesh.position.set(0, 0, -2.9);
+        noseHeadingMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.032, 0, 0), new THREE.Vector3(-0.012, 0, 0)]), noseMat));
+        noseHeadingMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.032, 0, 0), new THREE.Vector3(0.012, 0, 0)]), noseMat));
+        noseHeadingMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -0.032, 0), new THREE.Vector3(0, -0.012, 0)]), noseMat));
+        noseHeadingMesh.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.032, 0), new THREE.Vector3(0, 0.012, 0)]), noseMat));
+        shipGroup.add(noseHeadingMesh);
+
+        // Toggleable Mission Objective / Keyhole Target Vector Reticle
+        const keyholeGroup = new THREE.Group();
+        const keyholeRingMat = new THREE.MeshBasicMaterial({color: 0xffd24c, side: THREE.DoubleSide, transparent: true, opacity: 0.85});
+        const keyholeHitMesh = new THREE.Mesh(new THREE.RingGeometry(0.068, 0.092, 4), keyholeRingMat);
+        keyholeHitMesh.rotation.z = Math.PI / 4; // Crisp diamond perimeter leaving center clear for prograde ring
+        keyholeHitMesh.name = "MISSION KEYHOLE VECTOR";
+        keyholeGroup.add(keyholeHitMesh);
+        const keyholeLineMat = new THREE.LineBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.9});
+        keyholeGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0.105, 0), new THREE.Vector3(0.105, 0, 0),
+            new THREE.Vector3(0, -0.105, 0), new THREE.Vector3(-0.105, 0, 0),
+            new THREE.Vector3(0, 0.105, 0)
+        ]), keyholeLineMat));
+        hudVectorGroup.add(keyholeGroup);
+
+        shipGroup.add(camera); scene.add(shipGroup);
 
         let lookLon = 0; let lookLat = 0; let isDraggingView = false; let prevMousePos = { x: 0, y: 0 };
-        document.addEventListener('mousedown', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; } });
+        document.addEventListener('mousedown', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT') { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; } });
         document.addEventListener('mouseup', () => isDraggingView = false);
         document.addEventListener('mousemove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.clientX - prevMousePos.x) * 0.2; lookLat = Math.max(-85, Math.min(85, lookLat - (e.clientY - prevMousePos.y) * 0.2)); prevMousePos = { x: e.clientX, y: e.clientY }; } });
-        document.addEventListener('touchstart', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON') { isDraggingView = true; prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: false });
+        document.addEventListener('touchstart', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') { isDraggingView = true; prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: false });
         document.addEventListener('touchend', () => isDraggingView = false);
         document.addEventListener('touchmove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.touches[0].clientX - prevMousePos.x) * 0.3; lookLat = Math.max(-85, Math.min(85, lookLat - (e.touches[0].clientY - prevMousePos.y) * 0.3)); prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; if (e.cancelable) e.preventDefault(); } }, { passive: false });
 
@@ -965,6 +1040,28 @@
             autoWarpEnabled = true;
             activeMCCWaypoint = null; mccAutoCountdown = -1; tliAutoCountdown = -1; autoDecelerateTarget = -1; targetWarp = 1; smoothWarp = 1; warpTransitionStart = 1; warpTransitionTarget = 1; warpStepTimer = 0; userSelectedWarp = null;
             isMccBurning = false; mccBurnRemainingTime = 0; mccBurnAccel.set(0,0,0); mccFuelRate = 0;
+            keyholeVisible = true; maneuverDeckOpen = true;
+            shipYawOffsetDeg = 0; shipPitchOffsetDeg = 0; targetYawOffsetDeg = 0; targetPitchOffsetDeg = 0;
+            manualThrottlePct = 1.0; targetThrottlePct = 1.0;
+            holdingYawLeft = false; holdingYawRight = false; holdingPitchUp = false; holdingPitchDown = false;
+            manualMccAccumDv = 0; cachedMccSolution = { lowerPerigee: false, dV: 0, dir: new THREE.Vector3(0, 0, -1) };
+            keyholeGroup.visible = true;
+            const btnKh = document.getElementById('btn-toggle-keyhole');
+            if (btnKh) { btnKh.textContent = "KEYHOLE: ON"; btnKh.className = "active safe-btn"; }
+            const btnMDeck = document.getElementById('btn-toggle-maneuver');
+            if (btnMDeck) { btnMDeck.classList.add('active'); }
+            const panelMDeck = document.getElementById('maneuver-submission-panel');
+            if (panelMDeck) { panelMDeck.style.display = 'block'; }
+            const thrSlider = document.getElementById('throttle-slider');
+            if (thrSlider) { thrSlider.value = "100"; }
+            ['btn-thr-25', 'btn-thr-50', 'btn-thr-100'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) b.classList.toggle('active', id === 'btn-thr-100');
+            });
+            ['btn-yaw-left', 'btn-yaw-right', 'btn-pitch-up', 'btn-pitch-down'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) b.classList.remove('active-actuator');
+            });
             
             for (let key in milestoneLatches) milestoneLatches[key] = false;
             for (let wp of MISSION_WAYPOINTS_OUTBOUND) wp.passed = false;
@@ -1105,7 +1202,107 @@
             showNavMsg(`AUTO-RAMP: Cruising to window at ${safeTarget}x`, 3000, "solid-green");
         });
         
-        function startManualBurn() { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; if(fuel > 0) { isBurning = true; autoPilotEngaged = false; autoBurnActive = false; const autoBtn = document.getElementById('btn-toggle-auto'); if (autoBtn) { autoBtn.textContent = "ENABLE AUTO TMI"; autoBtn.className = "caution-btn"; autoBtn.classList.remove('pulse-blue-glow'); } safeSetText('autopilot-status', "OFF", "danger"); const btnMcc = document.getElementById('btn-autopilot-mcc'); if (btnMcc) { btnMcc.style.visibility = 'hidden'; mccAutoCountdown = -1; } } }
+        function disengageAutopilotForManual(msg = "MANUAL OVERRIDE: PILOT CONTROLS ENGAGED") {
+            if (!autoPilotEngaged) return;
+            autoPilotEngaged = false;
+            autoBurnActive = false;
+            const autoBtn = document.getElementById('btn-toggle-auto');
+            if (autoBtn) {
+                autoBtn.className = 'caution-btn';
+                autoBtn.textContent = 'ENABLE AUTO TMI';
+                autoBtn.classList.remove('pulse-blue-glow');
+            }
+            safeSetText('autopilot-status', "OFF", "danger");
+            showNavMsg(msg, 3000, "flash-warning");
+        }
+
+        function setManualThrottle(pct) {
+            manualThrottlePct = Math.max(0.10, Math.min(1.0, pct));
+            const pctInt = Math.round(manualThrottlePct * 100);
+            const slider = document.getElementById('throttle-slider');
+            if (slider && Math.round(Number(slider.value)) !== pctInt) slider.value = String(pctInt);
+            ['25', '50', '100'].forEach(p => {
+                const b = document.getElementById(`btn-thr-${p}`);
+                if (b) b.classList.toggle('active', Number(p) === pctInt);
+            });
+        }
+
+        const btnKeyholeToggle = document.getElementById('btn-toggle-keyhole');
+        if (btnKeyholeToggle) {
+            btnKeyholeToggle.addEventListener('click', (e) => {
+                keyholeVisible = !keyholeVisible;
+                keyholeGroup.visible = keyholeVisible;
+                e.target.textContent = keyholeVisible ? "KEYHOLE: ON" : "KEYHOLE: OFF";
+                e.target.className = keyholeVisible ? "active safe-btn" : "";
+                showNavMsg(keyholeVisible ? "MISSION KEYHOLE RETICLE: VISIBLE" : "MISSION KEYHOLE RETICLE: HIDDEN", 2000, "nominal");
+            });
+        }
+
+        const btnManeuverToggle = document.getElementById('btn-toggle-maneuver');
+        if (btnManeuverToggle) {
+            btnManeuverToggle.addEventListener('click', (e) => {
+                maneuverDeckOpen = !maneuverDeckOpen;
+                const panel = document.getElementById('maneuver-submission-panel');
+                if (panel) panel.style.display = maneuverDeckOpen ? 'block' : 'none';
+                e.target.classList.toggle('active', maneuverDeckOpen);
+            });
+        }
+
+        function bindAttitudeButton(btnId, onHoldChange) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            const start = (e) => {
+                if (e.cancelable && e.type && e.type.startsWith('touch')) e.preventDefault();
+                disengageAutopilotForManual("MANUAL HELM: ATTITUDE RCS ENGAGED");
+                onHoldChange(true);
+                btn.classList.add('active-actuator');
+            };
+            const stop = () => {
+                onHoldChange(false);
+                if (!autoPilotEngaged) btn.classList.remove('active-actuator');
+            };
+            btn.addEventListener('pointerdown', start);
+            btn.addEventListener('pointerup', stop);
+            btn.addEventListener('pointercancel', stop);
+            btn.addEventListener('pointerleave', stop);
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('mouseup', stop);
+            btn.addEventListener('mouseleave', stop);
+            btn.addEventListener('touchstart', start, { passive: false });
+            btn.addEventListener('touchend', stop);
+        }
+        bindAttitudeButton('btn-yaw-left', (v) => { holdingYawLeft = v; });
+        bindAttitudeButton('btn-yaw-right', (v) => { holdingYawRight = v; });
+        bindAttitudeButton('btn-pitch-up', (v) => { holdingPitchUp = v; });
+        bindAttitudeButton('btn-pitch-down', (v) => { holdingPitchDown = v; });
+
+        const btnAutoAlign = document.getElementById('btn-auto-align');
+        if (btnAutoAlign) {
+            btnAutoAlign.addEventListener('click', () => {
+                shipYawOffsetDeg = targetYawOffsetDeg;
+                shipPitchOffsetDeg = targetPitchOffsetDeg;
+                showNavMsg("RCS AUTO-ALIGN: LOCKED TO MISSION KEYHOLE VECTOR", 2200, "solid-green");
+            });
+        }
+
+        const throttleSlider = document.getElementById('throttle-slider');
+        if (throttleSlider) {
+            throttleSlider.addEventListener('input', (e) => {
+                disengageAutopilotForManual("MANUAL THROTTLE: POWER OVERRIDE");
+                setManualThrottle(Number(e.target.value) / 100);
+            });
+        }
+        [[25, 'btn-thr-25'], [50, 'btn-thr-50'], [100, 'btn-thr-100']].forEach(([pct, id]) => {
+            const b = document.getElementById(id);
+            if (b) {
+                b.addEventListener('click', () => {
+                    disengageAutopilotForManual(`MANUAL THROTTLE: ${pct}% POWER`);
+                    setManualThrottle(pct / 100);
+                });
+            }
+        });
+
+        function startManualBurn() { cinematicActive = false; document.getElementById('cinematic-status').style.display = 'none'; if(fuel > 0) { isBurning = true; disengageAutopilotForManual("MANUAL BURN OVERRIDE: ENGINES FIRING"); } }
         function stopManualBurn() { isBurning = false; }
         
         // PRESS-AND-HOLD ATTITUDE TRIM & GIMBAL CONTROLS
@@ -1204,7 +1401,82 @@
             });
         });
 
-        const _aEarth = new THREE.Vector3(), _aMoon = new THREE.Vector3(), _dirMoon = new THREE.Vector3(), _moonPos = new THREE.Vector3(), _accel = new THREE.Vector3(), _nextAccel = new THREE.Vector3(), _thrustAcc = new THREE.Vector3(), _nextThrustAcc = new THREE.Vector3(), _totalAccel = new THREE.Vector3(), _nextTotalAccel = new THREE.Vector3(), _tempVec1 = new THREE.Vector3(), _tempVec2 = new THREE.Vector3(), _camDir = new THREE.Vector3(), _dirToMoon = new THREE.Vector3(), _lookTarget = new THREE.Vector3(), _burnDirVec = new THREE.Vector3();
+        const _aEarth = new THREE.Vector3(), _aMoon = new THREE.Vector3(), _dirMoon = new THREE.Vector3(), _moonPos = new THREE.Vector3(), _accel = new THREE.Vector3(), _nextAccel = new THREE.Vector3(), _thrustAcc = new THREE.Vector3(), _nextThrustAcc = new THREE.Vector3(), _totalAccel = new THREE.Vector3(), _nextTotalAccel = new THREE.Vector3(), _tempVec1 = new THREE.Vector3(), _tempVec2 = new THREE.Vector3(), _camDir = new THREE.Vector3(), _dirToMoon = new THREE.Vector3(), _lookTarget = new THREE.Vector3(), _burnDirVec = new THREE.Vector3(), _worldUp = new THREE.Vector3(0, 1, 0), _basisFwd = new THREE.Vector3(), _basisRight = new THREE.Vector3(), _basisUp = new THREE.Vector3(), _objDirVec = new THREE.Vector3(), _noseDirWorld = new THREE.Vector3(), _mccHVec = new THREE.Vector3(), _mccTransVec = new THREE.Vector3(), _mccTestVel = new THREE.Vector3(), _mccTestH = new THREE.Vector3();
+
+        function computeVelBasis(velVec) {
+            if (velVec.lengthSq() > 0) _basisFwd.copy(velVec).normalize();
+            else _basisFwd.set(0, 0, -1);
+            _basisRight.crossVectors(_basisFwd, _worldUp);
+            if (_basisRight.lengthSq() < 1e-8) _basisRight.set(1, 0, 0);
+            else _basisRight.normalize();
+            _basisUp.crossVectors(_basisRight, _basisFwd).normalize();
+        }
+
+        function computeNoseDirFromVel(velVec, yawDeg, pitchDeg, outVec) {
+            computeVelBasis(velVec);
+            if (Math.abs(yawDeg) < 1e-4 && Math.abs(pitchDeg) < 1e-4) {
+                return outVec.copy(_basisFwd);
+            }
+            const yRad = THREE.MathUtils.degToRad(yawDeg);
+            const pRad = THREE.MathUtils.degToRad(pitchDeg);
+            const cp = Math.cos(pRad), sp = Math.sin(pRad);
+            const cy = Math.cos(yRad), sy = Math.sin(yRad);
+            // Local (-cos(p)*sin(y), sin(p), -cos(p)*cos(y)) mapped into (+right, +orthoUp, -fwd)
+            return outVec
+                .copy(_basisRight).multiplyScalar(-cp * sy)
+                .addScaledVector(_basisUp, sp)
+                .addScaledVector(_basisFwd, cp * cy)
+                .normalize();
+        }
+
+        function computeTargetYawPitchFromObj(velVec, objDir) {
+            computeVelBasis(velVec);
+            const fwdComp = objDir.dot(_basisFwd);
+            const rightComp = objDir.dot(_basisRight);
+            const upComp = THREE.MathUtils.clamp(objDir.dot(_basisUp), -1, 1);
+            return {
+                yawDeg: THREE.MathUtils.radToDeg(Math.atan2(-rightComp, fwdComp)),
+                pitchDeg: THREE.MathUtils.radToDeg(Math.asin(upComp))
+            };
+        }
+
+        function solveReturnMccVector(outSolution) {
+            _mccHVec.crossVectors(shipPos, shipVel);
+            _mccTransVec.crossVectors(_mccHVec, shipPos);
+            if (_mccTransVec.lengthSq() < 1e-10) _mccTransVec.set(0, 0, 1);
+            else _mccTransVec.normalize();
+
+            const target_rp = radEarth + 40;
+            const h0 = _mccHVec.length();
+            const e0 = (shipVel.lengthSq() / 2) - (muEarth / shipPos.length());
+            let rp_0 = target_rp;
+            if (e0 < 0) {
+                const a0 = -muEarth / (2 * e0);
+                const ecc0 = Math.sqrt(Math.max(0, 1 + (2 * e0 * h0 * h0) / (muEarth * muEarth)));
+                rp_0 = a0 * (1 - ecc0);
+            }
+            const lowerPerigee = (rp_0 > target_rp);
+            if (lowerPerigee) _mccTransVec.negate();
+
+            let dV = 0;
+            const step = 0.0005;
+            for (let i = 0; i < 3000; i++) {
+                _mccTestVel.copy(shipVel).addScaledVector(_mccTransVec, dV);
+                const h_test = _mccTestH.crossVectors(shipPos, _mccTestVel).length();
+                const e_test = (_mccTestVel.lengthSq() / 2) - (muEarth / shipPos.length());
+                if (e_test >= 0) break;
+                const a_test = -muEarth / (2 * e_test);
+                const ecc_test = Math.sqrt(Math.max(0, 1 + (2 * e_test * h_test * h_test) / (muEarth * muEarth)));
+                const rp_test = a_test * (1 - ecc_test);
+                if (!lowerPerigee && rp_test >= target_rp) break;
+                if (lowerPerigee && rp_test <= target_rp) break;
+                dV += step;
+            }
+            outSolution.lowerPerigee = lowerPerigee;
+            outSolution.dV = dV;
+            outSolution.dir.copy(_mccTransVec);
+            return outSolution;
+        }
 
         function getAcceleration(pos, accelOut) {
             let rEarth = pos.length(); let magEarth = muEarth / (rEarth * rEarth); _aEarth.copy(pos).multiplyScalar(-muEarth / (rEarth * rEarth * rEarth));
@@ -1325,8 +1597,8 @@
                     mccEndedThisStep = true;
                 }
             } else if (isBurning && fuel > 0) { 
-                _burnDirVec.copy(shipVel).normalize();
-                let throttleScale = (typeof manualThrottlePct !== 'undefined' ? manualThrottlePct : 1.0);
+                computeNoseDirFromVel(shipVel, shipYawOffsetDeg, shipPitchOffsetDeg, _burnDirVec);
+                let throttleScale = manualThrottlePct;
                 let rawThrustAccMag = (thrustForce * throttleScale) / currentMass;
                 tliStepThrustAccMag = rawThrustAccMag;
                 let stepFraction = 1.0;
@@ -1337,7 +1609,10 @@
                 _thrustAcc.copy(_burnDirVec).multiplyScalar(tliStepThrustAccMag); 
                 fuel -= (massFlowRate * throttleScale * stepFraction * dt); 
                 if(fuel < 0) fuel = 0; 
-                currentGForce = tliStepThrustAccMag / 0.00980665; 
+                currentGForce = tliStepThrustAccMag / 0.00980665;
+                if (!autoPilotEngaged && activeMCCWaypoint) {
+                    manualMccAccumDv += tliStepThrustAccMag * dt * 1000;
+                }
             }
             
             if (isReentry) {
@@ -1407,7 +1682,9 @@
 
             shipGroup.position.copy(shipPos).multiplyScalar(renderScale);
             if (shipVel.lengthSq() > 0) {
-                _tempVec1.copy(shipVel).normalize(); _lookTarget.copy(shipGroup.position).sub(_tempVec1); shipGroup.lookAt(_lookTarget); 
+                _tempVec1.copy(shipVel).normalize(); _lookTarget.copy(shipGroup.position).sub(_tempVec1); shipGroup.lookAt(_lookTarget);
+                if (Math.abs(shipYawOffsetDeg) > 1e-4) shipGroup.rotateY(THREE.MathUtils.degToRad(shipYawOffsetDeg));
+                if (Math.abs(shipPitchOffsetDeg) > 1e-4) shipGroup.rotateX(THREE.MathUtils.degToRad(shipPitchOffsetDeg));
                 camera.rotation.order = 'YXZ'; camera.rotation.y = THREE.MathUtils.degToRad(lookLon); camera.rotation.x = THREE.MathUtils.degToRad(lookLat);
             }
             earth.rotation.y += 0.0000727 * dt;
@@ -1450,6 +1727,221 @@
                 for(let i=0; i<steps; i++) { telemetry = updatePhysics(dt_step); }
                 metSeconds += simSecondsToProcess;
                 celestialGroup.position.copy(shipGroup.position);
+                hudVectorGroup.position.copy(shipGroup.position);
+
+                // --- ACTIVE MISSION KEYHOLE VECTOR, PROGRADE COLORING & SUB-MISSION DECK ---
+                if (holdingYawLeft) shipYawOffsetDeg += 45.0 * dt_real;
+                if (holdingYawRight) shipYawOffsetDeg -= 45.0 * dt_real;
+                if (holdingPitchUp) shipPitchOffsetDeg += 45.0 * dt_real;
+                if (holdingPitchDown) shipPitchOffsetDeg -= 45.0 * dt_real;
+                if (shipYawOffsetDeg > 180) shipYawOffsetDeg -= 360;
+                if (shipYawOffsetDeg < -180) shipYawOffsetDeg += 360;
+                shipPitchOffsetDeg = THREE.MathUtils.clamp(shipPitchOffsetDeg, -85, 85);
+
+                let _velMagNow = shipVel.length();
+                let _rMagNow = shipPos.length();
+                let _altENow = _rMagNow - radEarth;
+                if (_velMagNow > 0) {
+                    _tempVec1.copy(shipVel).normalize();
+                    progradeMesh.position.copy(_tempVec1).multiplyScalar(3.0);
+                    progradeMesh.lookAt(shipGroup.position);
+                } else {
+                    _tempVec1.set(0, 0, -1);
+                }
+
+                // Compute live Mission Objective / Keyhole Target Vector & Delta-V Plan
+                let subObjLabel = "LEO PROGRADE";
+                let subReqDvMs = 0;
+                let subNeedsAdj = false;
+                let subWarnCorridor = false;
+                let subDangerCorridor = false;
+                _objDirVec.copy(_tempVec1);
+
+                if (!isReturningHome && !telemetry.isTliCoast && _altENow > 122) {
+                    subObjLabel = (isBurning || telemetry.timeToWindow < FLIGHT_TIMERS.tliApproachSlowdown) ? "TLI INJECTION KEYHOLE" : "LEO PROGRADE / TLI VECTOR";
+                    let a_tr = (radEarth + 400 + distMoon) / 2;
+                    let e_tr = -muEarth / (2 * a_tr);
+                    let dm_now = Math.max(1, shipPos.distanceTo(_moonPos));
+                    let v_tgt = Math.sqrt(Math.max(0, 2 * (e_tr + (muEarth / _rMagNow) + (muMoon / dm_now))));
+                    subReqDvMs = Math.max(0, (v_tgt - _velMagNow) * 1000);
+                    if (isBurning || telemetry.timeToWindow <= FLIGHT_TIMERS.tliApproachSlowdown) subNeedsAdj = true;
+                } else if (isMccBurning && mccBurnAccel.lengthSq() > 0) {
+                    _objDirVec.copy(mccBurnAccel).normalize();
+                    subObjLabel = isReturningHome ? "RETURN MCC (-6.5° KEYHOLE)" : "OUTBOUND MCC TRIM";
+                    subReqDvMs = mccBurnAccel.length() * mccBurnRemainingTime * 1000;
+                    subNeedsAdj = true;
+                } else if (activeMCCWaypoint) {
+                    if (isReturningHome) {
+                        solveReturnMccVector(cachedMccSolution);
+                        if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
+                        subObjLabel = cachedMccSolution.lowerPerigee ? "RETURN MCC (LOWER PERIGEE)" : "RETURN MCC (RAISE PERIGEE)";
+                        subReqDvMs = cachedMccSolution.dV * 1000;
+                    } else {
+                        subObjLabel = "OUTBOUND MCC (+50 m/s)";
+                        subReqDvMs = Math.max(0, 50.0 - manualMccAccumDv);
+                    }
+                    subNeedsAdj = true;
+                } else if (isReturningHome && _altENow > 122) {
+                    let h_c = _mccHVec.crossVectors(shipPos, shipVel).length();
+                    let en_c = (_velMagNow * _velMagNow / 2) - (muEarth / _rMagNow);
+                    if (en_c < 0) {
+                        let a_c = -muEarth / (2 * en_c);
+                        let ecc_c = Math.sqrt(Math.max(0, 1 + (2 * en_c * h_c * h_c) / (muEarth * muEarth)));
+                        let rp_c = a_c * (1 - ecc_c);
+                        let r_ei_c = radEarth + 122;
+                        if (rp_c > r_ei_c || rp_c < radEarth) {
+                            subDangerCorridor = true;
+                            solveReturnMccVector(cachedMccSolution);
+                            if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
+                            subReqDvMs = cachedMccSolution.dV * 1000;
+                            subObjLabel = "OFF-CORRIDOR RECOVERY";
+                        } else {
+                            let v_ei_c = Math.sqrt(2 * (en_c + (muEarth / r_ei_c)));
+                            let cos_g_c = h_c / (r_ei_c * v_ei_c);
+                            if (cos_g_c <= 1.0) {
+                                let g_deg = -Math.acos(cos_g_c) * (180 / Math.PI);
+                                if (g_deg <= -5.5 && g_deg >= -7.5) {
+                                    subObjLabel = "RE-ENTRY KEYHOLE (-6.5° NOMINAL)";
+                                } else if (g_deg < -4.5 && g_deg > -8.5) {
+                                    subWarnCorridor = true;
+                                    solveReturnMccVector(cachedMccSolution);
+                                    if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
+                                    subReqDvMs = cachedMccSolution.dV * 1000;
+                                    subObjLabel = "CORRIDOR FINE-TUNE";
+                                } else {
+                                    subDangerCorridor = true;
+                                    solveReturnMccVector(cachedMccSolution);
+                                    if (cachedMccSolution.dV > 0.0001) _objDirVec.copy(cachedMccSolution.dir);
+                                    subReqDvMs = cachedMccSolution.dV * 1000;
+                                    subObjLabel = "DANGER CORRIDOR ADJUST";
+                                }
+                            }
+                        }
+                    }
+                } else if (_altENow <= 122 && _altENow > 0) {
+                    subObjLabel = "ATMOSPHERIC CORRIDOR";
+                    if (telemetry.flightPathAngle > -4.5 || telemetry.flightPathAngle < -8.5) subDangerCorridor = true;
+                    else if (telemetry.flightPathAngle > -5.5 || telemetry.flightPathAngle < -7.5) subWarnCorridor = true;
+                } else if (telemetry.isTliCoast) {
+                    subObjLabel = distM <= 60000 ? "LUNAR FLYBY TRAJECTORY" : "TRANS-LUNAR COAST";
+                }
+
+                // Target Yaw/Pitch offsets needed for nose to point directly into _objDirVec
+                const tgtAtt = computeTargetYawPitchFromObj(shipVel, _objDirVec);
+                targetYawOffsetDeg = tgtAtt.yawDeg;
+                targetPitchOffsetDeg = tgtAtt.pitchDeg;
+
+                if (autoPilotEngaged && _altENow > 122) {
+                    let sY = targetYawOffsetDeg - shipYawOffsetDeg;
+                    if (sY > 180) sY -= 360;
+                    if (sY < -180) sY += 360;
+                    shipYawOffsetDeg = Math.abs(sY) < 0.08 ? targetYawOffsetDeg : shipYawOffsetDeg + sY * Math.min(1.0, 4.0 * dt_real);
+                    let sP = targetPitchOffsetDeg - shipPitchOffsetDeg;
+                    shipPitchOffsetDeg = Math.abs(sP) < 0.08 ? targetPitchOffsetDeg : shipPitchOffsetDeg + sP * Math.min(1.0, 4.0 * dt_real);
+                    if (manualThrottlePct !== 1.0) setManualThrottle(1.0);
+                }
+
+                computeNoseDirFromVel(shipVel, shipYawOffsetDeg, shipPitchOffsetDeg, _noseDirWorld);
+                let noseAlignErrDeg = THREE.MathUtils.radToDeg(_noseDirWorld.angleTo(_objDirVec));
+                let deltaYawDeg = targetYawOffsetDeg - shipYawOffsetDeg;
+                if (deltaYawDeg > 180) deltaYawDeg -= 360;
+                if (deltaYawDeg < -180) deltaYawDeg += 360;
+                let deltaPitchDeg = targetPitchOffsetDeg - shipPitchOffsetDeg;
+
+                // Position Mission Keyhole Reticle
+                keyholeGroup.visible = keyholeVisible && (_altENow > 0);
+                keyholeGroup.position.copy(_objDirVec).multiplyScalar(3.15);
+                keyholeGroup.lookAt(shipGroup.position);
+
+                // Re-apply nose rotation immediately before world matrix sync for pixel-accurate crosshair/raycast
+                if (_velMagNow > 0 && _altENow > 0) {
+                    _tempVec1.copy(shipVel).normalize();
+                    _lookTarget.copy(shipGroup.position).sub(_tempVec1);
+                    shipGroup.lookAt(_lookTarget);
+                    if (Math.abs(shipYawOffsetDeg) > 1e-4) shipGroup.rotateY(THREE.MathUtils.degToRad(shipYawOffsetDeg));
+                    if (Math.abs(shipPitchOffsetDeg) > 1e-4) shipGroup.rotateX(THREE.MathUtils.degToRad(shipPitchOffsetDeg));
+                }
+                shipGroup.updateMatrixWorld(true);
+                hudVectorGroup.updateMatrixWorld(true);
+
+                // Determine Prograde Vector Red / Yellow / Green Alignment Color
+                let alignColorHex = 0x00ff66; // GREEN
+                let alignStatusText = "GREEN (NOMINAL)";
+                let alignCssClass = "nominal solid-green";
+                if (subDangerCorridor || noseAlignErrDeg > 8.0 || (subNeedsAdj && !isBurning && !isMccBurning && subReqDvMs > 0.5 && noseAlignErrDeg > 2.5)) {
+                    alignColorHex = 0xff3333; // RED
+                    alignStatusText = subDangerCorridor ? "RED (OFF-CORRIDOR)" : "RED (ADJUST REQ)";
+                    alignCssClass = "danger solid-red";
+                } else if (subWarnCorridor || noseAlignErrDeg > 2.5 || isBurning || isMccBurning || subNeedsAdj) {
+                    alignColorHex = 0xffcc00; // YELLOW
+                    alignStatusText = (isBurning || isMccBurning) ? "YELLOW (EXECUTING)" : "YELLOW (CLOSE / ARMED)";
+                    alignCssClass = "caution solid-yellow";
+                }
+                progradeMat.color.setHex(alignColorHex);
+                pgLineMat.color.setHex(alignColorHex);
+                noseMat.color.setHex(noseAlignErrDeg <= 2.5 ? 0x00ff66 : (noseAlignErrDeg <= 8.0 ? 0xffcc00 : 0x00ffff));
+                keyholeRingMat.color.setHex(subNeedsAdj ? 0xffaa00 : 0xffd24c);
+
+                // Check Manual Pilot MCC completion during manual burns
+                if (!autoPilotEngaged && isBurning && !isMccBurning && activeMCCWaypoint) {
+                    if ((isReturningHome && !subDangerCorridor && !subWarnCorridor) || (!isReturningHome && manualMccAccumDv >= 48.0)) {
+                        logEvent(`MANUAL MCC COMPLETE: ${activeMCCWaypoint.name} achieved by pilot.`);
+                        activeMCCWaypoint = null;
+                        manualMccAccumDv = 0;
+                        mccAutoCountdown = -1;
+                        const btnMccDone = document.getElementById('btn-autopilot-mcc');
+                        if (btnMccDone) { btnMccDone.style.display = 'none'; btnMccDone.className = ''; }
+                        showNavMsg("MANUAL MCC COMPLETE: TRAJECTORY NOMINAL 🟢", 4000, "nominal");
+                    }
+                }
+
+                // Update Trajectory Correction Sub-Mission HUD Deck
+                const subModeEl = document.getElementById('sub-mode-badge');
+                if (subModeEl) {
+                    subModeEl.textContent = autoPilotEngaged ? "AUTO COMPUTER" : "MANUAL HELM";
+                    subModeEl.className = autoPilotEngaged ? "nominal" : "caution";
+                }
+                safeSetText('vec-align-badge', alignStatusText, alignCssClass);
+                const objNameEl = document.getElementById('vec-objective-name');
+                if (objNameEl) objNameEl.textContent = subObjLabel;
+
+                let turnParts = [];
+                if (Math.abs(deltaYawDeg) > 0.8) turnParts.push(deltaYawDeg > 0 ? `◀ LEFT ${deltaYawDeg.toFixed(1)}°` : `▶ RIGHT ${Math.abs(deltaYawDeg).toFixed(1)}°`);
+                if (Math.abs(deltaPitchDeg) > 0.8) turnParts.push(deltaPitchDeg > 0 ? `▲ UP ${deltaPitchDeg.toFixed(1)}°` : `▼ DOWN ${Math.abs(deltaPitchDeg).toFixed(1)}°`);
+                const turnText = turnParts.length > 0 ? turnParts.join(' | ') : `ALIGNED (Δ ${noseAlignErrDeg.toFixed(1)}°)`;
+                const turnClass = turnParts.length === 0 ? "nominal" : (noseAlignErrDeg <= 8.0 ? "caution" : "danger");
+                safeSetText('vec-turn-cue', turnText, turnClass);
+
+                // Illuminate D-pad buttons automatically when autopilot slews nose
+                if (autoPilotEngaged) {
+                    const yL = document.getElementById('btn-yaw-left'), yR = document.getElementById('btn-yaw-right');
+                    const pU = document.getElementById('btn-pitch-up'), pD = document.getElementById('btn-pitch-down');
+                    if (yL) yL.classList.toggle('active-actuator', deltaYawDeg > 1.0);
+                    if (yR) yR.classList.toggle('active-actuator', deltaYawDeg < -1.0);
+                    if (pU) pU.classList.toggle('active-actuator', deltaPitchDeg > 1.0);
+                    if (pD) pD.classList.toggle('active-actuator', deltaPitchDeg < -1.0);
+                }
+
+                const curThrPct = Math.round(manualThrottlePct * 100);
+                safeSetText('throttle-readout', `${curThrPct}% (TARGET: ${subNeedsAdj || isBurning ? '100%' : curThrPct + '%'})`, curThrPct === 100 ? "nominal" : "caution");
+
+                let reqBurnSec = 0;
+                let burnProgressPct = 0;
+                if (isMccBurning) {
+                    reqBurnSec = mccBurnRemainingTime;
+                    burnProgressPct = 100 * (1 - (mccBurnRemainingTime / Math.max(0.01, mccBurnDuration)));
+                } else if (subReqDvMs > 0.05) {
+                    const mNow = shipEmptyMass + fuel;
+                    const dVKms = subReqDvMs / 1000;
+                    const massNeeded = mNow * (1 - Math.exp(-dVKms / exhaustVel));
+                    reqBurnSec = massNeeded / Math.max(0.001, massFlowRate * manualThrottlePct);
+                    if (isBurning && initialTargetBurnTime > 0) {
+                        burnProgressPct = Math.min(100, (actualBurnTime / initialTargetBurnTime) * 100);
+                    }
+                }
+                safeSetText('sub-dv-readout', `ΔV ${subReqDvMs.toFixed(1)} m/s • ${reqBurnSec.toFixed(1)}s @ ${curThrPct}%`, subReqDvMs > 1.0 ? (isBurning ? "caution" : "nominal") : "nominal");
+                const progEl = document.getElementById('sub-burn-progress');
+                if (progEl) progEl.style.width = `${Math.max(0, Math.min(100, burnProgressPct)).toFixed(1)}%`;
                 
                 if (distM < globalMinMoonDist && distM > 0) globalMinMoonDist = distM;
                 
@@ -1469,15 +1961,16 @@
                         if (timeWarp > 30 || targetWarp > 30) { shiftWarp(30); }
                         tliAutoCountdown -= dt_real;
                         let remaining = Math.max(0, Math.ceil(tliAutoCountdown));
-                        showNavMsg(`AUTO-ALIGNMENT IN ${remaining}s`, 1000, "flash-warning");
+                        showNavMsg(autoPilotEngaged ? `AUTO-ALIGNMENT IN ${remaining}s` : `MANUAL TLI WINDOW READY (${remaining}s)`, 1000, "flash-warning");
                         const mccBtn = document.getElementById('btn-autopilot-mcc');
                         if (mccBtn) {
                             mccBtn.style.display = 'block';
                             mccBtn.className = "caution-btn pulse-blue-glow";
-                            mccBtn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${remaining}s)`;
+                            mccBtn.textContent = autoPilotEngaged ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `COMPUTER ASSIST TLI`;
                         }
                         if (tliAutoCountdown <= 0) {
-                            alignAndIgniteTLI();
+                            if (autoPilotEngaged) alignAndIgniteTLI();
+                            else tliAutoCountdown = -999;
                         }
                     }
                 }
@@ -1488,15 +1981,15 @@
                     if (mccAutoCountdown > 0) {
                         mccAutoCountdown -= dt_real;
                         let remaining = Math.max(0, Math.ceil(mccAutoCountdown));
-                        showNavMsg(`AUTO-CORRECTION IN ${remaining}s`, 1000, "flash-warning");
+                        showNavMsg(autoPilotEngaged ? `AUTO-CORRECTION IN ${remaining}s` : `MANUAL MCC READY — ALIGN KEYHOLE & THRUST`, 1000, "flash-warning");
                         const mccBtn = document.getElementById('btn-autopilot-mcc');
                         if (mccBtn) { 
                             mccBtn.style.display = 'block';
                             mccBtn.className = "caution-btn pulse-blue-glow"; 
-                            mccBtn.textContent = (autoPilotEngaged || autoWarpEnabled) ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `EXECUTE TRAJECTORY ALIGNMENT (${remaining}s)`; 
+                            mccBtn.textContent = autoPilotEngaged ? `EXECUTE AUTO-ALIGNMENT (${remaining}s)` : `COMPUTER ASSIST MCC`; 
                         }
                     } else if (mccAutoCountdown <= 0 && mccAutoCountdown > -1) {
-                        executeAutopilotBurn();
+                        if (autoPilotEngaged) executeAutopilotBurn();
                     }
                 } else if ((tliAutoCountdown <= 0 && tliAutoCountdown !== -1) || isBurning) {
                     const mccBtn = document.getElementById('btn-autopilot-mcc');
@@ -1514,10 +2007,11 @@
                     lookLat = THREE.MathUtils.lerp(lookLat, THREE.MathUtils.radToDeg(Math.asin(localTarget.y)), 0.05);
                 }
 
-                raycaster.setFromCamera(centerScreen, camera); const intersects = raycaster.intersectObjects([earth, moon, sunMesh, progradeMesh]); const popup = document.getElementById('target-popup');
+                raycaster.setFromCamera(centerScreen, camera); const rayTargets = [earth, moon, sunMesh, progradeMesh]; if (keyholeGroup.visible) rayTargets.push(keyholeHitMesh); const intersects = raycaster.intersectObjects(rayTargets); const popup = document.getElementById('target-popup');
                 if (intersects.length > 0 && !isDraggingView) {
                     let target = intersects[0].object; currentTargetObj = target; 
-                    if (target.name === "PROGRADE VECTOR") { safeSetText('target-name', "PROGRADE VECTOR"); safeSetText('target-dist', "Velocity Heading"); safeSetText('target-hint', "Ship travels in this direction."); if (popup) popup.style.display = 'block'; } 
+                    if (target.name === "PROGRADE VECTOR") { safeSetText('target-name', `PROGRADE VECTOR (${alignStatusText})`); safeSetText('target-dist', `Δ ${noseAlignErrDeg.toFixed(1)}° from Keyhole`); safeSetText('target-hint', "True instantaneous velocity vector."); if (popup) popup.style.display = 'block'; }
+                    else if (target.name === "MISSION KEYHOLE VECTOR") { safeSetText('target-name', `KEYHOLE: ${subObjLabel}`); safeSetText('target-dist', `ΔV ${subReqDvMs.toFixed(1)} m/s`); safeSetText('target-hint', turnText); if (popup) popup.style.display = 'block'; }
                     else if (target.name) {
                         let tDist = shipPos.distanceTo(target.position.clone().divideScalar(renderScale)); safeSetText('target-name', target.name);
                         if(target.name === "THE MOON") { safeSetText('target-dist', Math.round(tDist - radMoon).toLocaleString() + " km"); safeSetText('target-hint', telemetry.isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn."); } 
@@ -1875,8 +2369,8 @@
                 if (burnActualEl) { burnActualEl.textContent = actualBurnTime.toFixed(1) + " s"; if (isBurning) { let ratio = actualBurnTime / (initialTargetBurnTime || 145.0); burnActualEl.className = ratio < 0.8 ? "flash-red" : "flash-yellow"; } else if (telemetry.isTliCoast) { burnActualEl.className = (metSeconds - burnEndTime < 5) ? "flash-green" : "solid-green"; } else { burnActualEl.className = "nominal"; } }
 
                 const itinTli = document.getElementById('itin-tli'); const itinCoast = document.getElementById('itin-coast'); const tliEstEl = document.getElementById('tli-est-time'); const tliEtaEl = document.getElementById('tli-eta');
-                if(telemetry.isTliCoast) { if (itinTli) { itinTli.className = "complete"; if (!itinTli.dataset.done) { itinTli.innerHTML = `[X] TLI Burn Complete`; itinTli.dataset.done = "true"; } } if (itinCoast) itinCoast.className = "active"; if (tliEtaEl) { let etaSeconds = distM / Math.max(0.1, shipVel.length()); tliEtaEl.textContent = formatTime(etaSeconds); } progradeMat.color.setHex(0x00ff00); } 
-                else { if (itinTli) { itinTli.className = "active"; if (itinTli.dataset.done) { itinTli.innerHTML = `[ ] TLI Burn (Target: <span id="tli-est-time">${Math.ceil(telemetry.estimatedBurnTime)}</span>s)`; delete itinTli.dataset.done; } } if (tliEstEl) tliEstEl.textContent = Math.ceil(telemetry.estimatedBurnTime); progradeMat.color.setHex(isBurning ? 0xffff00 : 0x00ffff); }
+                if(telemetry.isTliCoast) { if (itinTli) { itinTli.className = "complete"; if (!itinTli.dataset.done) { itinTli.innerHTML = `[X] TLI Burn Complete`; itinTli.dataset.done = "true"; } } if (itinCoast) itinCoast.className = "active"; if (tliEtaEl) { let etaSeconds = distM / Math.max(0.1, shipVel.length()); tliEtaEl.textContent = formatTime(etaSeconds); } } 
+                else { if (itinTli) { itinTli.className = "active"; if (itinTli.dataset.done) { itinTli.innerHTML = `[ ] TLI Burn (Target: <span id="tli-est-time">${Math.ceil(telemetry.estimatedBurnTime)}</span>s)`; delete itinTli.dataset.done; } } if (tliEstEl) tliEstEl.textContent = Math.ceil(telemetry.estimatedBurnTime); }
 
                 if (telemetry.isTliCoast && !isReturningHome) { safeSetText('window-timer', "N/A (EN ROUTE)", "nominal"); } 
                 else if (isReturningHome && altE > 122) { safeSetText('window-timer', `ATMO ENTRY IN: ${(altE - 122).toFixed(0)} km`, "nominal"); }
@@ -1989,6 +2483,7 @@
             userSelectedWarp = null;
             shiftWarp(1);
             activeMCCWaypoint = waypoint;
+            manualMccAccumDv = 0;
             mccAutoCountdown = (autoPilotEngaged || autoWarpEnabled) ? FLIGHT_TIMERS.mccAutoAlignDelay : FLIGHT_TIMERS.mccCountdownManual;
             const btn = document.getElementById('btn-autopilot-mcc');
             if (btn) {
@@ -2034,40 +2529,11 @@
             }
             let altE = shipPos.length() - radEarth;
             
-            if (isReturningHome) {
-                let h_vec = new THREE.Vector3().crossVectors(shipPos, shipVel);
-                let transverseDir = new THREE.Vector3().crossVectors(h_vec, shipPos).normalize();
-                
-                let target_rp = radEarth + 40;
-                // Evaluate initial perigee rp_0 prior to burn
-                let h0 = h_vec.length();
-                let e0 = (shipVel.lengthSq() / 2) - (muEarth / shipPos.length());
-                let rp_0 = target_rp;
-                if (e0 < 0) {
-                    let a0 = -muEarth / (2 * e0);
-                    let ecc0 = Math.sqrt(Math.max(0, 1 + (2 * e0 * h0 * h0) / (muEarth * muEarth)));
-                    rp_0 = a0 * (1 - ecc0);
-                }
-                // Bidirectional search: if trajectory is too shallow (rp_0 > target_rp), burn in -transverseDir
-                let lowerPerigee = (rp_0 > target_rp);
-                if (lowerPerigee) {
-                    transverseDir.negate();
-                }
-
-                let dV = 0;
-                let step = 0.0005;
-                for (let i = 0; i < 3000; i++) {
-                    let testVel = shipVel.clone().add(transverseDir.clone().multiplyScalar(dV));
-                    let h_test = new THREE.Vector3().crossVectors(shipPos, testVel).length();
-                    let e_test = (testVel.lengthSq() / 2) - (muEarth / shipPos.length());
-                    if (e_test >= 0) break;
-                    let a_test = -muEarth / (2 * e_test);
-                    let ecc_test = Math.sqrt(Math.max(0, 1 + (2 * e_test * h_test * h_test) / (muEarth * muEarth)));
-                    let rp_test = a_test * (1 - ecc_test);
-                    if (!lowerPerigee && rp_test >= target_rp) break;
-                    if (lowerPerigee && rp_test <= target_rp) break;
-                    dV += step;
-                }
+                if (isReturningHome) {
+                solveReturnMccVector(cachedMccSolution);
+                let lowerPerigee = cachedMccSolution.lowerPerigee;
+                let dV = cachedMccSolution.dV;
+                let transverseDir = cachedMccSolution.dir.clone();
                 
                 let m0 = shipEmptyMass + fuel; 
                 let fuelConsumed = m0 * (1 - Math.exp(-dV / exhaustVel));
@@ -2075,6 +2541,7 @@
                 mccBurnRemainingTime = mccBurnDuration;
                 mccBurnAccel.copy(transverseDir).multiplyScalar(dV / mccBurnDuration);
                 mccFuelRate = fuelConsumed / mccBurnDuration;
+                manualMccAccumDv = 0;
                 isMccBurning = true;
                 isBurning = true;
                 logEvent(`MCC IGNITION: Return Trajectory Alignment (${lowerPerigee ? '-' : '+'}${dV.toFixed(4)} km/s Transverse over ${mccBurnDuration}s). Target Perigee: 40km. Fuel: ~${fuelConsumed.toFixed(1)}kg. Alt: ${altE.toFixed(0)}km.`);

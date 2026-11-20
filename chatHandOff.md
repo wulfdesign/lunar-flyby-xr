@@ -1,14 +1,25 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.32-dev)
-> *Artemis: The Free Return | Fin Fest Showcase Prep, 1:1 Lunar Tidal Locking, Real Astronomical Starfield & Live Task Dashboard*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.35-dev — Finster / Fin Fest Update 🐾)
+> *Artemis: The Free Return | Finster / Fin Fest Edition: 5-Point Physics Remediation, Solar G2V Corona, OpNav Wiki & Trajectory Sub-Mission HUD*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.32-dev`) • PRODUCTION `sim.html` UNTOUCHED AT `v2.1.19` BASELINE • 29/29 E2E TESTS PASSING** 🚀🌕✨🎛️
+**Status:** **DEV STAGING UPGRADED (`v2.1.35-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED AT `v2.1.19` BASELINE • 29/29 E2E TESTS + FULL-FLIGHT REGRESSION PASSING** 🚀🌕✨🐾🎯
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.32-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.1.35-dev)
+1. **Launch Memories & Finster / Fin Fest Shelter Pledge (`private/LAUNCH_MEMORIES.md`):**
+   - Recorded the Two Tears of Artemis (reclaiming the citizen space dream + `⭐ SIRIUS (α CMa) — Apollo Nav Star #18 • The Dog Star — In Honor of Fin 🐾`) and the pledge to donate a portion of future Early Adopter / Early Access purchases to the local animal shelter in Fin's honor; crystallized into Symbiot Memory Substrate (`finster_fin_fest_tribute_and_openspace_dream_genesis.md`).
+2. **5-Point Physics & Flight Computer Remediation (`v2.1.33-dev`):**
+   - Reset outbound/return waypoint `.passed` flags in `resetMission()`; enforced `0.01s` burn substep + exact `dvRequired` MECO clamping (`0.000000` energy overshoot); upgraded Return MCC solver (`solveReturnMccVector`) to bidirectional `±transverseDir` + `<= 30x` warp clamp; symmetrically clamped final MCC substep across both Verlet half-steps; and fixed symplectic lunar ephemeris ordering between $\mathbf{a}(t)$ and $\mathbf{a}(t + \Delta t)$.
+3. **Option A Solar G2V Corona & Celestial OpNav Wiki (`v2.1.34-dev`):**
+   - Upgraded `sunMesh` to warm `0xfff5cc` + $256 \times 256$ multi-stop golden corona & 12-streamer additive sprite (`THREE.AdditiveBlending`).
+   - Added Celestial Optical Navigation (OpNav / Space Sextant triangulation & future minigame roadmap) to `docs/physics.html#celestial-opnav` and `docs/celestial_navigation.md`.
+   - Empirically confirmed live by Magus Wulf (`v2.1.34-dev`): Moon facing/lighting (`v2.1.30-dev`), Starfield (`v2.1.31-dev`), and Sun corona look great!
+4. **Red/Yellow/Green Prograde Alignment, Toggleable Mission Keyhole & Trajectory Correction Sub-Mission HUD (`v2.1.35-dev`):**
+   - Decoupled `progradeMesh` into world-tracked `hudVectorGroup`, added cyan `noseHeadingMesh` + toggleable diamond **Mission Keyhole Vector (`keyholeGroup`, `#btn-toggle-keyhole`)**, dynamically colored prograde **Green / Yellow / Red** by alignment & corridor status, and built `#maneuver-submission-panel` (turn cues + RCS D-pad, `10%–100%` Thrust Power slider/presets, and $\Delta v$/burn duration bar) operating live in hands-off Autopilot and interactively in Manual Helm.
+   - Verified `0.000000°` spherical attitude round-trip, full cislunar regression (`1,557.67 km` perilune, `12.24 G` peak, `0.00 m/s` splashdown), and `29/29` E2E tests passing.
 1. **Lunar 1:1 Tidal Locking & Anti-Washout Crater Relief (`v2.1.30-dev` in `private/dev_site/sim.html` & `dev/index.html`):**
    - Applied `moon.rotation.y = Math.PI - moonAngle` in `resetMission()` and `updatePhysics(dt)` so the Lunar Near Side (`u = 0.5` maria) permanently faces Earth while the cratered Far Side greets the perilune pass.
    - Calibrated `moonMat` (`color: 0xb8b8b4`, `roughness: 0.96`, `bumpMap: tex`, `bumpScale: 0.012`) and balanced scene lighting (`sunLight: 1.35`, `AmbientLight: 0x282c38`) to prevent white wash-out on lunar approach.
