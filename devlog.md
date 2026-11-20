@@ -6,6 +6,23 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 18:04] - v2.1.40-dev: Pre-MCC Return Gating & 4-Stage Atmospheric Re-Entry & Landing Sub-Mission Deck 🔥🪂🌊**
+
+📝 **Summary**
+1. **Pre-MCC Cislunar Return Transit Gating (`isReturnCorridorActive`):**
+   - Diagnosed why `Entry:` / `Corr:` flashed red `TOO STEEP (CRASH)` / `DANGER: FATAL DESCENT` immediately upon exiting Lunar SOI (~`320,000 km`): the 2-body Earth-only Keplerian perigee check evaluated prior to the scheduled Return MCC checkpoints (`192,200 km` & `42,164 km`) while lunar gravity was still perturbing the return vector.
+   - Gated the corridor projection via `isReturnCorridorActive = (altE <= 36000) || (activeMCCWaypoint !== null) || isMccBurning || MISSION_WAYPOINTS_RETURN[1].passed`, displaying `Entry: PENDING MCC`, `Corr: CISLUNAR RETURN`, and a **Green** prograde vector until Return MCC alignment or final approach.
+2. **4-Stage Atmospheric Re-Entry & Landing Sub-Mission Deck (`#reentry-controls`):**
+   - Eliminated false post-plasma `LETHAL DESCENT (USE LIFT)` warnings below `35 km` (where steep freefall / chute flight paths are healthy and no longer bounded by the `-5.5°..-7.5°` hypersonic skip corridor).
+   - Upgraded `#reentry-controls` with `#reentry-sub-title`, `#reentry-sub-badge` (`AUTO GIMBAL` / `MANUAL TRIM`), and `#reentry-next-goal` stepping through: (1) `🔥 ATMOSPHERIC RE-ENTRY` (`122 → 35 km`), (2) `🪂 LANDING SUB-MISSION` post-plasma Safe Zone (`CAPTURED (SAFE)` / `SAFE • DROGUES @ 7.3km`), (3) Drogue Descent (`DROGUES OUT (SAFE)` / `SAFE • MAINS @ 3.0km`), (4) `🌊 SPLASHDOWN SUB-MISSION` (`MAINS (9.0 m/s)` / `SAFE • SPLASHDOWN <15m/s`), and Ocean Touchdown (`SPLASHDOWN (SAFE)` / `MISSION ACCOMPLISHED`).
+3. **End-to-End Stage Audit & Live Browser Verification (`v2.1.40-dev`):**
+   - `verify_v2140_reentry.js` passed across all 7 stages (`earlyReturn` -> `finalApproach -6.29°` -> `plasmaEntry` -> `postPlasmaSafe` -> `drogueStage` -> `mainChuteStage 12.8 m/s` -> `splashdown 9.0 m/s`); `verify_v2135_steering.js` and `29/29` E2E tests passed.
+   - Live browser on Port `3550` (`1280×720`) confirmed `0` console/WebGL/network errors across all NASA textures (`earthMat.onBeforeCompile` shader + `moon_lro_4k.jpg` lazy-load), crisp ocean glint + dark-side night lights across Earth's terminator at `14.0x`, and `.panel.desktop-bottom-right` at `497 px` tall (`sim.html` production untouched).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 17:57] - v2.1.39-dev: NASA LRO/LOLA Moon, Visible Earth Ocean Specular / Night Lights Shader, Mobile-Safe `2K/4K` LOD & Credits 🌍🌕🌃**
 
 📝 **Summary**

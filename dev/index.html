@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.39-dev • Fin Fest Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.40-dev • Fin Fest Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none; }
         canvas { display: block; cursor: grab; }
@@ -226,7 +226,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.39-dev (Fin Fest 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.40-dev (Fin Fest 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -355,26 +355,34 @@
                         <div id="sub-burn-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ffff, #44ff44); transition: width 0.1s linear;"></div>
                     </div>
                 </div>
-                <div id="reentry-controls" style="display:none; flex-direction: column; width: 100%; margin-top: 6px;">
+                <div id="reentry-controls" style="display:none; flex-direction: column; width: 100%; margin-top: 5px; padding: 6px 8px; background: rgba(0, 25, 45, 0.72); border: 1px solid rgba(0, 255, 255, 0.45); border-radius: 6px; box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; border-bottom: 1px solid rgba(0,255,255,0.25); padding-bottom: 2px;">
+                        <span id="reentry-sub-title" style="font-size: 0.70rem; font-weight: bold; color: #00ffff; letter-spacing: 0.5px;">🔥 ATMOSPHERIC RE-ENTRY</span>
+                        <span id="reentry-sub-badge" class="nominal" style="font-size: 0.62rem; padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; line-height: 14px;">AUTO GIMBAL</span>
+                    </div>
+                    <div class="kv" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; height: 15px; line-height: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden;">
+                        <span class="tooltip" title="Current atmospheric phase status and next safe landing milestone.">Next Goal:</span>
+                        <span id="reentry-next-goal" class="nominal" style="overflow: hidden; text-overflow: ellipsis;">HOLD -6.5° → SAFE ZONE @ 35 KM</span>
+                    </div>
                     <!-- Dynamic Attitude Trim & Bank Vector Gauge (Zero-Jump Fixed Height Rows) -->
-                    <div id="bank-gauge-container" style="width: 100%; margin-bottom: 6px; background: rgba(0, 30, 50, 0.5); padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(0, 255, 255, 0.3); box-sizing: border-box;">
-                        <p style="margin: 0 0 4px 0; font-size: 0.70rem; height: 15px; line-height: 15px; display: flex; justify-content: space-between; white-space: nowrap; overflow: hidden;">
+                    <div id="bank-gauge-container" style="width: 100%; margin-bottom: 5px; background: rgba(0, 20, 38, 0.55); padding: 5px 7px; border-radius: 5px; border: 1px solid rgba(0, 255, 255, 0.25); box-sizing: border-box;">
+                        <p style="margin: 0 0 3px 0; font-size: 0.69rem; height: 15px; line-height: 15px; display: flex; justify-content: space-between; white-space: nowrap; overflow: hidden;">
                             <span class="tooltip" title="Capsule aerodynamic lift vector. Vectoring controlled via offset Center of Gravity (CoG) gimbaling / roll trim. See /docs/physics.html#aerodynamic-lift">Attitude Trim:</span>
                             <span id="bank-angle-text" class="nominal" style="overflow: hidden; text-overflow: ellipsis;">0° [NEUTRAL]</span>
                         </p>
-                        <div style="position: relative; width: 100%; height: 11px; border-radius: 6px; background: linear-gradient(to right, #ff4444 0%, #ffff44 22%, #44ff44 42%, #44ff44 58%, #ffff44 78%, #ff4444 100%); border: 1px solid rgba(0,255,255,0.4); box-sizing: border-box; overflow: hidden;">
+                        <div style="position: relative; width: 100%; height: 10px; border-radius: 6px; background: linear-gradient(to right, #ff4444 0%, #ffff44 22%, #44ff44 42%, #44ff44 58%, #ffff44 78%, #ff4444 100%); border: 1px solid rgba(0,255,255,0.4); box-sizing: border-box; overflow: hidden;">
                             <div id="bank-target-notch" style="position: absolute; top: 0; bottom: 0; width: 3px; background: #ffffff; box-shadow: 0 0 6px #fff; transform: translateX(-50%); left: 50%;" title="Computer Target Trim"></div>
                             <div id="bank-gauge-needle" style="position: absolute; top: 0; bottom: 0; width: 6px; background: #00ffff; border: 1px solid #000; box-shadow: 0 0 8px #00ffff; transform: translateX(-50%); left: 50%;" title="Current Attitude"></div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.60rem; color: #888; margin-top: 2px; height: 12px; line-height: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.58rem; color: #888; margin-top: 2px; height: 11px; line-height: 11px;">
                             <span>-90° (DIVE)</span>
                             <span>0° (NEUTRAL)</span>
                             <span>+90° (MAX LIFT)</span>
                         </div>
                     </div>
                     <div class="controls" style="margin-top: 0; gap: 6px;">
-                        <button id="btn-lift-up" class="safe-btn" style="padding: 6px 8px; font-size: 0.72rem;" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (-Gs)</button>
-                        <button id="btn-lift-down" class="danger-btn" style="padding: 6px 8px; font-size: 0.72rem;" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (+DRAG)</button>
+                        <button id="btn-lift-up" class="safe-btn" style="padding: 5px 8px; font-size: 0.70rem;" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift UP (Reduces G-Force, Shallows descent)">BANK UP (-Gs)</button>
+                        <button id="btn-lift-down" class="danger-btn" style="padding: 5px 8px; font-size: 0.70rem;" title="Press and hold to gimbal/roll capsule to direct aerodynamic lift DOWN (Increases drag, Steepens descent)">BANK DOWN (+DRAG)</button>
                     </div>
                 </div>
             </div>
@@ -388,7 +396,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.39";
+        const SIM_VERSION = "2.1.40";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -2278,46 +2286,58 @@
                     }
                     subNeedsAdj = true;
                 } else if (isReturningHome && _altENow > 122) {
-                    let h_c = _mccHVec.crossVectors(shipPos, shipVel).length();
-                    let en_c = (_velMagNow * _velMagNow / 2) - (muEarth / _rMagNow);
-                    if (en_c < 0) {
-                        let a_c = -muEarth / (2 * en_c);
-                        let ecc_c = Math.sqrt(Math.max(0, 1 + (2 * en_c * h_c * h_c) / (muEarth * muEarth)));
-                        let rp_c = a_c * (1 - ecc_c);
-                        let r_ei_c = radEarth + 122;
-                        if (rp_c > r_ei_c || rp_c < radEarth) {
-                            subDangerCorridor = true;
-                            const mccSol = getCachedReturnMccSolution(false);
-                            if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
-                            subReqDvMs = mccSol.dV * 1000;
-                            subObjLabel = "OFF-CORRIDOR RECOVERY";
-                        } else {
-                            let v_ei_c = Math.sqrt(2 * (en_c + (muEarth / r_ei_c)));
-                            let cos_g_c = h_c / (r_ei_c * v_ei_c);
-                            if (cos_g_c <= 1.0) {
-                                let g_deg = -Math.acos(cos_g_c) * (180 / Math.PI);
-                                if (g_deg <= -5.5 && g_deg >= -7.5) {
-                                    subObjLabel = "RE-ENTRY KEYHOLE (-6.5° NOMINAL)";
-                                } else if (g_deg < -4.5 && g_deg > -8.5) {
-                                    subWarnCorridor = true;
-                                    const mccSol = getCachedReturnMccSolution(false);
-                                    if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
-                                    subReqDvMs = mccSol.dV * 1000;
-                                    subObjLabel = "CORRIDOR FINE-TUNE";
-                                } else {
-                                    subDangerCorridor = true;
-                                    const mccSol = getCachedReturnMccSolution(false);
-                                    if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
-                                    subReqDvMs = mccSol.dV * 1000;
-                                    subObjLabel = "DANGER CORRIDOR ADJUST";
+                    const isReturnCorridorActive = (_altENow <= 36000) || (activeMCCWaypoint !== null) || isMccBurning || (MISSION_WAYPOINTS_RETURN[1] && MISSION_WAYPOINTS_RETURN[1].passed);
+                    if (!isReturnCorridorActive) {
+                        subObjLabel = "CISLUNAR RETURN COAST";
+                    } else {
+                        let h_c = _mccHVec.crossVectors(shipPos, shipVel).length();
+                        let en_c = (_velMagNow * _velMagNow / 2) - (muEarth / _rMagNow);
+                        if (en_c < 0) {
+                            let a_c = -muEarth / (2 * en_c);
+                            let ecc_c = Math.sqrt(Math.max(0, 1 + (2 * en_c * h_c * h_c) / (muEarth * muEarth)));
+                            let rp_c = a_c * (1 - ecc_c);
+                            let r_ei_c = radEarth + 122;
+                            if (rp_c > r_ei_c || rp_c < radEarth) {
+                                subDangerCorridor = true;
+                                const mccSol = getCachedReturnMccSolution(false);
+                                if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                                subReqDvMs = mccSol.dV * 1000;
+                                subObjLabel = "OFF-CORRIDOR RECOVERY";
+                            } else {
+                                let v_ei_c = Math.sqrt(2 * (en_c + (muEarth / r_ei_c)));
+                                let cos_g_c = h_c / (r_ei_c * v_ei_c);
+                                if (cos_g_c <= 1.0) {
+                                    let g_deg = -Math.acos(cos_g_c) * (180 / Math.PI);
+                                    if (g_deg <= -5.5 && g_deg >= -7.5) {
+                                        subObjLabel = "RE-ENTRY KEYHOLE (-6.5° NOMINAL)";
+                                    } else if (g_deg < -4.5 && g_deg > -8.5) {
+                                        subWarnCorridor = true;
+                                        const mccSol = getCachedReturnMccSolution(false);
+                                        if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                                        subReqDvMs = mccSol.dV * 1000;
+                                        subObjLabel = "CORRIDOR FINE-TUNE";
+                                    } else {
+                                        subDangerCorridor = true;
+                                        const mccSol = getCachedReturnMccSolution(false);
+                                        if (mccSol.dV > 0.0001) _objDirVec.copy(mccSol.dir);
+                                        subReqDvMs = mccSol.dV * 1000;
+                                        subObjLabel = "DANGER CORRIDOR ADJUST";
+                                    }
                                 }
                             }
                         }
                     }
                 } else if (_altENow <= 122 && _altENow > 0) {
-                    subObjLabel = "ATMOSPHERIC CORRIDOR";
-                    if (telemetry.flightPathAngle > -4.5 || telemetry.flightPathAngle < -8.5) subDangerCorridor = true;
-                    else if (telemetry.flightPathAngle > -5.5 || telemetry.flightPathAngle < -7.5) subWarnCorridor = true;
+                    const isPostPlasmaSafe = reentrySweetSpotReached || (_altENow <= 35) || (_velMagNow < 1.2) || milestoneLatches.drogues;
+                    if (isPostPlasmaSafe) {
+                        if (_altENow <= 3.0) subObjLabel = "MAIN CHUTES (TOUCHDOWN)";
+                        else if (_altENow <= 7.3) subObjLabel = "DROGUE DESCENT (MAINS @ 3KM)";
+                        else subObjLabel = "SAFE ZONE (DROGUES @ 7.3KM)";
+                    } else {
+                        subObjLabel = "ATMOSPHERIC CORRIDOR";
+                        if (telemetry.flightPathAngle > -4.5 || telemetry.flightPathAngle < -8.5) subDangerCorridor = true;
+                        else if (telemetry.flightPathAngle > -5.5 || telemetry.flightPathAngle < -7.5) subWarnCorridor = true;
+                    }
                 } else if (telemetry.isTliCoast) {
                     subObjLabel = distM <= 60000 ? "LUNAR FLYBY TRAJECTORY" : "TRANS-LUNAR COAST";
                 }
@@ -2557,8 +2577,11 @@
                 let energy = (v_mag * v_mag / 2) - (muEarth / r_mag); let r_ei = radEarth + 122;
                 
                 let projEntryText = "N/A"; let projEntryColor = "nominal"; let corridorStatus = "AWAITING TLI"; let corridorColor = "nominal";
+                const isReturnCorridorActive = isReturningHome && ((altE <= 36000) || (activeMCCWaypoint !== null) || isMccBurning || (MISSION_WAYPOINTS_RETURN[1] && MISSION_WAYPOINTS_RETURN[1].passed));
                 
-                if (energy < 0 && isReturningHome && altE > 122) { 
+                if (isReturningHome && altE > 122 && !isReturnCorridorActive) {
+                    projEntryText = "PENDING MCC"; projEntryColor = "nominal"; corridorStatus = "CISLUNAR RETURN"; corridorColor = "nominal";
+                } else if (energy < 0 && isReturningHome && altE > 122) { 
                     let a = -muEarth / (2 * energy); let ecc = Math.sqrt(Math.max(0, 1 + (2 * energy * h_mag * h_mag) / (muEarth * muEarth))); let rp = a * (1 - ecc); 
                     
                     if (rp > r_ei) { projEntryText = "TOO SHALLOW (SKIP OUT)"; projEntryColor = "danger solid-red"; corridorStatus = "DANGER: SKIP OUT"; corridorColor = "danger solid-red"; } 
@@ -2574,10 +2597,30 @@
                         }
                     }
                 } else if (altE <= 122 && altE > 0) {
-                    projEntryText = telemetry.flightPathAngle.toFixed(2) + "°";
-                    if (telemetry.flightPathAngle <= -5.5 && telemetry.flightPathAngle >= -7.5) { projEntryColor = "nominal"; corridorStatus = "LOCKED IN CORRIDOR"; corridorColor = "nominal"; } 
-                    else if (telemetry.flightPathAngle < -4.5 && telemetry.flightPathAngle > -8.5) { projEntryColor = "caution"; corridorStatus = "UNSAFE ANGLE (USE LIFT)"; corridorColor = "caution"; } 
-                    else { projEntryColor = "danger"; corridorStatus = "LETHAL DESCENT (USE LIFT)"; corridorColor = "danger"; }
+                    const isPostPlasmaSafe = reentrySweetSpotReached || (altE <= 35) || (v_mag < 1.2) || milestoneLatches.drogues;
+                    if (isPostPlasmaSafe) {
+                        if (altE <= 3.0) {
+                            projEntryText = `MAINS (${(v_mag * 1000).toFixed(1)} m/s)`; projEntryColor = "nominal solid-green";
+                            corridorStatus = "SAFE • SPLASHDOWN <15m/s"; corridorColor = "nominal solid-green";
+                        } else if (altE <= 7.3) {
+                            projEntryText = "DROGUES OUT (SAFE)"; projEntryColor = "nominal solid-green";
+                            corridorStatus = "SAFE • MAINS @ 3.0km"; corridorColor = "nominal solid-green";
+                        } else {
+                            projEntryText = "CAPTURED (SAFE)"; projEntryColor = "nominal solid-green";
+                            corridorStatus = "SAFE • DROGUES @ 7.3km"; corridorColor = "nominal solid-green";
+                        }
+                    } else {
+                        projEntryText = telemetry.flightPathAngle.toFixed(2) + "°";
+                        if (telemetry.flightPathAngle <= -5.5 && telemetry.flightPathAngle >= -7.5) { projEntryColor = "nominal"; corridorStatus = "LOCKED IN CORRIDOR"; corridorColor = "nominal"; } 
+                        else if (telemetry.flightPathAngle < -4.5 && telemetry.flightPathAngle > -8.5) { projEntryColor = "caution"; corridorStatus = "UNSAFE ANGLE (USE LIFT)"; corridorColor = "caution"; } 
+                        else { projEntryColor = "danger"; corridorStatus = "STEEP/SHALLOW (USE LIFT)"; corridorColor = "danger"; }
+                    }
+                } else if (altE <= 0) {
+                    const isSplashSafe = (maxGForce < 15 && v_mag * 1000 < 15);
+                    projEntryText = isSplashSafe ? "SPLASHDOWN (SAFE)" : "IMPACT (UNSAFE)";
+                    projEntryColor = isSplashSafe ? "nominal solid-green" : "danger solid-red";
+                    corridorStatus = isSplashSafe ? "MISSION ACCOMPLISHED" : "HARD LANDING";
+                    corridorColor = isSplashSafe ? "nominal solid-green" : "danger solid-red";
                 } else if (!isReturningHome && telemetry.isTliCoast) { corridorStatus = "EN ROUTE TO MOON"; corridorColor = "nominal"; }
 
                 safeSetText('entry-angle', projEntryText, projEntryColor);
@@ -2626,7 +2669,7 @@
                             reentrySweetSpotReached = true;
                         }
 
-                        if (reentrySweetSpotReached) {
+                        if (reentrySweetSpotReached || altE <= 35 || shipVel.length() < 1.2 || milestoneLatches.drogues) {
                             // Sweet spot reached: stabilize wings level, extinguish actuator pulses, cease adjustments
                             commandedTargetBank = 0;
                             capsuleBankAngle = THREE.MathUtils.lerp(capsuleBankAngle, 0, Math.min(1.0, 2.5 * dt_real));
@@ -2672,6 +2715,29 @@
                         if (!isHoldingLiftDown && btnDown) btnDown.classList.remove('active-actuator');
                     }
 
+                    // Update Atmospheric Re-Entry & Recovery Sub-Mission Deck
+                    const reSubBadge = document.getElementById('reentry-sub-badge');
+                    if (reSubBadge) {
+                        reSubBadge.textContent = autoPilotEngaged ? "AUTO GIMBAL" : "MANUAL TRIM";
+                        reSubBadge.className = autoPilotEngaged ? "nominal" : "caution";
+                    }
+                    if (reentrySweetSpotReached || altE <= 35 || shipVel.length() < 1.2 || milestoneLatches.drogues) {
+                        if (altE <= 3.0) {
+                            safeSetText('reentry-sub-title', "🌊 SPLASHDOWN SUB-MISSION");
+                            safeSetText('reentry-next-goal', `SAFE DESCENT (${(shipVel.length() * 1000).toFixed(1)} m/s) → TOUCHDOWN @ 0.0 KM`, "nominal solid-green");
+                        } else if (altE <= 7.3) {
+                            safeSetText('reentry-sub-title', "🪂 LANDING SUB-MISSION");
+                            safeSetText('reentry-next-goal', "DROGUES STABLE → MAIN CHUTES @ 3.0 KM", "nominal");
+                        } else {
+                            safeSetText('reentry-sub-title', "🪂 LANDING SUB-MISSION");
+                            safeSetText('reentry-next-goal', "SAFE ZONE (0° LEVEL) → DROGUES @ 7.3 KM", "nominal");
+                        }
+                    } else {
+                        safeSetText('reentry-sub-title', "🔥 ATMOSPHERIC RE-ENTRY");
+                        const inPlasma = (altE < 120 && altE > 40 && shipVel.length() > 5.0);
+                        safeSetText('reentry-next-goal', "HOLD -6.5° & G<12G → SAFE ZONE @ 35 KM", inPlasma ? "caution" : "nominal");
+                    }
+
                     // Update visual attitude trim gauge
                     const gaugeNeedle = document.getElementById('bank-gauge-needle');
                     const gaugeNotch = document.getElementById('bank-target-notch');
@@ -2689,7 +2755,7 @@
                         let sign = capsuleBankAngle >= 0 ? '+' : '';
                         let modeText = "NEUTRAL";
                         let colorClass = "nominal";
-                        if (reentrySweetSpotReached) {
+                        if (reentrySweetSpotReached || altE <= 35 || shipVel.length() < 1.2 || milestoneLatches.drogues) {
                             modeText = "SWEET SPOT (LEVEL)";
                             colorClass = "nominal";
                         } else if (capsuleBankAngle > 20) {
@@ -2927,15 +2993,18 @@
                         guideEl.textContent = (maxGForce < 15 && shipVel.length() * 1000 < 15) ? "MISSION ACCOMPLISHED: CREW SECURE" : "MISSION FAILED: FATAL IMPACT";
                         guideEl.className = (maxGForce < 15 && shipVel.length() * 1000 < 15) ? "nominal" : "danger";
                     } else if (altE < 122) {
-                        if (altE > 40 && shipVel.length() > 5.0) {
+                        if (altE <= 3.0) {
+                            guideEl.textContent = "SAFE ZONE: MAIN CHUTES LOCKED • AWAITING SPLASHDOWN";
+                            guideEl.className = "nominal solid-green";
+                        } else if (altE <= 7.3) {
+                            guideEl.textContent = "SAFE ZONE: DROGUES OUT • NEXT: MAINS @ 3.0 KM";
+                            guideEl.className = "nominal";
+                        } else if (reentrySweetSpotReached || altE <= 35 || shipVel.length() < 1.2) {
+                            guideEl.textContent = "SAFE ZONE REACHED: AWAITING DROGUES (7.3 KM)";
+                            guideEl.className = "nominal";
+                        } else if (altE > 40 && shipVel.length() > 5.0) {
                             guideEl.textContent = `PLASMA BLACKOUT: HOLDING ENTRY (${telemetry.flightPathAngle.toFixed(1)}°)`;
                             guideEl.className = "danger flash-red";
-                        } else if (altE <= 3.0) {
-                            guideEl.textContent = "PARACHUTES: MAIN CHUTES DEPLOYED";
-                            guideEl.className = "nominal";
-                        } else if (altE <= 7.3) {
-                            guideEl.textContent = "PARACHUTES: DROGUE CHUTES DEPLOYED";
-                            guideEl.className = "caution";
                         } else {
                             guideEl.textContent = `ATMOSPHERIC GUIDANCE: BANK ${Math.round(capsuleBankAngle)}° (${telemetry.flightPathAngle.toFixed(1)}°)`;
                             guideEl.className = "caution";

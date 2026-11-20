@@ -1,14 +1,18 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.39-dev — Finster / Fin Fest Update 🐾)
-> *Artemis: The Free Return | NASA LRO/LOLA Moon & Earth Ocean/Night Shader, Telescopic 5 Planets, Bulletproof Mouse Look & 3D Hover, Zero-Scroll HUD*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.40-dev — Finster / Fin Fest Update 🐾)
+> *Artemis: The Free Return | 4-Stage Atmospheric Re-Entry Sub-Mission, NASA LRO/LOLA Moon & Earth Ocean/Night Shader, Telescopic 5 Planets, Bulletproof Mouse Look & 3D Hover*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.39-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • NASA LRO/EARTH TEXTURES & LOD ACTIVE • 29/29 TESTS PASSING** 🚀🌕✨🐾🌍🌃
+**Status:** **DEV STAGING UPGRADED (`v2.1.40-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • 4-STAGE RE-ENTRY SUB-MISSION & NASA SHADERS VERIFIED • 29/29 TESTS PASSING** 🚀🌕✨🐾🔥🪂
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.39-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.1.40-dev)
+- **Pre-MCC Return Gating & 4-Stage Atmospheric Re-Entry & Landing Sub-Mission Deck (`v2.1.40-dev` — Ready for QA 🧪):**
+  - Gated early return 2-body perigee warnings (`PENDING MCC` / `CISLUNAR RETURN`, Green prograde vector) until active Return MCC (`192,200 km` / `42,164 km`) or `< 36,000 km` final approach.
+  - Upgraded `#reentry-controls` (`altE <= 122 km`) into a progressive 4-stage Safe-Zone Sub-Mission Deck (`🔥 ATMOSPHERIC RE-ENTRY` $\to$ `🪂 LANDING SUB-MISSION` post-plasma Safe Zone $\to$ Drogue Chutes `7.3 km` $\to$ `🌊 SPLASHDOWN SUB-MISSION` Main Chutes `3.0 km` $\to$ `SPLASHDOWN (SAFE)` / `MISSION ACCOMPLISHED`), eliminating false `LETHAL DESCENT (USE LIFT)` warnings below `35 km`.
+  - Passed 7-checkpoint flight audit (`verify_v2140_reentry.js`), `29/29` E2E tests, and live Chromium WebGL verification (`0` console/shader/network errors; Earth ocean glint + dark-side night lights across terminator; Moon `4K` lazy LOD swap).
 - **NASA LRO/LOLA Moon, Visible Earth Ocean/Night Shader & Mobile-Safe `2K/4K` LOD (`v2.1.39-dev` — Ready for QA 🧪):**
   - Bundled offline NASA SVS #4720 *CGI Moon Kit* (`moon_lro_2k.jpg`, `moon_lro_4k.jpg`, `moon_lola_bump_2k.jpg`) and Visible Earth / *Black Marble* maps (`earth_day_2k.jpg`, `earth_roughness_2k.jpg`, `earth_topo_bump_2k.jpg`, `earth_night_2k.jpg`) in `textures/` & `dev/textures/`.
   - Added solar-terminator-masked dark-side city lights (`earthMat.onBeforeCompile`), ocean specular / matte landmass roughness, 16× anisotropy, `updatePlanetaryTextureLOD()` (`2K/1K` cap on mobile/Quest vs. `4K` close-body swap on desktop), and NASA credits in `docs/physics.html#nasa-credits`, `README.md`, and `LICENSE_RATIONALE.md`.
