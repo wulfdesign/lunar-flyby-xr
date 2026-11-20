@@ -13,6 +13,7 @@ Features:
   - GET  /api/checklist   -> Serves private/checklist_status.json
   - POST /api/checklist   -> Persists checklist state atomically to disk
   - GET  /api/tasks       -> Parses Tasks.md and private/privTasks.md live task ledgers
+  - GET  /api/docs        -> Discovers & returns all public, docs, and private Markdown codex files
   - POST /api/task-action -> Toggles checkboxes, promotes to QA, or confirms QA to COMPLETED.md
   - POST /api/promote     -> Executes promote(dry_run=False) in-process
   - POST /api/rollback    -> Restores public index.html from baseline backup
@@ -39,7 +40,7 @@ if sys.platform == "win32":
         pass
 
 PORT = 3550
-SERVER_VERSION = "2.2.0"
+SERVER_VERSION = "2.2.1"
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 PRIVATE_DIR = os.path.join(ROOT_DIR, "private")
 CHECKLIST_FILE = os.path.join(PRIVATE_DIR, "checklist_status.json")
@@ -285,6 +286,91 @@ def handle_task_action(payload):
 
     return {"ok": True, "tasks": get_all_tasks_payload()}
 
+DOCS_PRIORITY_ORDER = [
+    "README.md",
+    "Tasks.md",
+    "devlog.md",
+    "chatHandOff.md",
+    "COMPLETED.md",
+    "LICENSE_RATIONALE.md",
+    "LICENSE.md",
+    "private/privTasks.md",
+    "private/privDevLog.md",
+    "private/chatHandOff.md",
+    "private/LAUNCH_MEMORIES.md",
+    "private/GOOGLE_FORM_SETUP_GUIDE.md",
+    "private/privCompleted.md",
+    "private/business_model.md",
+    "private/philosophy.md",
+    "private/founders.md",
+    "docs/celestial_navigation.md",
+    "docs/ArtemisII.md",
+    "docs/ArtemisII_Telemetry_Notes.md",
+    "docs/credits.md"
+]
+
+def _classify_doc_scope(rel_path):
+    norm = rel_path.replace("\\", "/")
+    if norm.startswith("private/"):
+        return "private"
+    if norm.startswith("docs/") or norm.startswith("snapshots/") or norm.startswith("session-handoff/") or norm.startswith("archive/") or norm.startswith(".agents/"):
+        return "docs"
+    return "public"
+
+def _extract_markdown_title(content, fallback_name):
+    for line in content.splitlines():
+        s = line.strip()
+        if s.startswith("#"):
+            title = re.sub(r"^#+\s*", "", s).strip()
+            if title:
+                return title
+    return fallback_name
+
+def get_all_docs_payload():
+    priority_map = {path: idx for idx, path in enumerate(DOCS_PRIORITY_ORDER)}
+    docs = []
+    counts = {"total": 0, "public": 0, "private": 0, "docs": 0}
+
+    for dirpath, dirnames, filenames in os.walk(ROOT_DIR):
+        dirnames[:] = [d for d in dirnames if d not in (".git", "node_modules", "__pycache__")]
+        for fname in filenames:
+            if not fname.lower().endswith(".md"):
+                continue
+            full_path = os.path.join(dirpath, fname)
+            rel_path = os.path.relpath(full_path, ROOT_DIR).replace("\\", "/")
+            scope = _classify_doc_scope(rel_path)
+            try:
+                stat = os.stat(full_path)
+                with open(full_path, "r", encoding="utf-8", errors="replace") as f:
+                    content = f.read()
+                title = _extract_markdown_title(content, fname)
+                line_count = len(content.splitlines())
+                docs.append({
+                    "id": rel_path,
+                    "name": fname,
+                    "rel_path": rel_path,
+                    "scope": scope,
+                    "title": title,
+                    "size_bytes": stat.st_size,
+                    "modified_at": datetime.fromtimestamp(stat.st_mtime).isoformat(timespec="seconds"),
+                    "line_count": line_count,
+                    "content": content
+                })
+                counts["total"] += 1
+                counts[scope] = counts.get(scope, 0) + 1
+            except Exception as exc:
+                sys.stderr.write(f"Warning: could not read markdown {rel_path}: {exc}\n")
+
+    docs.sort(key=lambda d: (priority_map.get(d["rel_path"], 9999), 0 if d["scope"] == "public" else 1 if d["scope"] == "private" else 2, d["rel_path"].lower()))
+
+    return {
+        "ok": True,
+        "version": SERVER_VERSION,
+        "counts": counts,
+        "docs": docs,
+        "updated_at": datetime.now().isoformat()
+    }
+
 class LunarServerHandler(http.server.SimpleHTTPRequestHandler):
     extensions_map = http.server.SimpleHTTPRequestHandler.extensions_map.copy()
     extensions_map.update({
@@ -320,6 +406,20 @@ class LunarServerHandler(http.server.SimpleHTTPRequestHandler):
         if clean_path == "/api/tasks":
             try:
                 payload = get_all_tasks_payload()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8"))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": False, "error": str(e)}).encode("utf-8"))
+            return
+        if clean_path == "/api/docs":
+            try:
+                payload = get_all_docs_payload()
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Access-Control-Allow-Origin", "*")

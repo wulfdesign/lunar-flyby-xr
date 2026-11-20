@@ -148,12 +148,12 @@ class TestPublicRootProtection(unittest.TestCase):
                 )
 
     def test_root_index_sim_version_nominal(self):
-        """Root sim.html must run production v2.2.0 Fin Fest Edition and archive must retain v2.1.19."""
+        """Root sim.html must run production v2.2.1 Fin Fest Edition and archive must retain v2.1.19."""
         root_sim = os.path.join(LUNAR_ROOT, "sim.html")
         tour_archive = os.path.join(LUNAR_ROOT, "sim_v2.1.19_showcase_2026.html")
         with open(root_sim, "r", encoding="utf-8", errors="replace") as f:
             content = f.read()
-        self.assertIn("const SIM_VERSION = \"2.2.0\";", content)
+        self.assertIn("const SIM_VERSION = \"2.2.1\";", content)
         self.assertIn("const IS_DEV = false;", content)
         self.assertIn("updateAstronomicalEphemeris", content)
         self.assertIn("moon_lro_2k.jpg", content)
@@ -766,6 +766,7 @@ class TestPromotionAndServer(unittest.TestCase):
         required_endpoints = [
             "/api/checklist",
             "/api/tasks",
+            "/api/docs",
             "/api/task-action",
             "/api/promote",
             "/api/rollback"
@@ -816,6 +817,8 @@ class TestPromotionAndServer(unittest.TestCase):
             "assert 'items' in server.DEFAULT_CHECKLIST and hasattr(server.LunarServerHandler, 'do_GET')\n"
             "tasks = server.get_all_tasks_payload()\n"
             "assert tasks['counts']['qa'] >= 1 and len(tasks['items']) >= 10, 'Expected live Tasks.md items'\n"
+            "docs = server.get_all_docs_payload()\n"
+            "assert docs['ok'] and docs['counts']['public'] >= 3 and docs['counts']['private'] >= 3, 'Expected public & private docs in /api/docs'\n"
             "print('LIVE_API_CHECKLIST_AND_TASKS_OK')\n"
         )
 

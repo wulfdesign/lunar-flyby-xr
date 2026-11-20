@@ -6,6 +6,23 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 18:51] - v2.2.1: Calibrated Saturn/Planet Angular Scales vs. Moon & Public/Private Markdown Codex Hub (`private/dev_dashboard`) 🪐📚✨**
+
+📝 **Summary**
+1. **Calibrated Saturn & Planetary Angular Scales Relative to the Moon (`private/dev_site/sim.html`, `sim.html`, `dev/index.html`):**
+   - Diagnosed why Saturn behind the Moon appeared oversized at `14.0x` zoom (`NAV_PLANETS_CATALOG` set Saturn's `teleScale: 1,220,000` at `SKY_RADIUS * 0.98 = 49,000,000`, making the ring billboard subtend `~1.18°` vs. the Moon's real `0.518°` angular diameter from LEO).
+   - Recalibrated `nakedScale` and `teleScale` across all 5 naked-eye planets (`Saturn: 220,000 -> 310,000`, `Jupiter: 210,000 -> 280,000`, `Venus: 190,000 -> 210,000`, `Mars: 175,000 -> 195,000`, `Mercury: 160,000 -> 175,000`) and increased the `updatePlanetZoomScales(fov)` `5°–10°` boost factor to `1.35x`, so Saturn's rings (`~40–45 px` / `~0.28–0.31°` at `14.0x`) stay crisp and distinct while remaining strictly smaller than the Moon (`~84 px` / `~0.58°` observed in transit).
+2. **Public & Private Markdown Project Management Hub ([`private/dev_dashboard/index.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/private/dev_dashboard/index.html) & [`server.py`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/server.py)):**
+   - Upgraded `server.py` (`SERVER_VERSION = "2.2.1"`) with `GET /api/docs` (`get_all_docs_payload`) discovering and returning all Markdown files across Public Root (`8 PUBLIC`), Private Vault (`44 PRIVATE`), and Technical/Archives (`17 DOCS`).
+   - Built the **📚 Project Documentation & Markdown Codex (Public & Private Vault)** section inside `private/dev_dashboard/index.html` (modeled after the Master Symbiot Observatory dashboard) with scope filter tabs, pinned quick-open shortcuts, full-text search, clickable intra-project `.md` links, `Raw Source` / GFM rendered view toggle, and 1-click Markdown copy. Scoped `#category-filter-bar .filter-btn` cleanly so checklist filters don't interfere with task/codex tabs.
+3. **Roadmap Sync & Verification (`v2.2.1`):**
+   - Added **`🧠 Project-Local Dual-Tier Memory Substrate (private/memory/ — Public & Private Knowledge Graph)`** to [`Tasks.md`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/Tasks.md) & [`private/privTasks.md`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/private/privTasks.md) and noted Magus Wulf's live confirmation of Earth Night Lights (`v2.1.39-dev`).
+   - Verified `node --check`, `verify_v2135_steering.js`, `verify_v2140_reentry.js`, `29/29` E2E tests (`tests/test_staging_and_portal.py`), untouched `sim_v2.1.19_showcase_2026.html` (`SHA-256: 5ecfaa50...`), and live Chromium QA on Port `3550` (`0` console/WebGL/network errors; zero `git push`).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 18:28] - v2.2.0: Fin Fest – Dog Star Edition Release — Real-Time UTC Epoch & J2000 Ephemeris, Soft Ocean Sheen, 2026 Tour Archive & Production Promotion 🚀🐾🌌**
 
 📝 **Summary**

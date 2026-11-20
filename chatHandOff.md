@@ -1,14 +1,18 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.2.0 — Fin Fest – Dog Star Edition 🐾)
-> *Artemis: The Free Return | Live UTC J2000 Ephemeris, Soft Ocean Glint & NASA Night Lights, Telescopic 5 Planets, 4-Stage Re-Entry Sub-Mission & 2026 Tour Archive*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.2.1 — Fin Fest – Dog Star Edition 🐾)
+> *Artemis: The Free Return | Calibrated Saturn/Moon Scale, Public/Private Markdown Dev Codex (`/api/docs`), Live UTC J2000 Ephemeris, Soft Ocean Glint & 2026 Tour Archive*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **LOCAL PRODUCTION PROMOTED (`v2.2.0` Fin Fest – Dog Star Edition `sim.html` / `index.html`) • 2026 TOUR ARCHIVED AT `sim_v2.1.19_showcase_2026.html` • 29/29 TESTS PASSING • ZERO `git push`** 🚀🌕✨🐾🌌
+**Status:** **LOCAL PRODUCTION PROMOTED (`v2.2.1` Fin Fest – Dog Star Edition `sim.html` / `index.html`) • DEV CODEX `/api/docs` LIVE • 2026 TOUR ARCHIVED AT `sim_v2.1.19_showcase_2026.html` • 29/29 TESTS PASSING • ZERO `git push`** 🚀🌕✨🐾📚
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.2.0)
+## ✅ Alchemical Victories (v2.1.25 – v2.2.1)
+- **Saturn/Planet Angular Calibration vs. Moon & Public/Private Markdown Codex Hub (`v2.2.1` — Ready for Final Operator QA 🧪):**
+  - **Calibrated Planetary Scale (`NAV_PLANETS_CATALOG`):** Scaled Saturn (`220k -> 310k`, `1.35x` boost at `14.0x / FOV 5°`) and Jupiter/Venus/Mars/Mercury so Saturn's rings (`~40–45 px` / `~0.28–0.31°` at `14.0x`) appear crisp and strictly smaller than the Moon (`~84 px` / `~0.58°` in transit).
+  - **Dev Studio Public & Private Markdown Codex (`private/dev_dashboard/index.html` & `server.py` `v2.2.1`):** Added `GET /api/docs` indexing `8 PUBLIC`, `44 PRIVATE`, and `17 DOCS` Markdown files into a Master Symbiot-inspired browser/reader panel with pinned shortcuts (`README.md`, `Tasks.md`, `devlog.md`, `privTasks.md`, `privDevLog.md`, `LAUNCH_MEMORIES.md`), scope tabs, instant search, intra-doc links, and Raw/Rendered toggle.
+  - **Roadmap & Promotion:** Added **`🧠 Project-Local Dual-Tier Memory Substrate (private/memory/)`** to `Tasks.md` / `private/privTasks.md`; noted operator QA confirmation of Earth Night Lights (`v2.1.39-dev`); promoted `v2.2.1` cleanly with `29/29` E2E tests and live Chromium QA (`0` console/WebGL/network errors).
 - **Fin Fest – Dog Star Edition (`v2.2.0`), Live J2000 Ephemeris, Soft Ocean Reflection & 2026 Tour Archive (Ready for Final Operator QA 🧪):**
   - **Soft Ocean Glint:** Corrected `earthMat.onBeforeCompile` to `meshphysical_frag`, remapped `earth_roughness_2k.jpg` oceans to `0.53` (`135/255`) / land to `0.95`, set `metalness: 0.0`, and scaled `directSpecular * 0.25`.
   - **Live UTC Epoch & J2000 Astronomical Ephemeris (`updateAstronomicalEphemeris`):** Added `#epoch-utc-time` HUD timestamp + log epochs and real-time J2000 solar/Earth-GMST/lunar/planetary Keplerian ephemeris advancing cleanly over `MET` (confirmed live Saturn `RA 00h 32m, Dec +0.6°, 8.78 AU` and accurate Asia/Pacific terminator lighting at `07:32 UTC`).
