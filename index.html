@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Artemis: The Free Return | Mission Control Briefing &amp; Flight Deck (v2.2.1 • Fin Fest – Dog Star Edition)</title>
+  <title>Artemis: The Free Return | Mission Control Briefing &amp; Flight Deck (v2.1.19 Prod • v2.2.2-dev Preview)</title>
   <meta name="description" content="Mission Control Briefing Terminal for Artemis: The Free Return (Lunar Flyby XR). 800,000 km cislunar trajectory powered by real-time Newtonian N-body physics, Vis-viva energy equations, and active aerodynamic reentry in WebXR.">
   <style>
     :root {
@@ -890,7 +890,7 @@
       </a>
       <div class="status-pill">
         <span class="pulse-dot"></span>
-        <span>TELEMETRY ONLINE // v2.2.1 (FIN FEST • DOG STAR 🐾)</span>
+        <span>PROD v2.1.19 &bull; DEV PREVIEW v2.2.2-dev (FIN FEST • DOG STAR 🐾)</span>
       </div>
       <div class="nav-links">
         <a href="#briefing">Briefing</a>
@@ -936,11 +936,14 @@
 
       <!-- Hero Call-to-Action Buttons -->
       <div class="hero-cta-grid">
-        <a href="sim.html" class="btn-launch-primary btn-launch-sim" id="btn-launch-hero">
-          🚀 Launch v2.2.1 (Fin Fest • Dog Star 🐾)
+        <a href="sim.html" class="btn-launch-primary btn-launch-sim" id="btn-launch-hero" title="Launch verified v2.1.19 Festival Tour Production build.">
+          🚀 Launch Production Sim (v2.1.19)
         </a>
-        <a href="sim_v2.1.19_showcase_2026.html" class="btn-jump-secondary" id="btn-launch-showcase-archive" style="border-color:var(--caution-amber); color:var(--caution-amber);" title="Play the preserved v2.1.19 snapshot exhibited at SLICE, SiM PAX West, Seattle Space Week, KremFest XR, and GeekGirlCon 2026.">
-          🏛️ 2026 Festival Tour Archive (v2.1.19)
+        <a href="dev/index.html" class="btn-jump-secondary" id="btn-launch-dev-preview" style="border-color:var(--caution-amber); color:var(--caution-amber); background: rgba(245, 158, 11, 0.12);" title="Try the latest Fin Fest – Dog Star Edition dev preview with Real-Time UTC J2000 Ephemeris, Sirius Dog Star, 14x Saturn/Jupiter Zoom, and NASA Earth/Moon textures.">
+          🐾 Try v2.2.2-dev Preview (Fin Fest • Dog Star)
+        </a>
+        <a href="sim_v2.1.19_showcase_2026.html" class="btn-jump-secondary" id="btn-launch-showcase-archive" title="Replay the archived 2026 Festival Tour snapshot (SLICE, SiM PAX West, Seattle Space Week, KremFest XR, GeekGirlCon 2026).">
+          🏛️ 2026 Tour Archive Snapshot
         </a>
         <a href="#controls" class="btn-jump-secondary">
           🎮 Flight Controls &amp; Autopilot
@@ -1253,18 +1256,25 @@
             Exhibiting in the Seattle Indies Gaming Hall. Speaking panel: <em>Sunday Oct 25 @ 1:30 PM (Room 'America')</em>. Tabletop acrylic signage and WebXR demo.
           </p>
         </div>
-        <div class="pedigree-card" style="grid-column: 1 / -1; border-left-color:var(--hud-cyan); background: rgba(0, 28, 52, 0.72);">
-          <h4>🐾 v2.2.1 "Fin Fest – Dog Star Edition" (Post-Tour Upgrade Release)</h4>
-          <div class="pedigree-date">November 2026 // Upgrades Inspired by 2026 Festival Floor Feedback • In Honor of Fin 🐾</div>
-          <p style="margin-bottom:0.75rem;">
-            Upgrades built directly from Pacific Northwest festival showcases: <strong>Real-Time UTC Epoch &amp; Live J2000 Ephemeris</strong> (Sun, Earth GMST spin, Moon, and 5 Keplerian Planets advancing live over time), <strong>59 J2000 Apollo Nav Stars</strong> featuring <em>⭐ SIRIUS (α CMa) — The Dog Star in honor of Fin</em>, <strong>Calibrated Telescopic 5-Planet Sprites</strong> (Saturn's Cassini rings, Jupiter's cloud belts &amp; 4 Galilean moons, Venus, Mars, Mercury scaled accurately smaller than the Moon up to 14x zoom), <strong>NASA LRO/LOLA Moon &amp; Visible Earth Ocean/Night-Lights Shader</strong>, and <strong>Trajectory &amp; 4-Stage Re-Entry Sub-Mission Decks</strong>. A portion of future Early Access purchases will be donated to the local animal shelter in Fin's honor.
+        <div class="pedigree-card" style="grid-column: 1 / -1; border-left-color:var(--caution-amber); background: rgba(24, 18, 8, 0.72);">
+          <h4>🐾 What's New in the Public <code>v2.2.2-dev</code> Preview — "Fin Fest – Dog Star Edition"</h4>
+          <div class="pedigree-date">November 2026 Public Dev Sandbox (<code>dev/index.html</code>) // Next-Gen Upgrades Inspired by 2026 Festival Feedback • In Honor of Fin 🐾</div>
+          <p style="margin-bottom:0.65rem;">
+            While production (<a href="sim.html" style="color:var(--hud-cyan);"><code>sim.html</code></a>) remains pinned at our festival-proven <strong>v2.1.19</strong> showcase baseline for zero-surprise stability, anyone can test our bleeding-edge upgrades right now in the public dev preview:
           </p>
+          <ul style="margin:0 0 0.85rem 1.25rem; color:#cbd5e1; font-size:0.9rem; line-height:1.55;">
+            <li><strong>Real-Time UTC Epoch &amp; Live J2000 Ephemeris:</strong> Sun, Earth sidereal spin, Lunar orbit, and all 5 naked-eye planets advance continuously with Mission Elapsed Time (<code>#epoch-utc-time</code>).</li>
+            <li><strong>59 J2000 Apollo Nav Stars + G2V Solar Corona:</strong> Featuring <em>⭐ SIRIUS (α CMa) — The Dog Star in honor of Fin 🐾</em> (with a portion of future Early Access purchases pledged to the local animal shelter).</li>
+            <li><strong>Calibrated Telescopic 5-Planet Sprites (<code>1.0x–14.0x</code> Zoom):</strong> Resolve Saturn's tilted Cassini rings, Jupiter's cloud belts &amp; 4 Galilean moons, Venus, Mars, and Mercury accurately scaled relative to the Moon.</li>
+            <li><strong>NASA LRO/LOLA Moon &amp; Visible Earth Shader:</strong> Soft ocean specular sheen, solar-terminator nighttime city lights, and mobile-safe adaptive <code>2K/4K</code> texture LOD.</li>
+            <li><strong>Precision Controls &amp; Sub-Mission HUD:</strong> Hardened left-click-and-drag look + free 3D cursor hover tooltips (<code>#hover-target-popup</code>), Red/Yellow/Green prograde alignment + Trajectory Correction &amp; 4-Stage Re-Entry / Landing Safe-Zone Sub-Mission Decks.</li>
+          </ul>
           <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-            <a href="sim.html" class="btn-jump-secondary btn-launch-sim" style="border-color:var(--hud-cyan); color:var(--hud-cyan);">
-              🚀 Launch v2.2.1 (Fin Fest – Dog Star Edition)
+            <a href="dev/index.html" class="btn-jump-secondary" style="border-color:var(--caution-amber); color:var(--caution-amber); background: rgba(245, 158, 11, 0.14);">
+              🐾 Launch v2.2.2-dev Public Preview (dev/index.html)
             </a>
-            <a href="sim_v2.1.19_showcase_2026.html" class="btn-jump-secondary" style="border-color:var(--caution-amber); color:var(--caution-amber);">
-              🏛️ Replay Preserved 2026 Festival Tour Snapshot (v2.1.19)
+            <a href="sim.html" class="btn-jump-secondary btn-launch-sim" style="border-color:var(--hud-cyan); color:var(--hud-cyan);">
+              🚀 Launch v2.1.19 Production Build (sim.html)
             </a>
           </div>
         </div>
@@ -1514,7 +1524,7 @@
           ARTEMIS: THE FREE RETURN (LUNAR FLYBY XR)
         </div>
         <div style="font-size:0.82rem; color:#64748b;">
-          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Version v2.2.1 (Fin Fest – Dog Star Edition 🐾)
+          Engineered by <a href="https://wulfdesign.github.io/lunar-flyby-xr/" target="_blank" rel="noopener" style="color:#94a3b8;">UpLiftVR Studios &amp; Wulf Design Studios</a> &bull; Prod v2.1.19 / Dev Preview v2.2.2-dev (Fin Fest – Dog Star Edition 🐾)
           <div style="font-size:0.72rem; color:#475569; margin-top:0.25rem;">
             Imagery Credits (Public Domain, 17 U.S.C. &sect; 105): NASA GSFC SVS #4720 CGI Moon Kit (LRO/LOLA, Ernie Wright) &bull; NASA Visible Earth Blue &amp; Black Marble (Reto St&ouml;ckli / Suomi NPP VIIRS) &bull; Yale BSC5 / Apollo Nav Catalog.
           </div>

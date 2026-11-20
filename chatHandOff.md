@@ -1,14 +1,18 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.2.1 — Fin Fest – Dog Star Edition 🐾)
-> *Artemis: The Free Return | Calibrated Saturn/Moon Scale, Public/Private Markdown Dev Codex (`/api/docs`), Live UTC J2000 Ephemeris, Soft Ocean Glint & 2026 Tour Archive*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.2.2 — Fin Fest – Dog Star Public Dev Preview + Pinned v2.1.19 Production 🐾)
+> *Artemis: The Free Return | Pinned v2.1.19 Production `sim.html`, Public v2.2.2-dev Preview at `dev/index.html`, Updated Landing Portal & `/api/docs` Markdown Codex*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **LOCAL PRODUCTION PROMOTED (`v2.2.1` Fin Fest – Dog Star Edition `sim.html` / `index.html`) • DEV CODEX `/api/docs` LIVE • 2026 TOUR ARCHIVED AT `sim_v2.1.19_showcase_2026.html` • 29/29 TESTS PASSING • ZERO `git push`** 🚀🌕✨🐾📚
+**Status:** **PRODUCTION `sim.html` PINNED AT `v2.1.19` (`SHA-256: 5ecfaa50...`) • PUBLIC DEV PREVIEW `v2.2.2-dev` LIVE AT `dev/index.html` • LANDING & CODEX DASHBOARD UPDATED • 29/29 TESTS • PUSHED TO `origin/main`** 🚀🐾🌐☁️
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.2.1)
+## ✅ Alchemical Victories (v2.1.25 – v2.2.2)
+- **Session Wrap-Up Split Release (`v2.2.2`) — Pinned `v2.1.19` Production + Public `v2.2.2-dev` Preview & GitHub Push:**
+  - Kept root [`sim.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/sim.html) cleanly at the 2026 Festival Tour `v2.1.19` baseline (`SHA-256: 5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`) until Magus Wulf promotes dev to production.
+  - Published **`v2.2.2-dev` ("Fin Fest – Dog Star Edition 🐾")** to [`dev/index.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/dev/index.html) (`dev/vendor/` & `dev/textures/`), updated [`index.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/index.html) / [`landing.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/landing.html) via `promote_to_production.py --index-only` with Hero + `#pedigree` feature summary links for both `sim.html` (`v2.1.19`) and `dev/index.html` (`v2.2.2-dev`).
+  - Synced `server.py` & `private/dev_dashboard/index.html` (`v2.2.2`), Master Observatory (`compile_dashboard.py`), and pushed `private`, `lunar-flyby-xr`, and `a0-symbiot-ai` to GitHub `origin main` after `29/29` E2E + live Chromium QA (`0` errors).
 - **Saturn/Planet Angular Calibration vs. Moon & Public/Private Markdown Codex Hub (`v2.2.1` — Ready for Final Operator QA 🧪):**
   - **Calibrated Planetary Scale (`NAV_PLANETS_CATALOG`):** Scaled Saturn (`220k -> 310k`, `1.35x` boost at `14.0x / FOV 5°`) and Jupiter/Venus/Mars/Mercury so Saturn's rings (`~40–45 px` / `~0.28–0.31°` at `14.0x`) appear crisp and strictly smaller than the Moon (`~84 px` / `~0.58°` in transit).
   - **Dev Studio Public & Private Markdown Codex (`private/dev_dashboard/index.html` & `server.py` `v2.2.1`):** Added `GET /api/docs` indexing `8 PUBLIC`, `44 PRIVATE`, and `17 DOCS` Markdown files into a Master Symbiot-inspired browser/reader panel with pinned shortcuts (`README.md`, `Tasks.md`, `devlog.md`, `privTasks.md`, `privDevLog.md`, `LAUNCH_MEMORIES.md`), scope tabs, instant search, intra-doc links, and Raw/Rendered toggle.

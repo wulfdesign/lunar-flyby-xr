@@ -6,6 +6,22 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 19:08] - v2.2.2: Session Wrap-Up — Pinned `v2.1.19` Production `sim.html` + Public `v2.2.2-dev` Preview (`dev/index.html`) Linked on Landing Portal & Pushed to GitHub 🚀🌐☁️**
+
+📝 **Summary**
+1. **Production Stability Guard (`sim.html` Pinned to `v2.1.19`):**
+   - Per Magus Wulf's wrap-up directive, restored root [`sim.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/sim.html) byte-identically to [`snapshots/index_v2.1.19_sim_backup.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/snapshots/index_v2.1.19_sim_backup.html) (`SHA-256: 5ecfaa504e093f6025159a6a88037154598eb26545f2a34a98b44843f0d74861`) alongside [`sim_v2.1.19_showcase_2026.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/sim_v2.1.19_showcase_2026.html) so the live Festival Tour baseline remains completely untouched until full promotion.
+   - Added `--index-only` mode and `dev/` relative path normalization to `private/promote_to_production.py`.
+2. **Public `v2.2.2-dev` Preview (`dev/index.html`) & Landing Portal (`index.html`, `landing.html`):**
+   - Synced all Fin Fest – Dog Star Edition upgrades (`Real-Time UTC Epoch & Live J2000 Ephemeris`, `59 J2000 Apollo Nav Stars` w/ *Sirius for Fin 🐾*, `G2V Solar Corona`, calibrated `14.0x` Saturn/Jupiter/planet sprites, `NASA LRO/LOLA Moon & Visible Earth Ocean/Night-Lights Shader`, click-and-drag + 3D hover tooltips, `Red/Yellow/Green` prograde vector & `Trajectory/4-Stage Re-Entry Sub-Mission Decks`) into [`private/dev_site/sim.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/private/dev_site/sim.html) and public [`dev/index.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/dev/index.html) (`v2.2.2-dev`, loading cleanly from `dev/vendor/` & `dev/textures/`).
+   - Promoted [`index.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/index.html) & [`landing.html`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/landing.html) featuring **`🚀 Launch Production Sim (v2.1.19)`**, **`🐾 Try v2.2.2-dev Preview (Fin Fest • Dog Star)`**, and the full **`What's New in the Public v2.2.2-dev Preview`** feature card in `#pedigree`.
+3. **Dashboards, Verification & GitHub Push (`origin main`):**
+   - Bumped `server.py` & `private/dev_dashboard/index.html` to `v2.2.2`, updated [`tests/test_staging_and_portal.py`](file:///C:/Agents/a0-symbiot-ai/projects/lunar-flyby-xr/tests/test_staging_and_portal.py) (`29/29` passed), verified all 4 live Port `3550` routes in Chromium (`0` console/WebGL/network errors), recompiled the Master Observatory HUD (`dashboard/compile_dashboard.py`), and pushed all commits to GitHub `origin main` across `private`, `lunar-flyby-xr`, and `a0-symbiot-ai`.
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 18:51] - v2.2.1: Calibrated Saturn/Planet Angular Scales vs. Moon & Public/Private Markdown Codex Hub (`private/dev_dashboard`) 🪐📚✨**
 
 📝 **Summary**

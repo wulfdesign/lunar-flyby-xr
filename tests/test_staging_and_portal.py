@@ -125,48 +125,51 @@ class TestPublicRootProtection(unittest.TestCase):
         )
 
     def test_root_index_identical_to_baseline_snapshot(self):
-        """Preserved 2026 Tour archive must match v2.1.19 baseline SHA-256, and root sim.html must match v2.2.0 snapshot."""
+        """Production sim.html and preserved 2026 Tour archive must both match v2.1.19 baseline SHA-256."""
         tour_archive = os.path.join(LUNAR_ROOT, "sim_v2.1.19_showcase_2026.html")
-        fin_fest_snap = os.path.join(LUNAR_ROOT, "snapshots", "index_v2.2.0_fin_fest_sim_backup.html")
         root_sim = os.path.join(LUNAR_ROOT, "sim.html")
-        if not os.path.isfile(tour_archive) or not os.path.isfile(SNAPSHOT_FILE):
-            self.skipTest("Missing 2026 Festival Tour snapshot or baseline file.")
+        if not os.path.isfile(tour_archive) or not os.path.isfile(SNAPSHOT_FILE) or not os.path.isfile(root_sim):
+            self.skipTest("Missing production sim.html, tour archive, or baseline snapshot file.")
 
-        with open(tour_archive, "rb") as f_arch, open(SNAPSHOT_FILE, "rb") as f_snap:
+        with open(SNAPSHOT_FILE, "rb") as f_snap:
+            expected_sha = hashlib.sha256(f_snap.read()).hexdigest()
+
+        with open(tour_archive, "rb") as f_arch, open(root_sim, "rb") as f_root:
             self.assertEqual(
                 hashlib.sha256(f_arch.read()).hexdigest(),
-                hashlib.sha256(f_snap.read()).hexdigest(),
+                expected_sha,
                 "2026 Festival Tour archive sim_v2.1.19_showcase_2026.html must remain byte-identical to v2.1.19 baseline."
             )
-
-        if os.path.isfile(fin_fest_snap) and os.path.isfile(root_sim):
-            with open(root_sim, "rb") as f_root, open(fin_fest_snap, "rb") as f_fin:
-                self.assertEqual(
-                    hashlib.sha256(f_root.read()).hexdigest(),
-                    hashlib.sha256(f_fin.read()).hexdigest(),
-                    "Root sim.html does not match snapshots/index_v2.2.0_fin_fest_sim_backup.html."
-                )
+            self.assertEqual(
+                hashlib.sha256(f_root.read()).hexdigest(),
+                expected_sha,
+                "Production root sim.html must remain pinned to v2.1.19 baseline until full dev promotion."
+            )
 
     def test_root_index_sim_version_nominal(self):
-        """Root sim.html must run production v2.2.1 Fin Fest Edition and archive must retain v2.1.19."""
+        """Production sim.html retains v2.1.19, public dev preview dev/index.html runs v2.2.2-dev, and landing portals link both."""
         root_sim = os.path.join(LUNAR_ROOT, "sim.html")
-        tour_archive = os.path.join(LUNAR_ROOT, "sim_v2.1.19_showcase_2026.html")
+        dev_preview = os.path.join(LUNAR_ROOT, "dev", "index.html")
         with open(root_sim, "r", encoding="utf-8", errors="replace") as f:
-            content = f.read()
-        self.assertIn("const SIM_VERSION = \"2.2.1\";", content)
-        self.assertIn("const IS_DEV = false;", content)
-        self.assertIn("updateAstronomicalEphemeris", content)
-        self.assertIn("moon_lro_2k.jpg", content)
-        self.assertIn("In Honor of Fin", content)
+            prod_content = f.read()
+        self.assertIn("const SIM_VERSION = \"2.1.19\";", prod_content)
+        self.assertIn("const IS_DEV = false;", prod_content)
 
-        with open(tour_archive, "r", encoding="utf-8", errors="replace") as f_arch:
-            arch_content = f_arch.read()
-        self.assertIn("const SIM_VERSION = \"2.1.19\";", arch_content)
+        with open(dev_preview, "r", encoding="utf-8", errors="replace") as f_dev:
+            dev_content = f_dev.read()
+        self.assertIn("const SIM_VERSION = \"2.2.2\";", dev_content)
+        self.assertIn("const IS_DEV = true;", dev_content)
+        self.assertIn("updateAstronomicalEphemeris", dev_content)
+        self.assertIn("moon_lro_2k.jpg", dev_content)
+        self.assertIn("In Honor of Fin", dev_content)
+        self.assertNotIn("../../textures/", dev_content)
+        self.assertNotIn("../../vendor/", dev_content)
 
         for portal in (ROOT_INDEX, ROOT_LANDING):
             with open(portal, "r", encoding="utf-8", errors="replace") as f_p:
                 p_txt = f_p.read()
             self.assertIn("sim.html", p_txt)
+            self.assertIn("dev/index.html", p_txt)
             self.assertIn("sim_v2.1.19_showcase_2026.html", p_txt)
 
 

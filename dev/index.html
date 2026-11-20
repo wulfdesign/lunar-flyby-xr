@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.2.1-dev • Fin Fest – Dog Star Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.2.2-dev • Fin Fest – Dog Star Edition)</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none; }
         canvas { display: block; cursor: grab; }
@@ -213,7 +213,7 @@
         #btn-autopilot-mcc { height: 24px; line-height: 22px; padding: 0 6px; font-size: 0.72rem; width: 100%; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; flex-grow: 0; }
     </style>
     <!-- Offline vendor library with automatic CDN fallback -->
-    <script src="../../vendor/three.min.js"></script>
+    <script src="vendor/three.min.js"></script>
     <script>
         if (typeof THREE === 'undefined') {
             document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
@@ -226,7 +226,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.2.1-dev (Fin Fest • Dog Star 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.2.2-dev (Fin Fest • Dog Star 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -397,7 +397,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.2.1";
+        const SIM_VERSION = "2.2.2";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -778,15 +778,15 @@
 
         let earthTex2k = null, earthTex4k = null, earthTex4kLoading = false;
         let currentEarthLod = '2K';
-        earthTex2k = loadPlanetTex('../../textures/earth_day_2k.jpg', (tex) => {
+        earthTex2k = loadPlanetTex('textures/earth_day_2k.jpg', (tex) => {
             if (!earthMat.map) { earthMat.map = tex; earthMat.needsUpdate = true; }
         });
-        loadPlanetTex('../../textures/earth_roughness_2k.jpg', (tex) => { earthMat.roughnessMap = tex; earthMat.needsUpdate = true; });
-        loadPlanetTex('../../textures/earth_topo_bump_2k.jpg', (tex) => { earthMat.bumpMap = tex; earthMat.needsUpdate = true; });
-        loadPlanetTex('../../textures/earth_night_2k.jpg', (tex) => { earthMat.emissiveMap = tex; earthMat.needsUpdate = true; });
+        loadPlanetTex('textures/earth_roughness_2k.jpg', (tex) => { earthMat.roughnessMap = tex; earthMat.needsUpdate = true; });
+        loadPlanetTex('textures/earth_topo_bump_2k.jpg', (tex) => { earthMat.bumpMap = tex; earthMat.needsUpdate = true; });
+        loadPlanetTex('textures/earth_night_2k.jpg', (tex) => { earthMat.emissiveMap = tex; earthMat.needsUpdate = true; });
         if (!IS_MOBILE_TIER) {
             earthTex4kLoading = true;
-            loadPlanetTex('../../textures/earth-blue-marble.jpg', (tex) => {
+            loadPlanetTex('textures/earth-blue-marble.jpg', (tex) => {
                 earthTex4k = tex;
                 earthMat.map = tex;
                 earthMat.needsUpdate = true;
@@ -801,12 +801,12 @@
         const moonMat = new THREE.MeshStandardMaterial({ color: 0xb8b8b4, roughness: 0.94, metalness: 0.0, bumpScale: 0.018 });
         let moonTex1k = null, moonTex2k = null, moonTex4k = null, moonTex4kLoading = false;
         let currentMoonLod = '2K';
-        moonTex2k = loadPlanetTex('../../textures/moon_lro_2k.jpg', (tex) => {
+        moonTex2k = loadPlanetTex('textures/moon_lro_2k.jpg', (tex) => {
             if (!moonMat.map) { moonMat.map = tex; moonMat.needsUpdate = true; }
         });
-        loadPlanetTex('../../textures/moon_lola_bump_2k.jpg', (tex) => { moonMat.bumpMap = tex; moonMat.needsUpdate = true; });
+        loadPlanetTex('textures/moon_lola_bump_2k.jpg', (tex) => { moonMat.bumpMap = tex; moonMat.needsUpdate = true; });
         if (IS_MOBILE_TIER) {
-            loadPlanetTex('../../textures/moon_1024.jpg', (tex) => { moonTex1k = tex; });
+            loadPlanetTex('textures/moon_1024.jpg', (tex) => { moonTex1k = tex; });
         }
         const moon = new THREE.Mesh(new THREE.SphereGeometry(radMoon * renderScale, 64, 64), moonMat);
         moon.name = "THE MOON"; scene.add(moon);
@@ -823,7 +823,7 @@
                         currentEarthLod = '4K';
                     } else if (!earthTex4kLoading) {
                         earthTex4kLoading = true;
-                        loadPlanetTex('../../textures/earth-blue-marble.jpg', (tex) => { earthTex4k = tex; });
+                        loadPlanetTex('textures/earth-blue-marble.jpg', (tex) => { earthTex4k = tex; });
                     }
                 } else if (wantEarth2k && currentEarthLod !== '2K' && earthTex2k) {
                     earthMat.map = earthTex2k;
@@ -855,7 +855,7 @@
                         currentMoonLod = '4K';
                     } else if (!moonTex4kLoading) {
                         moonTex4kLoading = true;
-                        loadPlanetTex('../../textures/moon_lro_4k.jpg', (tex) => {
+                        loadPlanetTex('textures/moon_lro_4k.jpg', (tex) => {
                             moonTex4k = tex;
                             moonMat.map = tex;
                             moonMat.needsUpdate = true;
