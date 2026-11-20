@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.36-dev • Fin Fest Edition)</title>
+    <title>Artemis: Lunar Flyby VR - Educational Edition (v2.1.37-dev • Fin Fest Edition)</title>
     <style>
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; }
-        canvas { display: block; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none; }
+        canvas { display: block; cursor: grab; }
         
         #ui-layer {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -172,6 +172,12 @@
             color: #44ff44; font-size: 0.8rem; pointer-events: none; display: none; z-index: 5;
             box-shadow: 0 0 10px rgba(68, 255, 68, 0.3); backdrop-filter: blur(2px);
         }
+        #hover-target-popup {
+            position: fixed; top: 0; left: 0; background: rgba(6, 22, 38, 0.92);
+            border: 1px solid #00ffff; padding: 8px 10px; border-radius: 4px;
+            color: #00ffff; font-size: 0.78rem; line-height: 1.35; pointer-events: none; display: none; z-index: 6;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.28); backdrop-filter: blur(2px); max-width: 290px;
+        }
 
         #zoom-indicator { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); color: #00ffff; font-size: 1.08rem; font-weight: bold; text-shadow: 0 0 5px #000; pointer-events: auto; cursor: help; }
 
@@ -220,7 +226,7 @@
         <div class="panel desktop-top-left" title="Real-time flight data. All units are accurate to real-world physics.">
                 <h1 title="Displays current physical state of the spacecraft">Flight Telemetry</h1>
                 <div id="version-display" style="font-size: 0.68rem; color: #00ffff; margin-top: -6px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; opacity: 0.85;">
-                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.36-dev (Fin Fest 🐾)</span>
+                    Early Access Alpha &bull; <span id="app-version-badge" class="nominal">v2.1.37-dev (Fin Fest 🐾)</span>
                 </div>
                 <p><span class="tooltip" title="Current state of the flight plan">Phase:</span> <span id="phase-text" class="nominal">Low Earth Orbit</span></p>
                 <p><span class="tooltip" title="Your current orbital zone">Region:</span> <span id="region-text" class="nominal">Low Earth Orbit</span></p>
@@ -247,6 +253,7 @@
         <div id="zoom-indicator" title="Current camera zoom level. Use your mouse scroll wheel to zoom in and out.">FOV: 70&deg; (1.0x Zoom)</div>
         <div id="crosshair-view"></div>
         <div id="target-popup"><strong id="target-name">TARGET</strong><br>Dist: <span id="target-dist">0 km</span><br><span id="target-hint"></span></div>
+        <div id="hover-target-popup"><strong id="hover-target-name">TARGET</strong><br><span id="hover-target-dist">0 km</span><br><span id="hover-target-hint" style="color:#aaddff; font-size:0.72rem;"></span></div>
 
         <div class="panel desktop-bottom-left" title="Your mission checklist. Follow the steps to safely reach the Moon.">
                 <h1 title="Track your progress through the mission phases">Mission Itinerary</h1>
@@ -381,7 +388,7 @@
          * have been abstracted to /docs/physics-math-reference.md to keep the 
          * production source code clean and performant.
          */
-        const SIM_VERSION = "2.1.36";
+        const SIM_VERSION = "2.1.37";
         const IS_DEV = true;
         window.addEventListener('DOMContentLoaded', () => {
             const badge = document.getElementById("app-version-badge");
@@ -1078,11 +1085,49 @@
         shipGroup.add(camera); scene.add(shipGroup);
 
         let lookLon = 0; let lookLat = 0; let isDraggingView = false; let prevMousePos = { x: 0, y: 0 };
-        document.addEventListener('mousedown', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && !(e.target.closest && e.target.closest('.panel'))) { isDraggingView = true; prevMousePos = { x: e.clientX, y: e.clientY }; } });
-        document.addEventListener('mouseup', () => isDraggingView = false);
-        document.addEventListener('mousemove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.clientX - prevMousePos.x) * 0.2; lookLat = Math.max(-85, Math.min(85, lookLat - (e.clientY - prevMousePos.y) * 0.2)); prevMousePos = { x: e.clientX, y: e.clientY }; } });
+        const mouseScreen = new THREE.Vector2(0, 0);
+        let mouseClientX = 0; let mouseClientY = 0; let isMouseOverUI = false; let mouseHasMoved = false;
+        const UI_BLOCK_SELECTOR = '.panel, button, a, input, select, .modal-card, #wiki-drawer, #maneuver-submission-panel, #launch-modal, #debug-bar';
+        function stopViewDrag() {
+            isDraggingView = false;
+            if (typeof renderer !== 'undefined' && renderer.domElement) renderer.domElement.style.cursor = 'grab';
+        }
+        document.addEventListener('mousedown', (e) => {
+            if (e.button !== 0 || isTrackingTarget) return;
+            if (e.target && e.target.closest && e.target.closest(UI_BLOCK_SELECTOR)) return;
+            isDraggingView = true;
+            prevMousePos = { x: e.clientX, y: e.clientY };
+            if (typeof renderer !== 'undefined' && renderer.domElement) renderer.domElement.style.cursor = 'grabbing';
+        });
+        window.addEventListener('mouseup', stopViewDrag);
+        document.addEventListener('mouseup', stopViewDrag);
+        window.addEventListener('blur', stopViewDrag);
+        document.addEventListener('mouseleave', () => { stopViewDrag(); mouseHasMoved = false; });
+        document.addEventListener('dragstart', stopViewDrag);
+        document.addEventListener('contextmenu', stopViewDrag);
+        document.addEventListener('mousemove', (e) => {
+            mouseHasMoved = true;
+            mouseClientX = e.clientX;
+            mouseClientY = e.clientY;
+            const vw = window.innerWidth || 1;
+            const vh = window.innerHeight || 1;
+            mouseScreen.x = (e.clientX / vw) * 2 - 1;
+            mouseScreen.y = -(e.clientY / vh) * 2 + 1;
+            isMouseOverUI = !!(e.target && e.target.closest && e.target.closest(UI_BLOCK_SELECTOR + ', [title]'));
+
+            if (isDraggingView && typeof e.buttons === 'number' && (e.buttons & 1) === 0) {
+                stopViewDrag();
+                return;
+            }
+            if (isDraggingView && !isTrackingTarget) {
+                lookLon -= (e.clientX - prevMousePos.x) * 0.2;
+                lookLat = Math.max(-85, Math.min(85, lookLat - (e.clientY - prevMousePos.y) * 0.2));
+                prevMousePos = { x: e.clientX, y: e.clientY };
+            }
+        });
         document.addEventListener('touchstart', (e) => { if (!isTrackingTarget && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && !(e.target.closest && e.target.closest('.panel'))) { isDraggingView = true; prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } }, { passive: false });
         document.addEventListener('touchend', () => isDraggingView = false);
+        document.addEventListener('touchcancel', () => isDraggingView = false);
         document.addEventListener('touchmove', (e) => { if (isDraggingView && !isTrackingTarget) { lookLon -= (e.touches[0].clientX - prevMousePos.x) * 0.3; lookLat = Math.max(-85, Math.min(85, lookLat - (e.touches[0].clientY - prevMousePos.y) * 0.3)); prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; if (e.cancelable) e.preventDefault(); } }, { passive: false });
 
         function resetMission() {
@@ -1766,6 +1811,77 @@
         function formatTime(totalSeconds) { let d = Math.floor(totalSeconds / 86400); let h = Math.floor((totalSeconds % 86400) / 3600); let m = Math.floor((totalSeconds % 3600) / 60); let s = Math.floor(totalSeconds % 60); return `${d.toString().padStart(2, '0')}:${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; }
 
         const clock = new THREE.Clock(); const raycaster = new THREE.Raycaster(); const centerScreen = new THREE.Vector2(0, 0);
+        const _rayInspectPos = new THREE.Vector3(); const _rayInspectDir = new THREE.Vector3();
+        function inspectTargetWithRay(ndcPoint, rayTargets, alignStatusText, noseAlignErrDeg, subObjLabel, subReqDvMs, turnText, isTliCoast, allowAngularFallback, beaconDegThreshold) {
+            raycaster.setFromCamera(ndcPoint, camera);
+            const intersects = raycaster.intersectObjects(rayTargets, false);
+            let target = intersects.length > 0 ? intersects[0].object : null;
+
+            if (!target && allowAngularFallback) {
+                let bestObjDot = Math.cos(THREE.MathUtils.degToRad(2.2));
+                const softCandidates = [progradeMesh];
+                if (keyholeGroup.visible) softCandidates.push(keyholeHitMesh);
+                softCandidates.push(moon, sunMesh);
+                for (let i = 0; i < softCandidates.length; i++) {
+                    const cand = softCandidates[i];
+                    if (!cand || !cand.visible) continue;
+                    cand.getWorldPosition(_rayInspectPos);
+                    _rayInspectDir.subVectors(_rayInspectPos, raycaster.ray.origin).normalize();
+                    const d = raycaster.ray.direction.dot(_rayInspectDir);
+                    const minDot = (cand === moon || cand === sunMesh)
+                        ? Math.cos(THREE.MathUtils.degToRad(1.8))
+                        : bestObjDot;
+                    if (d > minDot && d > bestObjDot) { bestObjDot = d; target = cand; }
+                }
+            }
+
+            if (target) {
+                if (target.name === "PROGRADE VECTOR") {
+                    return {
+                        trackObj: target, beacon: null, hasDistance: false,
+                        name: `PROGRADE VECTOR (${alignStatusText})`,
+                        dist: `Δ ${noseAlignErrDeg.toFixed(1)}° from Keyhole`,
+                        hint: "True instantaneous velocity vector."
+                    };
+                }
+                if (target.name === "MISSION KEYHOLE VECTOR") {
+                    return {
+                        trackObj: target, beacon: null, hasDistance: false,
+                        name: `KEYHOLE: ${subObjLabel}`,
+                        dist: `ΔV ${subReqDvMs.toFixed(1)} m/s`,
+                        hint: turnText
+                    };
+                }
+                if (target.name) {
+                    let tDist = shipPos.distanceTo(_rayInspectPos.copy(target.position).divideScalar(renderScale));
+                    if (target.name === "THE MOON") {
+                        return { trackObj: target, beacon: null, hasDistance: true, name: target.name, dist: Math.round(tDist - radMoon).toLocaleString() + " km", hint: isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn." };
+                    }
+                    if (target.name === "EARTH") {
+                        return { trackObj: target, beacon: null, hasDistance: true, name: target.name, dist: Math.round(tDist - radEarth).toLocaleString() + " km", hint: "Origin / Communications Hub." };
+                    }
+                    if (target.name === "THE SUN") {
+                        return { trackObj: target, beacon: null, hasDistance: true, name: target.name, dist: "149,597,870 km", hint: "Solar Array Charging Nominal." };
+                    }
+                }
+            }
+
+            let bestDot = Math.cos(THREE.MathUtils.degToRad(beaconDegThreshold));
+            let bestBeacon = null;
+            for (let i = 0; i < celestialBeacons.length; i++) {
+                const d = raycaster.ray.direction.dot(celestialBeacons[i].dir);
+                if (d > bestDot) { bestDot = d; bestBeacon = celestialBeacons[i]; }
+            }
+            if (bestBeacon) {
+                return {
+                    trackObj: celestialTargetAnchor, beacon: bestBeacon, hasDistance: false,
+                    name: (bestBeacon.isPlanet ? '🪐 ' : '⭐ ') + bestBeacon.name,
+                    dist: bestBeacon.meta,
+                    hint: bestBeacon.role
+                };
+            }
+            return null;
+        }
 
         function safeSetText(id, text, className) { const el = document.getElementById(id); if (el) { if (text !== undefined) el.textContent = text; if (className !== undefined) el.className = className; } return el; }
 
@@ -2043,38 +2159,53 @@
                     lookLat = THREE.MathUtils.lerp(lookLat, THREE.MathUtils.radToDeg(Math.asin(localTarget.y)), 0.05);
                 }
 
-                raycaster.setFromCamera(centerScreen, camera); const rayTargets = [earth, moon, sunMesh, progradeMesh]; if (keyholeGroup.visible) rayTargets.push(keyholeHitMesh); const intersects = raycaster.intersectObjects(rayTargets); const popup = document.getElementById('target-popup');
-                if (intersects.length > 0 && !isDraggingView) {
-                    let target = intersects[0].object; currentTargetObj = target; 
-                    if (target.name === "PROGRADE VECTOR") { safeSetText('target-name', `PROGRADE VECTOR (${alignStatusText})`); safeSetText('target-dist', `Δ ${noseAlignErrDeg.toFixed(1)}° from Keyhole`); safeSetText('target-hint', "True instantaneous velocity vector."); if (popup) popup.style.display = 'block'; }
-                    else if (target.name === "MISSION KEYHOLE VECTOR") { safeSetText('target-name', `KEYHOLE: ${subObjLabel}`); safeSetText('target-dist', `ΔV ${subReqDvMs.toFixed(1)} m/s`); safeSetText('target-hint', turnText); if (popup) popup.style.display = 'block'; }
-                    else if (target.name) {
-                        let tDist = shipPos.distanceTo(target.position.clone().divideScalar(renderScale)); safeSetText('target-name', target.name);
-                        if(target.name === "THE MOON") { safeSetText('target-dist', Math.round(tDist - radMoon).toLocaleString() + " km"); safeSetText('target-hint', telemetry.isTliCoast ? "Target Energy Reached. Coasting." : "Awaiting TLI Burn."); } 
-                        else if(target.name === "EARTH") { safeSetText('target-dist', Math.round(tDist - radEarth).toLocaleString() + " km"); safeSetText('target-hint', "Origin / Communications Hub."); } 
-                        else if (target.name === "THE SUN") { safeSetText('target-dist', "149,597,870 km"); safeSetText('target-hint', "Solar Array Charging Nominal."); }
-                        if (popup) popup.style.display = 'block';
-                    }
-                } else if (!isDraggingView) {
-                    camera.getWorldDirection(_camDir);
-                    let bestDot = Math.cos(THREE.MathUtils.degToRad(1.8));
-                    let bestBeacon = null;
-                    for (let i = 0; i < celestialBeacons.length; i++) {
-                        let d = _camDir.dot(celestialBeacons[i].dir);
-                        if (d > bestDot) { bestDot = d; bestBeacon = celestialBeacons[i]; }
-                    }
-                    if (bestBeacon) {
-                        if (!isTrackingTarget) {
-                            celestialTargetAnchor.position.copy(bestBeacon.pos);
-                            celestialTargetAnchor.name = bestBeacon.name;
-                            currentTargetObj = celestialTargetAnchor;
+                const rayTargets = [earth, moon, sunMesh, progradeMesh]; if (keyholeGroup.visible) rayTargets.push(keyholeHitMesh);
+                const popup = document.getElementById('target-popup');
+                const hoverPopup = document.getElementById('hover-target-popup');
+                const centerHit = !isDraggingView ? inspectTargetWithRay(centerScreen, rayTargets, alignStatusText, noseAlignErrDeg, subObjLabel, subReqDvMs, turnText, telemetry.isTliCoast, false, 1.8) : null;
+                if (centerHit) {
+                    if (!isTrackingTarget) {
+                        if (centerHit.beacon) {
+                            celestialTargetAnchor.position.copy(centerHit.beacon.pos);
+                            celestialTargetAnchor.name = centerHit.beacon.name;
                         }
-                        safeSetText('target-name', (bestBeacon.isPlanet ? '🪐 ' : '⭐ ') + bestBeacon.name);
-                        safeSetText('target-dist', bestBeacon.meta);
-                        safeSetText('target-hint', bestBeacon.role);
-                        if (popup) popup.style.display = 'block';
-                    } else { if (popup) popup.style.display = 'none'; }
-                } else { if (popup) popup.style.display = 'none'; }
+                        currentTargetObj = centerHit.trackObj;
+                    }
+                    safeSetText('target-name', centerHit.name);
+                    safeSetText('target-dist', centerHit.dist);
+                    safeSetText('target-hint', centerHit.hint);
+                    if (popup) popup.style.display = 'block';
+                } else {
+                    if (popup) popup.style.display = 'none';
+                }
+
+                const hoverHit = (!isDraggingView && !isMouseOverUI && mouseHasMoved) ? inspectTargetWithRay(mouseScreen, rayTargets, alignStatusText, noseAlignErrDeg, subObjLabel, subReqDvMs, turnText, telemetry.isTliCoast, true, 2.0) : null;
+                if (hoverHit) {
+                    if (!centerHit && !isTrackingTarget) {
+                        if (hoverHit.beacon) {
+                            celestialTargetAnchor.position.copy(hoverHit.beacon.pos);
+                            celestialTargetAnchor.name = hoverHit.beacon.name;
+                        }
+                        currentTargetObj = hoverHit.trackObj;
+                    }
+                    safeSetText('hover-target-name', hoverHit.name);
+                    safeSetText('hover-target-dist', (hoverHit.hasDistance ? 'Dist: ' : '') + hoverHit.dist);
+                    safeSetText('hover-target-hint', hoverHit.hint);
+                    if (hoverPopup) {
+                        const vw = window.innerWidth || 1280;
+                        const vh = window.innerHeight || 720;
+                        const hx = Math.max(8, Math.min(mouseClientX + 16, vw - 305));
+                        const hy = Math.max(8, Math.min(mouseClientY + 16, vh - 95));
+                        hoverPopup.style.left = hx + 'px';
+                        hoverPopup.style.top = hy + 'px';
+                        hoverPopup.style.display = 'block';
+                    }
+                } else {
+                    if (hoverPopup) hoverPopup.style.display = 'none';
+                }
+                if (renderer && renderer.domElement) {
+                    renderer.domElement.style.cursor = isDraggingView ? 'grabbing' : (hoverHit ? 'pointer' : 'grab');
+                }
 
                 let altE = shipPos.length() - radEarth; distM = shipPos.distanceTo(moon.position.clone().divideScalar(renderScale)) - radMoon;
                 if (altE > globalMaxAlt) globalMaxAlt = altE;

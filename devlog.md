@@ -6,6 +6,21 @@
 
 **⚠️ INSTRUCTIONS:** Always insert new entries **BELOW** this header block and **ABOVE** the previous entry. Maintain the alchemical formatting.
 
+### **[2026-11-19 17:06] - v2.1.37-dev: Bulletproof Click-and-Drag Mouse Look & 3D Mouse-Over Inspection (`#hover-target-popup`) 🖱️🔍✨**
+
+📝 **Summary**
+1. **Bulletproof Click-and-Drag Camera Look (Zero Stuck Drag / Zero Disabled Reticle):**
+   - Diagnosed why `mousedown` could latch `isDraggingView = true` cleanly on missed `mouseup` (e.g., right-click context menus, text-selection `dragstart`, focus loss): `mousemove` only checked `if (isDraggingView && !isTrackingTarget)` and `#target-popup` suppressed rendering whenever `isDraggingView` stayed `true`.
+   - Enforced `e.button === 0`, added `user-select: none` on `html, body`, checked `(e.buttons & 1) === 0` on every `mousemove` to immediately clear `isDraggingView`, and registered `stopViewDrag()` on `window` `mouseup`/`blur` + `document` `mouseup`/`mouseleave`/`dragstart`/`contextmenu` (+ `touchcancel`).
+2. **3D Cursor Mouse-Over Inspection (`#hover-target-popup`) While Preserving Center Reticle & UI Tooltips:**
+   - Extracted shared `inspectTargetWithRay(..., isTliCoast, allowAngularFallback, beaconDegThreshold)` raycast helper used for BOTH center crosshair reticle inspection (`#target-popup`) AND free cursor mouse-over (`#hover-target-popup` fixed near cursor, clamped inside viewport) across **Earth, Moon, Sun, Prograde Vector, Mission Keyhole Vector, 59 J2000 Apollo Nav Stars, and 5 Naked-Eye Planets**.
+   - Preserved native UI/UX `title` tooltips (auto-hiding `#hover-target-popup` when hovering `.panel`, buttons, links, inputs, modals, or `[title]` elements) and added dynamic canvas cursor feedback (`grab` / `grabbing` / `pointer`).
+   - Verified `node --check`, `verify_v2135_steering.js`, `29/29` E2E tests in `tests/test_staging_and_portal.py`, live browser check on Port `3550` through `TRANS-LUNAR COAST` (`0` console/network errors across Earth, Mintaka, Saturn, Prograde/Keyhole, and THE MOON hover/reticle), and live operator confirmation from Magus Wulf (`sim.html` production untouched).
+
+🧙‍♂️ Magus Wulf & 🐈 Orchestrator
+
+---
+
 ### **[2026-11-19 16:52] - v2.1.36-dev: Single-Screen Right Control Panel (`1280×720` Zero-Scroll), Zero-Jump Fixed Slots, Restored Mouse Look & New Roadmap Items 🎛️🖱️🌍☀️**
 
 📝 **Summary**

@@ -1,14 +1,18 @@
-# 📥 Chat Handoff: Lunar Flyby XR (v2.1.36-dev — Finster / Fin Fest Update 🐾)
-> *Artemis: The Free Return | Zero-Scroll Single-Screen HUD, Zero-Jump Fixed Slots, Restored Mouse Look, 5-Point Physics Fixes & Solar Corona*
+# 📥 Chat Handoff: Lunar Flyby XR (v2.1.37-dev — Finster / Fin Fest Update 🐾)
+> *Artemis: The Free Return | Bulletproof Mouse Look, 3D Hover Inspection, Zero-Scroll Single-Screen HUD, Zero-Jump Slots, Physics Fixes & Solar Corona*
 
 **Date:** 2026-11-19  
 **Operator:** Magus Wulf (`🧙‍♂️🐺`)  
 **Alchemical Steward:** 🐈 Orchestrator  
-**Status:** **DEV STAGING UPGRADED (`v2.1.36-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • FITS 1280×720 ZERO SCROLL • 29/29 TESTS PASSING** 🚀🌕✨🐾🎛️
+**Status:** **DEV STAGING UPGRADED (`v2.1.37-dev • Fin Fest 🐾`) • PRODUCTION `sim.html` UNTOUCHED (`v2.1.19`) • MOUSE CONTROLS & 3D HOVER VERIFIED • 29/29 TESTS PASSING** 🚀🌕✨🐾🎛️🖱️
 
 ---
 
-## ✅ Alchemical Victories (v2.1.25 – v2.1.36-dev)
+## ✅ Alchemical Victories (v2.1.25 – v2.1.37-dev)
+- **Bulletproof Click-and-Drag Mouse Look & 3D Mouse-Over Inspection (`v2.1.37-dev` — Verified Live by Magus Wulf):**
+  - Hardened left-click-and-drag camera look (`e.button === 0`, `(e.buttons & 1) === 0` failsafe in `mousemove`, `stopViewDrag()` on `window`/`document` `mouseup`/`blur`/`mouseleave`/`dragstart`/`contextmenu`, `user-select: none`) so releasing the mouse button always stops rotation immediately and never disables center reticle inspection (`#target-popup`).
+  - Added free 3D cursor hover inspection (`#hover-target-popup`, shared `inspectTargetWithRay(..., isTliCoast)`) for Earth, Moon, Sun, Prograde/Keyhole vectors, 59 J2000 Apollo Nav Stars, and 5 naked-eye planets without needing to aim the center reticle directly, while hiding cleanly over UI controls (`title` tooltips preserved) and providing tactile `grab` / `grabbing` / `pointer` cursors.
+  - Fixed a live-caught `telemetry.isTliCoast` parameter reference in `THE MOON` hover during Trans-Lunar Coast; confirmed `0` console/network errors across Earth, Mintaka, Saturn, Prograde, Keyhole, and Moon hover/reticle inspection.
 0. **Single-Screen Right Panel (`497px @ 1280×720`), Zero-Jump Fixed Slots & Mouse Look Restoration (`v2.1.36-dev`):**
    - Removed `shipGroup.rotateY/rotateX` parent rotation so mouse panning (`lookLon`/`lookLat`) matches `v2.1.34-dev` 100%, displaying `noseHeadingMesh` and `keyholeGroup` on a `±35°` HUD arc inside `shipGroup` + throttled `getCachedReturnMccSolution()` (`>= 0.5s`) + panel click/wheel guards.
    - Compacted `.panel.desktop-bottom-right` (`511 px` @ `1280×800`, `497 px` @ `1280×720`, **zero vertical scrollbars**), locked `#btn-autopilot-mcc` into a permanent `24 px` slot (`setMccSlotState`), removed `.flash-warning` padding shifts, shortened `#bank-angle-text` strings, and auto-swapped `#maneuver-submission-panel` with `#reentry-controls` at `< 122 km`.
